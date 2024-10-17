@@ -2,7 +2,23 @@
 import { onMounted } from 'vue';
 import { scrollanimation } from '@/js/scroll';
 import { gsap } from 'gsap';
+import SearchInputComponent from '@/components/SearchInputComponent.vue';
 // import { GSAPInfoBar } from "https://codepen.io/GreenSock/pen/vYqpyLg.js";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const searchQuery = ref("");
+
+const SearchHandler = (searchQuery) => {
+  if (searchQuery) {
+    router.push({
+      name: "search",
+      query: { searchQuery: searchQuery },
+    });
+  }
+};
+
 
 onMounted(()=>{
   try {
@@ -21,6 +37,7 @@ onMounted(()=>{
   <body>
     <div class="description">
       <div>
+      <SearchInputComponent @search="SearchHandler" v-model="searchQuery"></SearchInputComponent>
       <h1>Horizontal "<code>containerAnimation</code>"</h1>
         <p>Scroll this page vertically and you'll see a horizontal fake-scrolling section where a container is animated on the x-axis using a ScrollTrigger animation. With <code>containerAnimation</code> you can trigger animations when certain elements <i>inside</i> that container enter the viewport horizontally! It's like a ScrollTrigger inside of a ScrollTrigger. 🤯
         </p>
