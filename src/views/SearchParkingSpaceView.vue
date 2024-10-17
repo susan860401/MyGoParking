@@ -14,7 +14,7 @@ const map = ref(null);
 const markerGroup = ref(null);
 
 const updateUrlQuery = (newQuery) => {
-  router.push({ name: "map", query: { address: newQuery } });
+  router.push({ name: "search", query: { searchQuery: newQuery } });
 };
 
 const SearchHandler = async (searchQuery) => {
@@ -120,16 +120,18 @@ onBeforeUnmount(() => {
       <!-- ======= About Section ======= -->
       <section id="about" class="about">
         <div class="container" data-aos="fade-up">
-          <div class="row d-flex">
-            <div class="col-md-6">
+          <div class="row">
+            <div class="col-md-4">
               <h2>MyGo Parking</h2>
-              <div class="our-story" style="width: 100%">
+              <div style="width: 100%">
                 <SearchInputComponent
                   @search="SearchHandler"
                 ></SearchInputComponent>
               </div>
             </div>
-            <div id="map" class="col-md-8"></div>
+            <div class="col-md-8">
+              <div id="map"></div>
+            </div>
           </div>
         </div>
       </section>
