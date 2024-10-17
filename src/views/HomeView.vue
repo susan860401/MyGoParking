@@ -1,9 +1,7 @@
 <script setup>
 import { onMounted } from 'vue';
 import { scrollanimation } from '@/js/scroll';
-import { gsap } from 'gsap';
 import SearchInputComponent from '@/components/SearchInputComponent.vue';
-// import { GSAPInfoBar } from "https://codepen.io/GreenSock/pen/vYqpyLg.js";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
@@ -22,10 +20,7 @@ const SearchHandler = (searchQuery) => {
 
 onMounted(()=>{
   try {
-    // window.gsap = gsap; // 將 gsap 設為全域變量
     scrollanimation();
-    // new GSAPInfoBar({ link: "https://gsap.com/docs/v3/Plugins/ScrollTrigger/", position:'top'});
-    // console.log(gsap);
   } catch (error) {
     console.error("Error during mounted:", error);
   }
@@ -34,238 +29,127 @@ onMounted(()=>{
 
 
 <template>
-  <body>
-    <div class="description">
-      <div>
-        <div id="searchbar">
-          <SearchInputComponent @search="SearchHandler" v-model="searchQuery"></SearchInputComponent>
-        </div>
-      <h1>Horizontal "<code>containerAnimation</code>"</h1>
-        <p>Scroll this page vertically and you'll see a horizontal fake-scrolling section where a container is animated on the x-axis using a ScrollTrigger animation. With <code>containerAnimation</code> you can trigger animations when certain elements <i>inside</i> that container enter the viewport horizontally! It's like a ScrollTrigger inside of a ScrollTrigger. 🤯
-        </p>
-        <div class="scroll-down">Scroll down<div class="arrow"></div></div>
+  <div class="view-container">
+    <section class="view-point">
+      <div class="box box1"></div>
+      <div class="box box2"></div>
+      <div class="box box3"></div>
+      <div class="box box4"></div>
+    </section>    
+    <section class="title">
+      <div id="searchbar">
+        <SearchInputComponent @search="SearchHandler" v-model="searchQuery"></SearchInputComponent>
       </div>
-    </div>
-
-    <div class="panels">
-      
-      <div class="panel blue">
-        Scroll down to animate horizontally &gt;
-      </div>
-      
-      <section class="panel red">
-        <div class="car-parked">car-parked</div>
-        <div class="box-1 box">box-1</div>
-      </section>
-      
-      <section class="panel gray">
-        <div>
-        <pre class="code-block prettyprint lang-js linenums">gsap.to(".box-2", {
-            y: -120,
-            backgroundColor: "#1e90ff",
-            ease: "none",
-            scrollTrigger: {
-              trigger: ".box-2",
-              containerAnimation: scrollTween,
-              start: "center 80%",
-              end: "center 20%",
-              scrub: true
-            }
-          });
-        </pre>
-      ...or scrub it back &amp; forth with the scrollbar
-    </div>
-        <div class="box-2 box">box-2</div>
-      </section>
-      <section class="panel purple">
-        <div>
-        <pre class="code-block prettyprint lang-js linenums">ScrollTrigger.create({
-      trigger: ".box-3",
-      containerAnimation: scrollTween,
-      toggleClass: "active",
-      start: "center 60%"
-    });</pre>
-          Toggle a CSS class
+      <div id="car_container">
+        <div id="car_path">
+          <img id="car" src="@/images/ot140.svg"></img>
         </div>
-        <div class="box-3 box">box-3</div>
-      </section>
-      <section class="panel green">
-        <div>
-        <pre class="code-block prettyprint lang-js linenums">ScrollTrigger.create({
-      trigger: ".green",
-      containerAnimation: scrollTween,
-      start: "center 65%",
-      end: "center 51%",
-      onEnter: () => console.log("enter"),
-      onLeave: () => console.log("leave"),
-      onEnterBack: () => console.log("enterBack"),
-      onLeaveBack: () => console.log("leaveBack"),
-      onToggle: self => console.log("active", self.isActive)
-    });</pre>
-          Use the rich callback system
-        </div>
-      </section>
-    </div>
-
-    <div class="final">
-      <div>
-        <h1>Wasn't that fun?</h1>
-        <p>Here are a few caveats to keep in mind:</p>
-        <ul>
-          <li>The fake-scrolling animation (just the part that's moving the container horizontally) must have no easing (<code>ease: "none"</code>).</li>
-          <li>Pinning and snapping won't work on ScrollTriggers with a <code>containerAnimation</code>.</li>
-          <li>The mapping of scroll position trigger points are based on the trigger element itself not being animated horizontally (inside the container). If you need to animate the trigger, you can either wrap it in a &lt;div&gt; and use that as the trigger instead or just factor the trigger's movement into your end position. For example, if you animate it left 100px, make the <code>end</code> 100px further to the left.</li>
-          <li>Requires ScrollTrigger 3.8.0 or later</li>
-        </ul>
       </div>
-    </div>
-  </body>
+    </section>
+    <section class="panel panel_search"></section>
+    <section class="panel panel_reserve"></section>
+    <section class="panel panel_test"></section>
+    <section class="panel panel_test"></section>
+  </div>
 </template>
 
-<style lang="css">
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;  /* 確保寬度和高度包含邊框和內邊距 */
+<style lang="css" scoped>
+.box{
+  width: 30px;
+  height: 30px;
+  background-color: blueviolet;
 }
-html {
-  scroll-behavior: smooth;
+.box1{
+  position: sticky;
+  top:0;
 }
-body {
-  background-color: #222;
-  color: #ddd;
-  font-size: 18px;
-  line-height: 1.4;
-  font-weight: 300;
-  overflow-x: hidden;
+.box2{
+  opacity: 0;
 }
-h1,
-h2 {
-  color: white;
-  font-weight: 400;
-  margin-bottom: 0;
+.view-point{
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  opacity: 0.5;
+  background-color: rgb(0, 255, 191);
 }
-.panel pre.prettyprint {
-  font-size: 20px;
-  text-align: left;
-  width: auto;
-  font-weight: normal;
-  margin: 10px;
-  border: none;
-}
-.prettyprint .linenums {
-  padding: 0;
-  list-style: none;
-}
-.prettyprint ol li {
+
+.title{
+  padding:0;
+  height: 100vh;
   background-color: black;
+  flex:content;
+}
+#searchbar{
+  height: 75vh;
+  width: 50%;
+  margin: auto;
+  align-content: center;
+}
+.panel{
+  width: 100vw;
+  height: 100vh;
 }
 
-.panel.red .prettyprint .linenums > li:nth-child(n + 7):nth-child(-n + 9),
-.panel.gray .prettyprint .linenums > li:nth-child(10),
-.panel.purple .prettyprint .linenums > li:nth-child(4),
-.panel.green .prettyprint .linenums > li:nth-child(n + 6):nth-child(-n + 10) {
-  background-color: #444;
-}
-
-.blue{
-  background-color: blue;
-}
-
-.red{
-  background-color: red;
-}
-
-.gray{
-  background-color: gray;
-}
-
-.purple{
-  background-color: purple;
-}
-
-.green{
+.panel_search{
   background-color: green;
 }
 
-
-.box {
-  width: 100px;
-  height: 80px;
-  text-align: center;
-  line-height: 80px;
-  background-color: white;
-  border-radius: 8px;
-  color: #222;
-  font-weight: 700;
-  margin-left: 20px;
-  will-change: transform;
+.panel_reserve{
+  background-color: gray;
 }
 
-.car-parked{
-  position: relative;
-  width: 100px;
-  height: 80px;
-  text-align: center;
-  line-height: 80px;
-  background-color: white;
-  border-radius: 8px;
-  color: #222;
-  font-weight: 700;
-  margin-left: 20px;
-  will-change: transform;
-  transform-origin: center;
+.panel_test{
+  height: 98vh;
+  background-color: aquamarine;
+  padding: 0;
 }
 
-.box.active {
-  background-color: orange;
-  border: 2px solid white;
-}
-.description,
-.final {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10px;
-  min-height: 80vh;
-  height: 100vh;
-  width: 70vw;
-  margin: auto;
+.view-container {
+  position: relative;  /* 關鍵：確保子元素相對這個容器定位 */
+  overflow: hidden;    /* 防止子元素超出這個區域 */
+  min-height: 500vh;    /* 留出足夠的空間讓動畫運行 */
 }
 
-.panels {
-  width: 500vw;
-  height: 100%;
-  display: flex;
-  flex-wrap: nowrap;
-}
-
-.panel {
-  font-weight: 300;
-  height: 100vh;
+#car_container{
+  background-color: goldenrod;
+  height: 25vh;
   width: 100vw;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  position: relative;
+  z-index: 1000;
+  bottom: 0;
+  right: 0;
+}
+#car,#car_path{
+  height: 25vh;
+  position: absolute;
+  top:1vh;
+  right: 10px;
+}
+#car{
+  animation:shakeCar 0.5s ease-in-out infinite;
+}
+#car_path{
+  /* animation: moveCar 5s linear infinite; */
 }
 
-code {
-  padding: 0.1rem;
-  background: #fff;
-  color: #222;
-  font-size: 1.5rem;
+@keyframes moveCar {
+  to {
+    transform: translateX(-100vw); /* 完全移出視窗 */
+  }
 }
 
-h1 code {
-  font-size: 1.7rem;
+@keyframes shakeCar {
+  0%, 100% {
+    transform: translateY(0); /* 垂直方向震動 */
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }
 
-#searchbar{
-  width: 50vh;
-}
 
 .footer{
-  position: relative;
+  z-index: 1001;
 }
-
 </style>
