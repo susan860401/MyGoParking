@@ -37,12 +37,14 @@ onMounted(()=>{
   <body>
     <div class="description">
       <div>
-      <SearchInputComponent @search="SearchHandler" v-model="searchQuery"></SearchInputComponent>
+        <div id="searchbar">
+          <SearchInputComponent @search="SearchHandler" v-model="searchQuery"></SearchInputComponent>
+        </div>
       <h1>Horizontal "<code>containerAnimation</code>"</h1>
         <p>Scroll this page vertically and you'll see a horizontal fake-scrolling section where a container is animated on the x-axis using a ScrollTrigger animation. With <code>containerAnimation</code> you can trigger animations when certain elements <i>inside</i> that container enter the viewport horizontally! It's like a ScrollTrigger inside of a ScrollTrigger. 🤯
         </p>
+        <div class="scroll-down">Scroll down<div class="arrow"></div></div>
       </div>
-          <div class="scroll-down">Scroll down<div class="arrow"></div></div>
     </div>
 
     <div class="panels">
@@ -227,6 +229,8 @@ h2 {
   padding: 10px;
   min-height: 80vh;
   height: 100vh;
+  width: 70vw;
+  margin: auto;
 }
 
 .panels {
@@ -254,6 +258,10 @@ code {
 
 h1 code {
   font-size: 1.7rem;
+}
+
+#searchbar{
+  width: 50vh;
 }
 
 .footer{

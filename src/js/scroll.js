@@ -7,8 +7,9 @@ export function scrollanimation(){
 
     let sections = gsap.utils.toArray(".panel");
 
+    gsap.set(".panels",{x:"-400vw"})
     let scrollTween = gsap.to(sections, {
-        xPercent: -100 * (sections.length - 1),
+        xPercent: +100 * (sections.length - 1),
         ease: "none", // <-- IMPORTANT!
         scrollTrigger: {
         trigger: ".panels",
@@ -126,8 +127,8 @@ export function scrollanimation(){
     ScrollTrigger.create({
         trigger: "." + triggerClass,
         containerAnimation: scrollTween,
-        start: "left 30%",
-        end: i === 3 ? "right right" : "right 30%",
+        start: "right 30%",
+        end: i === 3 ? "right right" : "left 30%",
         markers: false,
         onToggle: self => gsap.to(".marker-" + (i+1), {duration: 0.25, autoAlpha: self.isActive ? 1 : 0})
     });
