@@ -4,6 +4,8 @@ import SearchInputComponent from "@/components/SearchInputComponent.vue";
 import Swal from "sweetalert2";
 import "leaflet/dist/leaflet.css";
 import "leaflet/dist/leaflet.js";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import "@fortawesome/fontawesome-free/js/all.min.js";
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -14,12 +16,26 @@ const route = useRoute();
 const map = ref(null);
 const markerGroup = ref(null);
 const searchMarkerGroup = ref(null); // 用於搜尋標記
+let userLocationMarker = ref(null); // 用來存放用戶定位的標記
+const parkingLots = ref([]); // 儲存所有停車場資訊
+const selectedParkingLot = ref(null); // 儲存選中的停車場資訊
+const displayedParkingLots = ref([]); // 儲存顯示的10個停車場
+const destinationLat = ref(null); //儲存目的地經緯度
+const destinationLon = ref(null);
 
+// 使用的定位圖標
 var locationIcon = L.icon({
   iconUrl: "Location.png",
-  iconSize: [38, 35], // size of the icon
-  iconAnchor: [19, 35], // point of the icon which will correspond to marker's location
-  popupAnchor: [0, -35], // point from which the popup should open relative to the iconAnchor
+  iconSize: [38, 40],
+  iconAnchor: [19, 35],
+  popupAnchor: [0, -35],
+});
+
+var userLocationMarkerIcon = L.icon({
+  iconUrl: "Visit.png",
+  iconSize: [38, 40],
+  iconAnchor: [19, 35],
+  popupAnchor: [0, -35],
 });
 
 const updateUrlQuery = (newQuery) => {
@@ -40,20 +56,23 @@ const SearchHandler = async (searchQuery) => {
     if (data.latitude && data.longitude) {
       const lat = parseFloat(data.latitude);
       const lon = parseFloat(data.longitude);
-      // 確保 markerGroup 已初始化
+
+      // 保存目的地經緯度
+      destinationLat.value = lat;
+      destinationLon.value = lon;
+
       if (!searchMarkerGroup.value) {
         searchMarkerGroup.value = L.layerGroup().addTo(map.value);
       }
-      // 清除之前的標記
       searchMarkerGroup.value.clearLayers();
-      //增加標記
       const marker = L.marker([lat, lon], { icon: locationIcon })
         .bindPopup(`位置：${searchQuery}`)
         .openPopup();
       searchMarkerGroup.value.addLayer(marker);
-      //定位
       map.value.setView([lat, lon], 15);
       updateUrlQuery(searchQuery);
+      // 更新顯示的停車場
+      updateDisplayLots();
     } else {
       Swal.fire({
         icon: "error",
@@ -70,7 +89,7 @@ const SearchHandler = async (searchQuery) => {
   }
 };
 
-//載入停車場
+// 載入停車場
 const loadParkingLots = async () => {
   if (!map.value) {
     console.error("地圖尚未初始化");
@@ -81,46 +100,11 @@ const loadParkingLots = async () => {
     if (!res.ok) {
       throw new Error("Server無法獲取停車場數據");
     }
-    const parkingLots = await res.json();
-    // 確保 markerGroup 已初始化
-    if (!markerGroup.value) {
-      markerGroup.value = L.layerGroup().addTo(map.value);
-    }
-    // 清除之前的所有標記
-    markerGroup.value.clearLayers();
-
-    // 將每個停車場標記加入地圖
-    parkingLots.forEach((lot) => {
-      const marker = L.marker([lot.latitude, lot.longitude]).on("click", () => {
-        // 關閉地圖上所有的 popup
-        map.value.closePopup();
-
-        // 為當前點擊的標記開啟新的 popup
-        marker
-          .bindPopup(
-            `<b>${lot.lotName}</b><br>
-            地址：${lot.location}<br>
-            可用車位：${lot.validSpace} / ${lot.smallCarSpace}<br>
-            平日每小時費用：${lot.weekdayRate} 元<br>
-            假日每小時費用：${lot.holidayRate} 元<br>
-            月租費用：${lot.monRate} 元<br>
-            營業時間：${lot.opendoorTime}<br>
-            電話：${lot.tel}`
-          )
-          .openPopup(); // 開啟新的 popup
-
-        // 當 popup 關閉時清理狀態
-        marker.on("popupclose", () => {
-          marker.unbindPopup(); // 清除 popup
-        });
-      });
-
-      // 縮放前關閉所有的 popup，避免錯誤
-      map.value.on("zoomstart", () => {
-        map.value.closePopup();
-      });
-      markerGroup.value.addLayer(marker);
-    });
+    const data = await res.json();
+    parkingLots.value = data;
+    console.log(parkingLots.value);
+    updateDisplayLots();
+    AddMarkerToMap();
   } catch (error) {
     console.error("加載停車場數據時出現錯誤：", error);
     Swal.fire({
@@ -129,6 +113,114 @@ const loadParkingLots = async () => {
       text: "無法加載停車場數據，請稍後再試!",
     });
   }
+};
+
+//show 10 lots data
+const updateDisplayLots = () => {
+  // 確保已經有目的地的經緯度
+  if (destinationLat.value === null || destinationLon.value === null) {
+    console.error("目的地經緯度未定義");
+    return;
+  }
+  displayedParkingLots.value = parkingLots.value
+    .map((lot) => {
+      const distance = calculateDistance(
+        destinationLat.value,
+        destinationLon.value,
+        lot.latitude,
+        lot.longitude
+      );
+      return { ...lot, distance };
+    })
+    .sort((a, b) => a.distance - b.distance);
+  AddMarkerToMap();
+};
+
+//停車場加上marker
+const AddMarkerToMap = () => {
+  if (markerGroup.value) {
+    markerGroup.value.clearLayers();
+  }
+  displayedParkingLots.value.forEach((lot) => {
+    const marker = L.marker([lot.latitude, lot.longitude]).on("click", () => {
+      selectedParkingLot.value = lot;
+    });
+    markerGroup.value.addLayer(marker);
+  });
+};
+
+// 計算兩個經緯度之間的距離函數
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // 地球半徑，單位：公里
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c; // 得到距離
+  return distance;
+};
+
+// 自定義 Leaflet 控制項 (定位按鈕)
+const locateUserControl = () => {
+  const locateControl = L.Control.extend({
+    onAdd: function () {
+      const button = L.DomUtil.create("button", "locate-button");
+      button.innerHTML =
+        '<i class="fa-solid fa-location-crosshairs fa-beat"></i>';
+      button.style.backgroundColor = "white";
+      button.style.width = "30px";
+      button.style.height = "30px";
+      button.style.border = "2px solid #4CAF50";
+      button.style.borderRadius = "50px";
+
+      L.DomEvent.on(button, "click", function () {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const lat = position.coords.latitude;
+              const lon = position.coords.longitude;
+              // 檢查是否已經有上一個定位標記，若有則清除
+              if (userLocationMarker.value) {
+                map.value.removeLayer(userLocationMarker.value);
+              }
+              searchMarkerGroup.value.clearLayers();
+              // 添加新的定位標記
+              userLocationMarker.value = L.marker([lat, lon], {
+                icon: userLocationMarkerIcon,
+              })
+                .addTo(map.value)
+                .bindPopup("當前位置")
+                .openPopup();
+              // 移動地圖到使用者位置
+              map.value.setView([lat, lon], 15);
+            },
+            () => {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "無法取得當前位置，請確保定位已啟用!",
+              });
+            }
+          );
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "您的瀏覽器不支援定位功能!",
+          });
+        }
+      });
+
+      return button;
+    },
+  });
+
+  map.value.addControl(new locateControl({ position: "bottomright" })); // 設定按鈕的位置
 };
 
 // 添加 watch 監聽器
@@ -141,7 +233,7 @@ watch(
   }
 );
 
-//掛載時檢查有沒有來自首頁的字串
+// 掛載時檢查有沒有來自首頁的字串
 onMounted(() => {
   if (map.value === null) {
     //初始化地圖
@@ -152,13 +244,24 @@ onMounted(() => {
     // 初始化 LayerGroup
     markerGroup.value = L.layerGroup().addTo(map.value); // 停車場標記
     searchMarkerGroup.value = L.layerGroup().addTo(map.value); // 搜尋標記
+    userLocationMarker.value = L.layerGroup().addTo(map.value);
 
     loadParkingLots();
+
+    locateUserControl(); // 添加定位按鈕
 
     const destinationFromHome = route.query.searchQuery;
     console.log("Received Destination:", destinationFromHome);
     if (destinationFromHome) {
       SearchHandler(destinationFromHome); //自動搜尋跟定位
+    }
+
+    // 防止重複綁定 zoomstart 事件，只需要一次即可
+    if (!map.value._zoomEventBound) {
+      map.value.on("zoomstart", () => {
+        map.value.closePopup();
+      });
+      map.value._zoomEventBound = true; // 標記事件已綁定
     }
   }
 });
@@ -168,14 +271,6 @@ onBeforeUnmount(() => {
     if (map.value) {
       map.value.remove();
       map.value = null;
-    }
-    if (searchMarkerGroup.value) {
-      searchMarkerGroup.value.clearLayers();
-      searchMarkerGroup.value = null;
-    }
-    if (markerGroup.value) {
-      markerGroup.value.clearLayers();
-      markerGroup.value = null;
     }
   } catch (error) {
     console.error("移除地圖時發生錯誤：", error);
@@ -200,43 +295,52 @@ onBeforeUnmount(() => {
 
       <!-- ======= About Section ======= -->
       <section id="about" class="about">
-        <div class="container" data-aos="fade-up">
-          <div class="row">
-            <div class="col-md-4">
-              <div class="row">
-                <div class="col-md-12">
-                  <h3>MyGo Parking</h3>
-                  <div style="width: 100%">
-                    <SearchInputComponent
-                      @search="SearchHandler"
-                    ></SearchInputComponent>
-                  </div>
+        <div class="row ms-2 me-2" data-aos="fade-up">
+          <div class="col-md-4">
+            <div class="row">
+              <div class="col-md-12">
+                <h3>MyGo Parking</h3>
+                <div style="width: 100%">
+                  <SearchInputComponent
+                    @search="SearchHandler"
+                  ></SearchInputComponent>
                 </div>
-                <div class="col-md-12">
-                  <div class="container">
-                    <div class="row">
-                      <!-- Sorting Buttons -->
-                      <div class="sorting-buttons mt-3">
-                        <button @click="sortByDistance" class="btn btn-primary">
-                          按距離排序
-                        </button>
-                        <button @click="sortByCost" class="btn btn-secondary">
-                          按費用排序
-                        </button>
-                      </div>
-                      <div class="col-md-12">
-                        <div class="card" style="width: 18rem">
+              </div>
+              <div class="col-md-12">
+                <div class="container">
+                  <div class="row">
+                    <!-- Sorting Buttons -->
+                    <div class="sorting-buttons mt-3">
+                      <button @click="sortByDistance" class="btn btn-primary">
+                        按距離排序
+                      </button>
+                      <button @click="sortByCost" class="btn btn-secondary">
+                        按費用排序
+                      </button>
+                    </div>
+                    <div class="col-md-12">
+                      <!-- 停車場資訊卡片 -->
+                      <div
+                        class="container mt-3"
+                        style="overflow-y: auto; max-height: 400px"
+                      >
+                        <div
+                          v-for="(lot, index) in displayedParkingLots.slice(
+                            0,
+                            5
+                          )"
+                          :key="index"
+                          class="card"
+                        >
                           <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <h6 class="card-subtitle mb-2 text-body-secondary">
-                              Card subtitle
-                            </h6>
-                            <p class="card-text">
-                              Some quick example text to build on the card title
-                              and make up the bulk of the card's content.
-                            </p>
-                            <a href="#" class="card-link">Card link</a>
-                            <a href="#" class="card-link">Another link</a>
+                            <h5 class="card-title">{{ lot.lotName }}</h5>
+                            <p>地址: {{ lot.location }}</p>
+                            <p>可用車位: {{ lot.validSpace }}</p>
+                            <p>平日每小時費用: {{ lot.weekdayRate }} 元</p>
+                            <p>假日每小時費用: {{ lot.holidayRate }} 元</p>
+                            <p>月租費用: {{ lot.monRate }} 元</p>
+                            <p>營業時間: {{ lot.opendoorTime }}</p>
+                            <p>電話: {{ lot.tel }}</p>
                           </div>
                         </div>
                       </div>
@@ -245,9 +349,9 @@ onBeforeUnmount(() => {
                 </div>
               </div>
             </div>
-            <div class="col-md-8">
-              <div id="map"></div>
-            </div>
+          </div>
+          <div class="col-md-8">
+            <div id="map"></div>
           </div>
         </div>
       </section>
@@ -259,6 +363,18 @@ onBeforeUnmount(() => {
 <style lang="css" scoped>
 #map {
   width: 100%;
-  height: 650px;
+  height: 700px;
+}
+.locate-button {
+  background-color: white;
+  border-radius: 5px;
+  padding: 5px;
+  border: 2px solid #4caf50;
+  cursor: pointer;
+}
+
+.locate-button:hover {
+  background-color: #4caf50;
+  color: white;
 }
 </style>
