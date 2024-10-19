@@ -11,7 +11,6 @@ import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster/dist/leaflet.markercluster.js";
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import flatpickr from "flatpickr";
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const API_URL = `${BASE_URL}?address=`;
@@ -23,7 +22,6 @@ const markerClusterGroup = ref(null);
 const searchMarkerGroup = ref(null); // 用於搜尋標記
 let userLocationMarker = ref(null); // 用來存放用戶定位的標記
 const parkingLots = ref([]); // 儲存所有停車場資訊
-const selectedParkingLot = ref(null); // 儲存選中的停車場資訊
 const displayedParkingLots = ref([]); // 儲存顯示的10個停車場
 const destinationLat = ref(null); //儲存目的地經緯度
 const destinationLon = ref(null);
@@ -46,29 +44,6 @@ var userLocationMarkerIcon = L.icon({
   popupAnchor: [0, -35],
 });
 
-// 自動滾動到卡片區域並高亮顯示的函數
-const scrollToCard = (lot) => {
-  // 移除之前選中的卡片的高亮顏色
-  if (selectedParkingLot.value !== null) {
-    const previousCard = document.querySelector(
-      `[ref='parkingLotCard-${selectedParkingLot.value}']`
-    );
-    if (previousCard) {
-      previousCard.classList.remove("active-card");
-    }
-  }
-  // 設置新的選中卡片
-  const cardElement = document.querySelector(`[ref='parkingLotCard-${lot}']`);
-  if (cardElement) {
-    cardElement.classList.add("active-card"); // 添加高亮樣式
-    cardElement.scrollIntoView({
-      behavior: "smooth", // 平滑滾動
-      block: "start", // 滾動到頂部
-    });
-  }
-  // 更新當前選中的卡片索引
-  selectedParkingLot.value = lot;
-};
 const updateUrlQuery = (newQuery) => {
   router.push({ name: "search", query: { searchQuery: newQuery } });
 };
@@ -181,7 +156,7 @@ const AddMarkerToMap = async () => {
 
   // 模擬延遲 2 秒鐘
   await new Promise((resolve) => setTimeout(resolve, 2000));
-  displayedParkingLots.value.forEach((lot, index) => {
+  displayedParkingLots.value.forEach((lot) => {
     const iconClass = lot.validSpace > 0 ? "lotsIcon" : "lotsIcon2"; // 根據可用車位判斷class
     const lotsIcon = L.divIcon({
       className: iconClass,
@@ -195,10 +170,7 @@ const AddMarkerToMap = async () => {
         icon: lotsIcon,
       },
       13
-    ).on("click", () => {
-      selectedParkingLot.value = lot;
-      scrollToCard(selectedParkingLot.value);
-    });
+    );
     markerClusterGroup.value.addLayer(marker);
   });
   // 將 MarkerClusterGroup 添加到地圖
@@ -361,10 +333,6 @@ onBeforeUnmount(() => {
               <div class="col-md-12">
                 <h3>MyGo Parking</h3>
                 <div style="width: 100%">
-                  <flatpickr
-                    v-model="selectedDate"
-                    :config="dateConfig"
-                  ></flatpickr>
                   <SearchInputComponent
                     @search="SearchHandler"
                   ></SearchInputComponent>
