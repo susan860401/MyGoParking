@@ -13,7 +13,6 @@ import Swiper from "swiper/bundle";
 
 document.addEventListener("DOMContentLoaded", () => {
   "use strict";
-  console.log("DOMContentLoaded");
   aos_init();
   // 獲取scrollTop按鈕元素
   const scrollTop = document.querySelector(".scroll-top");
@@ -205,7 +204,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // 滑到最上方按鈕的顯示與隱藏
 function togglescrollTop(scrollTop) {
-  console.log("scrollTop");
   if (scrollTop) {
     window.scrollY > 100
       ? scrollTop.classList.add("active")
@@ -215,7 +213,6 @@ function togglescrollTop(scrollTop) {
 
 //初始化aos
 function aos_init() {
-  console.log("aos init");
   AOS.init({
     duration: 800,
     easing: "slide",
