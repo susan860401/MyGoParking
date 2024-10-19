@@ -60,8 +60,10 @@ onMounted(()=>{
       <div class="box box4"></div>
     </section>    
     <section class="panel title">
-      <div class="component" id="searchbar">
-        <SearchInputComponent @search="SearchHandler" v-model="searchQuery"></SearchInputComponent>
+      <div class="component">
+        <div id="searchbar">
+          <SearchInputComponent @search="SearchHandler" v-model="searchQuery"></SearchInputComponent>
+        </div>
       </div>
       <div id="car_container">
         <div id="car_path">
@@ -125,17 +127,23 @@ onMounted(()=>{
   height: 100vh;
   background-color: black;
   position: relative;
+  display: flex;
+  /* justify-content: center; */
+  /* justify-items: center; */
+  align-items: center;
 }
 /* 搜尋欄 */
 .component * {
+  /* display: inline-block; */
   z-index: 2000;
 }
 
 #searchbar{
-  height: 80vh;
-  width: 50%;
-  margin: auto;
-  align-content: center;
+  position: absolute;
+  /* height: 80vh; */
+  width: 100%;
+  justify-content: center;
+  justify-items: center;
 }
 
 
@@ -165,7 +173,9 @@ onMounted(()=>{
 }
 /* 車子部分 */
 #car_container{
-  background-color: gray;
+  background-image: url('../images/road.png');
+  background-size: contain;
+  /* background-color: gray; */
   height: 15vmin;
   width: 100vw;
   position: fixed;

@@ -12,6 +12,10 @@ export function scrollanimation(){
         end: "17% bottom", // 200px past the start 
         // pin: "#car_container",
         // pinSpacer:false,
+        onEnter: () => {
+            gsap.set("#car_container", { backgroundImage: "url('src/images/road.png')"});
+            //gsap.set("#car_container", { backgroundColor: "blue"});
+        },
         onUpdate: (self) => {
         // 獲取滾動的進度
         const progress = self.progress; // 進度 0 到 1
@@ -19,16 +23,17 @@ export function scrollanimation(){
         const moveDistance = progress * 100; // 根據需要調整比例
         // 更新車子的位置
         gsap.set("#car_path", { x: `-${moveDistance}vw` });
-        gsap.set("#car_container", { backgroundColor: 'gray'});
+        // gsap.set("#car_container", { backgroundColor: 'gray'});
         // gsap.set(".view-point",{opacity:'1'});
         // 計算建築物的移動距離
         const totalBuildingMoveDistance = progress * (buildingWidth * buildingCount);
         gsap.set(buildings, { x: `${totalBuildingMoveDistance}px` });
         // const buildingMoveDistance = moveDistance * (buildingWidth * buildingCount / (buildingWidth * buildingCount * 2)); // 調整比例
         // gsap.set(buildings, { x: `${buildingMoveDistance}px` });
+        gsap.set("#car_container", { backgroundImage: "url('src/images/road.png')"});
         },
         onLeave: () => {
-            gsap.set("#car_container", { backgroundColor: 'transparent'});
+            gsap.set("#car_container", { backgroundImage:"none"});
         }
     });
     
