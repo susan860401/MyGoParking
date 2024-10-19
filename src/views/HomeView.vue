@@ -31,6 +31,20 @@ onMounted(()=>{
 <template>
   <div class="view-container">
     <section class="view-point">
+      <div class="buildings">
+        <div class="building">
+          <img src="@/images/apartment.svg" alt="">
+        </div>
+        <div class="building">
+        <img src="@/images/cityscape.svg" alt="">
+        </div>
+        <div class="building">
+          <img src="@/images/apartment.svg" alt="">
+        </div>
+        <div class="building">
+          <img src="@/images/residential_area.svg" alt="">
+        </div>
+      </div>
       <div class="box box1"></div>
       <div class="box box2"></div>
       <div class="box box3"></div>
@@ -42,7 +56,8 @@ onMounted(()=>{
       </div>
       <div id="car_container">
         <div id="car_path">
-          <img id="car" src="@/images/ot140.svg"></img>
+          <div id="car"></div>
+          <!-- <img id="car" src="@/images/ot140.svg"></img> -->
         </div>
       </div>
     </section>
@@ -66,22 +81,35 @@ onMounted(()=>{
 .box2{
   opacity: 0;
 }
+.buildings{
+  width: 100vw;
+  position: absolute;
+  bottom: 15vmin;
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: nowrap;
+}
+.building{
+  bottom: 0;
+}
+
 .view-point{
   position: fixed;
   width: 100vw;
   height: 100vh;
   opacity: 0.5;
   background-color: rgb(0, 255, 191);
+  z-index: 1;
 }
 
 .title{
   padding:0;
   height: 100vh;
   background-color: black;
-  flex:content;
+  position: relative;
 }
 #searchbar{
-  height: 75vh;
+  height: 80vh;
   width: 50%;
   margin: auto;
   align-content: center;
@@ -112,21 +140,28 @@ onMounted(()=>{
 }
 
 #car_container{
-  background-color: goldenrod;
-  height: 25vh;
+  /* background-color: goldenrod; */
+  height: 15vmin;
   width: 100vw;
-  position: relative;
+  position: fixed;
   z-index: 1000;
   bottom: 0;
   right: 0;
+  flex: content;
+  align-items: center;
+  /* align-content: center; */
 }
 #car,#car_path{
-  height: 25vh;
+  height: 15vmin;
   position: absolute;
-  top:1vh;
+  /* bottom:1vh; */
   right: 10px;
 }
 #car{
+  width: 15vmin;
+  position: absolute;
+  top: 0;
+  align-content: center;
   animation:shakeCar 0.5s ease-in-out infinite;
 }
 #car_path{
