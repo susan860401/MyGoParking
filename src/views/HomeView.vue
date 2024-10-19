@@ -31,18 +31,27 @@ onMounted(()=>{
 <template>
   <div class="view-container">
     <section class="view-point">
-      <div class="buildings">
-        <div class="building">
+      <div class="buildings" style="--width:300px;--quantity:6">
+        <div class="building" style="--position:1">
           <img src="@/images/apartment.svg" alt="">
         </div>
-        <div class="building">
+        <div class="building" style="--position:2">
         <img src="@/images/cityscape.svg" alt="">
         </div>
-        <div class="building">
-          <img src="@/images/apartment.svg" alt="">
-        </div>
-        <div class="building">
+        <div class="building" style="--position:3">
           <img src="@/images/residential_area.svg" alt="">
+        </div>
+        <div class="building" style="--position:4">
+          <img src="@/images/convenience_store.svg" alt="">
+        </div>
+        <div class="building" style="--position:4">
+          <img src="@/images/apartment_small.svg" alt="">
+        </div>
+        <div class="building" style="--position:5">
+          <img src="@/images/apartment_rent.svg" alt="">
+        </div>
+        <div class="building" style="--position:6">
+          <img src="@/images/school.svg" alt="">
         </div>
       </div>
       <div class="box box1"></div>
@@ -50,8 +59,8 @@ onMounted(()=>{
       <div class="box box3"></div>
       <div class="box box4"></div>
     </section>    
-    <section class="title">
-      <div id="searchbar">
+    <section class="panel title">
+      <div class="component" id="searchbar">
         <SearchInputComponent @search="SearchHandler" v-model="searchQuery"></SearchInputComponent>
       </div>
       <div id="car_container">
@@ -81,25 +90,34 @@ onMounted(()=>{
 .box2{
   opacity: 0;
 }
+
+/* 建築物部分 */
 .buildings{
-  width: 100vw;
+  pointer-events: none;
   position: absolute;
   bottom: 15vmin;
   display: flex;
   align-items: flex-end;
   flex-wrap: nowrap;
+  padding: 0;
 }
 .building{
+  position: relative;
   bottom: 0;
 }
+.building img{
+  width: 40vmin;
+}
 
+/* 這是拿來做一個視野窗來放我要載入的東西 */
 .view-point{
+  pointer-events: none;
   position: fixed;
   width: 100vw;
   height: 100vh;
-  opacity: 0.5;
-  background-color: rgb(0, 255, 191);
-  z-index: 1;
+  opacity: 0.7;
+  z-index: 1000;
+  /* background-color: rgb(0, 255, 191); */
 }
 
 .title{
@@ -108,12 +126,19 @@ onMounted(()=>{
   background-color: black;
   position: relative;
 }
+/* 搜尋欄 */
+.component * {
+  z-index: 2000;
+}
+
 #searchbar{
   height: 80vh;
   width: 50%;
   margin: auto;
   align-content: center;
 }
+
+
 .panel{
   width: 100vw;
   height: 100vh;
@@ -138,9 +163,9 @@ onMounted(()=>{
   overflow: hidden;    /* 防止子元素超出這個區域 */
   min-height: 500vh;    /* 留出足夠的空間讓動畫運行 */
 }
-
+/* 車子部分 */
 #car_container{
-  /* background-color: goldenrod; */
+  background-color: gray;
   height: 15vmin;
   width: 100vw;
   position: fixed;
@@ -179,7 +204,7 @@ onMounted(()=>{
     transform: translateY(0); /* 垂直方向震動 */
   }
   50% {
-    transform: translateY(-5px);
+    transform: translateY(-1px);
   }
 }
 
