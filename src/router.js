@@ -8,9 +8,10 @@ import EditProfileView from "./views/CustomerCenter/EditProfileView.vue";
 import ParkingOrderView from "./views/CustomerCenter/ParkingOrderView.vue";
 import ParkingRecordView from "./views/CustomerCenter/ParkingRecordView.vue";
 import CouponView from "./views/CustomerCenter/CouponView.vue";
-import SignUpView from "./views/signUpView.vue";
+import SignUpView from "./views/SignUpView.vue";
 import SignInView from "./views/SignInView.vue";
 import NotFound from "./views/NotFound.vue";
+import MonthlyRentView from "./views/MonthlyRentView.vue";
 
 const routes = [
   {
@@ -32,6 +33,11 @@ const routes = [
     path: "/Customer-Service",
     component: CustomerServiceView,
     name: "service",
+  },
+  {
+    path: "/MonthlyRent",
+    component: MonthlyRentView,
+    name: "MonthlyRent",
   },
   {
     path: "/CustomerCenter",
