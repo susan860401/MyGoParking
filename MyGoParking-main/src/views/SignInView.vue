@@ -1,28 +1,5 @@
 <script setup>
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
-
-import { ref } from 'vue';
-
-const API_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/login`
-
-const user = ref({
-  "email":"",
-  "password":""
-})
-
-const send = async()=>{
-    const response = await fetch(API_URL,{
-        method:'POST',
-        body:JSON.stringify(user.value),
-        headers:{'Content-Type':'application/json'}
-    })
-    if(response.ok){
-       const datas = await response.json()
-       alert(datas.message)
-    }
-
-    
-}
 </script>
 
 <template>
@@ -64,63 +41,67 @@ const send = async()=>{
 
             <div class="col-lg-5" data-aos="fade">
               <form
-                @submit.prevent="send"
                 action="forms/quote.php"
                 method="post"
                 class="php-email-form"
               >
-                <h3>登入</h3>
+                <h3>Get a quote</h3>
                 <p>
-                  請輸入信箱及密碼
+                  Vel nobis odio laboriosam et hic voluptatem. Inventore vitae
+                  totam. Rerum repellendus enim linead sero park flows.
                 </p>
                 <div class="row gy-3">
+                  <div class="col-md-12">
+                    <input
+                      type="text"
+                      name="name"
+                      class="form-control"
+                      placeholder="Name"
+                      required
+                    />
+                  </div>
 
                   <div class="col-md-12">
                     <input
                       type="email"
                       class="form-control"
                       name="email"
-                      placeholder="請輸入Email帳號"
+                      placeholder="Email"
                       required
-                      v-model="user.email"
-                      id="email"
                     />
                   </div>
 
                   <div class="col-md-12">
                     <input
-                      type="password"
+                      type="text"
                       class="form-control"
-                      name="psw"
-                      placeholder="請輸入密碼"
+                      name="phone"
+                      placeholder="Phone"
                       required
-                      v-model="user.password" 
-                      id="password"
                     />
                   </div>
-                  
+
+                  <div class="col-md-12">
+                    <textarea
+                      class="form-control"
+                      name="message"
+                      rows="6"
+                      placeholder="Message"
+                      required
+                    ></textarea>
+                  </div>
 
                   <div class="col-md-12 text-center">
                     <div class="loading">Loading</div>
                     <div class="error-message"></div>
                     <div class="sent-message">
-                      您已成功登入!
+                      Your quote request has been sent successfully. Thank you!
                     </div>
 
-                    <button type="submit">登入</button>
+                    <button type="submit">Get a quote</button>
                   </div>
                 </div>
               </form>
-              <div class="row">
-                    <div class="col-12">
-                        <hr class="mt-5 mb-4 border-secondary-subtle">
-                        <div class="d-flex gap-2 gap-md-4 flex-column flex-md-row justify-content-md-center">
-
-                            <RouterLink :to="{ name: 'register' }" class="link-secondary text-decoration-none">註冊新帳號</RouterLink>
-                            <a href="#!" class="link-secondary text-decoration-none">忘記密碼</a>
-                        </div>
-                    </div>
-                </div>
             </div>
             <!-- End Quote Form -->
           </div>
