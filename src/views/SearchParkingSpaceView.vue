@@ -406,19 +406,6 @@ onBeforeUnmount(() => {
   position: relative;
   z-index: 1;
 }
-/*.locate-button {
-  background-color: white;
-  border-radius: 5px;
-  padding: 5px;
-  border: 2px solid #4caf50;
-  cursor: pointer;
-}
-
-.locate-button:hover {
-  background-color: #4caf50;
-  color: white;
-}*/
-
 .lotsIcon {
   display: inline-block;
   background-color: transparent; /* 不設置背景，直接顯示內部元素 */
