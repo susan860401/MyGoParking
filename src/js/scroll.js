@@ -22,12 +22,14 @@ export function scrollanimation(){
         // 根據進度計算車子移動距離
         const moveDistance = progress * 100; // 根據需要調整比例
         // 更新車子的位置
-        gsap.set("#car_path", { x: `-${moveDistance}vw` });
+        //gsap.set("#car_path", { x: `-${moveDistance}vw` }); //這是立即性
+        gsap.to("#car_path", { duration: 0.5, x: `-${moveDistance}vw`, y: 0, opacity: 1 });
         // gsap.set("#car_container", { backgroundColor: 'gray'});
         // gsap.set(".view-point",{opacity:'1'});
         // 計算建築物的移動距離
         const totalBuildingMoveDistance = progress * (buildingWidth * buildingCount);
-        gsap.set(buildings, { x: `${totalBuildingMoveDistance}px` });
+        //gsap.set(buildings, { x: `${totalBuildingMoveDistance}px` });
+        gsap.to(buildings, { duration: 0.5, x: `${totalBuildingMoveDistance}px`, y: 0, opacity: 1 });
         // const buildingMoveDistance = moveDistance * (buildingWidth * buildingCount / (buildingWidth * buildingCount * 2)); // 調整比例
         // gsap.set(buildings, { x: `${buildingMoveDistance}px` });
         gsap.set("#car_container", { backgroundImage: "url('src/images/road.png')"});

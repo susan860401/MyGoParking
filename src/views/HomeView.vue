@@ -31,27 +31,27 @@ onMounted(()=>{
 <template>
   <div class="view-container">
     <section class="view-point">
-      <div class="buildings" style="--width:300px;--quantity:6">
+      <div class="buildings" style="--width:300px;--quantity:7">
         <div class="building" style="--position:1">
-          <img src="@/images/apartment.svg" alt="">
+          <img src="@/images/school.svg" alt="">
         </div>
         <div class="building" style="--position:2">
-        <img src="@/images/cityscape.svg" alt="">
+          <img src="@/images/apartment.svg" alt="">
         </div>
         <div class="building" style="--position:3">
-          <img src="@/images/residential_area.svg" alt="">
-        </div>
-        <div class="building" style="--position:4">
-          <img src="@/images/convenience_store.svg" alt="">
+          <img src="@/images/cityscape.svg" alt="">
         </div>
         <div class="building" style="--position:4">
           <img src="@/images/apartment_small.svg" alt="">
         </div>
         <div class="building" style="--position:5">
-          <img src="@/images/apartment_rent.svg" alt="">
+          <img src="@/images/convenience_store.svg" alt="">
         </div>
         <div class="building" style="--position:6">
-          <img src="@/images/school.svg" alt="">
+          <img src="@/images/apartment_rent.svg" alt="">
+        </div>
+        <div class="building" style="--position:7">
+          <img src="@/images/residential_area.svg" alt="">
         </div>
       </div>
       <div class="box box1"></div>
