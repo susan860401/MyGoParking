@@ -6,6 +6,8 @@ import "leaflet/dist/leaflet.css";
 import "leaflet/dist/leaflet.js";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "@fortawesome/fontawesome-free/js/all.min.js";
+import "leaflet.locatecontrol/dist/L.Control.Locate.min.css";
+import "leaflet.locatecontrol/dist/L.Control.Locate.min.js";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster/dist/leaflet.markercluster.js";
@@ -20,25 +22,17 @@ const map = ref(null);
 const markerGroup = ref(null);
 const markerClusterGroup = ref(null);
 const searchMarkerGroup = ref(null); // 用於搜尋標記
-let userLocationMarker = ref(null); // 用來存放用戶定位的標記
+const userLocationMarker = ref(null); // 用來存放用戶定位的標記
 const parkingLots = ref([]); // 儲存所有停車場資訊
 const displayedParkingLots = ref([]); // 儲存顯示的10個停車場
 const destinationLat = ref(null); //儲存目的地經緯度
 const destinationLon = ref(null);
 const isLoading = ref(false);
-const selectedDate = ref(null);
-const dateConfig = { enableTime: true, dateFormat: "Y-m-d H:i" };
+const markerMap = ref(new Map()); // 用於存儲每個停車場的標記
 
 // 使用的定位圖標
 var locationIcon = L.icon({
   iconUrl: "Location.png",
-  iconSize: [38, 40],
-  iconAnchor: [19, 35],
-  popupAnchor: [0, -35],
-});
-
-var userLocationMarkerIcon = L.icon({
-  iconUrl: "Visit.png",
   iconSize: [38, 40],
   iconAnchor: [19, 35],
   popupAnchor: [0, -35],
@@ -71,6 +65,11 @@ const SearchHandler = async (searchQuery) => {
         searchMarkerGroup.value = L.layerGroup().addTo(map.value);
       }
       searchMarkerGroup.value.clearLayers();
+      if (userLocationMarker.value) {
+        map.value.removeLayer(userLocationMarker.value);
+        userLocationMarker.value = null;
+      }
+
       const marker = L.marker([lat, lon], { icon: locationIcon })
         .bindPopup(`位置：${searchQuery}`)
         .openPopup();
@@ -119,6 +118,51 @@ const loadParkingLots = async () => {
   }
 };
 
+//抓定位：Leaflet.Locate
+const locatePlace = () => {
+  L.control
+    .locate({
+      position: "topleft",
+      locateOptions: {
+        enableHighAccuracy: true,
+      },
+      strings: {
+        title: "定位我的位置",
+        metersUnit: "公尺",
+        feetUnit: "英尺",
+        popup: "距離誤差：{distance}{unit}以內",
+      },
+      clickBehavior: {
+        inView: "setView",
+        outOfView: "setView",
+        inViewNotFollowing: "inView",
+      },
+      onLocationfound: (e) => {
+        // 移除先前的 userLocationMarker 標記
+        if (userLocationMarker.value) {
+          map.value.removeLayer(userLocationMarker.value);
+        }
+        // 設置新的 userLocationMarker 標記
+        userLocationMarker.value = L.marker([e.latitude, e.longitude]).addTo(
+          map.value
+        );
+        // 設置地圖視圖到用戶位置
+        map.value.setView([e.latitude, e.longitude], 18);
+        destinationLat.value = e.latitude;
+        destinationLon.value = e.longitude;
+        updateDisplayLots();
+      },
+      onLocationerror: () => {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "無法取得當前位置，請確保定位已啟用!",
+        });
+      },
+    })
+    .addTo(map.value);
+};
+
 //show 10 lots data
 const updateDisplayLots = () => {
   // 確保已經有目的地的經緯度
@@ -142,17 +186,14 @@ const updateDisplayLots = () => {
 
 //停車場加上marker
 const AddMarkerToMap = async () => {
-  console.log("Loading start");
   isLoading.value = true;
   // 如果已經存在 markerClusterGroup，先移除
   if (markerClusterGroup.value) {
     map.value.removeLayer(markerClusterGroup.value);
   }
-  // if (markerGroup.value) {
-  //   markerGroup.value.clearLayers();
-  // }
   // 創建 MarkerClusterGroup
   markerClusterGroup.value = L.markerClusterGroup();
+  markerMap.value.clear(); // 每次都清空舊的 markerMap
 
   // 模擬延遲 2 秒鐘
   await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -172,6 +213,8 @@ const AddMarkerToMap = async () => {
       13
     );
     markerClusterGroup.value.addLayer(marker);
+    // 將 marker 存入 markerMap，使用 lotId 進行關聯
+    markerMap.value.set(lot.lotId, marker);
   });
   // 將 MarkerClusterGroup 添加到地圖
   if (map.value) {
@@ -181,6 +224,16 @@ const AddMarkerToMap = async () => {
   }
   isLoading.value = false;
 };
+
+const focusOnMarker = (lotId) => {
+  const marker = markerMap.value.get(lotId);
+  if (marker) {
+    map.value.setView(marker.getLatLng(), 18);
+  } else {
+    console.log("未找到對應marker");
+  }
+};
+
 // 計算兩個經緯度之間的距離函數
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
   const R = 6371; // 地球半徑，單位：公里
@@ -197,66 +250,6 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
   return distance;
 };
 
-// 自定義 Leaflet 控制項 (定位按鈕)
-const locateUserControl = () => {
-  const locateControl = L.Control.extend({
-    onAdd: function () {
-      const button = L.DomUtil.create("button", "locate-button");
-      button.innerHTML =
-        '<i class="fa-solid fa-location-crosshairs fa-beat"></i>';
-      button.style.backgroundColor = "white";
-      button.style.width = "30px";
-      button.style.height = "30px";
-      button.style.border = "2px solid #4CAF50";
-      button.style.borderRadius = "50px";
-
-      L.DomEvent.on(button, "click", function () {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const lat = position.coords.latitude;
-              const lon = position.coords.longitude;
-              // 檢查是否已經有上一個定位標記，若有則清除
-              destinationLat.value = lat;
-              destinationLon.value = lon;
-              updateDisplayLots();
-              if (userLocationMarker.value) {
-                map.value.removeLayer(userLocationMarker.value);
-              }
-              searchMarkerGroup.value.clearLayers();
-              // 添加新的定位標記
-              userLocationMarker.value = L.marker([lat, lon], {
-                icon: userLocationMarkerIcon,
-              })
-                .addTo(map.value)
-                .bindPopup("當前位置")
-                .openPopup();
-              // 移動地圖到使用者位置
-              map.value.setView([lat, lon], 18);
-            },
-            () => {
-              Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "無法取得當前位置，請確保定位已啟用!",
-              });
-            }
-          );
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "您的瀏覽器不支援定位功能!",
-          });
-        }
-      });
-
-      return button;
-    },
-  });
-
-  map.value.addControl(new locateControl({ position: "bottomright" })); // 設定按鈕的位置
-};
 // 添加 watch 監聽器
 watch(
   () => route.query.searchQuery,
@@ -272,17 +265,16 @@ onMounted(async () => {
   if (map.value === null) {
     //初始化地圖
     map.value = L.map("map").setView([22.6273, 120.3014], 15); //高雄經緯度
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "EasyPark © OpenStreetMap",
     }).addTo(map.value);
+    locatePlace();
     // 初始化 LayerGroup
     markerGroup.value = L.layerGroup().addTo(map.value); // 停車場標記
     searchMarkerGroup.value = L.layerGroup().addTo(map.value); // 搜尋標記
-    userLocationMarker.value = L.layerGroup().addTo(map.value);
     isLoading.value = true; // 顯示 loading 畫面
     await loadParkingLots();
     isLoading.value = false; // 資料載入完成，隱藏 loading 畫面
-    locateUserControl(); // 添加定位按鈕
 
     const destinationFromHome = route.query.searchQuery;
     if (destinationFromHome) {
@@ -359,6 +351,7 @@ onBeforeUnmount(() => {
                           :key="index"
                           :ref="'parkingLotCard-' + index"
                           class="card mb-4"
+                          @mouseover="focusOnMarker(lot.lotId)"
                         >
                           <div class="card-body">
                             <h3 class="card-title">{{ lot.lotName }}</h3>
@@ -413,7 +406,7 @@ onBeforeUnmount(() => {
   position: relative;
   z-index: 1;
 }
-.locate-button {
+/*.locate-button {
   background-color: white;
   border-radius: 5px;
   padding: 5px;
@@ -424,7 +417,7 @@ onBeforeUnmount(() => {
 .locate-button:hover {
   background-color: #4caf50;
   color: white;
-}
+}*/
 
 .lotsIcon {
   display: inline-block;
