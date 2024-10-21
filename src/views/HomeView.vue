@@ -34,8 +34,13 @@ onMounted(()=>{
       <div class="phone">
         <img src="@/images/phone.svg" alt="">
         <div class="function">
-          試試我們的功能吧
-          <SearchInputComponent @search="SearchHandler" v-model="searchQuery"></SearchInputComponent>
+          <div class="function_desc">試試我們的功能吧</div>
+          <div class="component">
+            <div id="searchbar">
+              <SearchInputComponent @search="SearchHandler" v-model="searchQuery"></SearchInputComponent>
+            </div>
+          </div>
+          <img src="@/images/location.svg" alt="">
         </div>
       </div>
       <div class="chat">
@@ -101,11 +106,6 @@ onMounted(()=>{
       <div class="box box4"></div>
     </section>    
     <section class="panel title">
-      <div class="component">
-        <div id="searchbar">
-          <!-- <SearchInputComponent @search="SearchHandler" v-model="searchQuery"></SearchInputComponent> -->
-        </div>
-      </div>
     </section>
     <section class="panel panel_search">search</section>
     <section class="panel panel_test panel_search_follow">test</section>
@@ -151,6 +151,14 @@ onMounted(()=>{
   font-size: 2rem; /* 根據需求調整文字大小 */
   text-align: center;
 }
+.function img{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 80%;
+  width: 100%;
+}
+
 /* 情境對話 */
 .chat{
   position: absolute;
@@ -298,13 +306,15 @@ onMounted(()=>{
   /* display: inline-block; */
   z-index: 2000;
 }
-
 #searchbar{
   position: absolute;
-  /* height: 80vh; */
+  top:10%;
   width: 100%;
   justify-content: center;
   justify-items: center;
+}
+#searchbar div{
+  width: 100%;
 }
 
 

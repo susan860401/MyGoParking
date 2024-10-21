@@ -106,6 +106,21 @@ export function scrollanimation(){
             // scrub:1,
         })
     });
+    //這段是放停車位出現後被其他車子搶走
+    // ScrollTrigger.create({
+    //     trigger:".panel_search_follow",
+    //     start:"50% bottom",
+    //     //endTrigger:"",
+    //     end:"bottom bottom",
+    //     toggleActions: "play reverse play reverse", // 進入時播放，離開時反轉，回滾時再次播放
+    //     animation: gsap.to("", { // 將動畫直接放入
+    //         duration: 0.5,
+    //         opacity: 1,
+    //         ease: "none",
+    //         // scrub:1,
+    //     })
+    // });
+
     //這段是要拿來放雲的
     ScrollTrigger.create({
         trigger:".panel_search",
@@ -115,7 +130,7 @@ export function scrollanimation(){
         toggleActions: "play reverse play reverse", // 進入時播放，離開時反轉，回滾時再次播放
         animation: gsap.to(".sky", { // 將動畫直接放入
             duration: 1,
-            opacity: 0.8,
+            opacity: 1,
             ease: "power1.out"
         })
     });
@@ -125,20 +140,15 @@ export function scrollanimation(){
         start:"25% bottom",
         endTrigger:".footer",
         end:"top bottom",
-        onEnter: () => {
-            console.log("進入預定panel_search")
-        },
-        onUpdate: () => {
-
-        },
-        onLeave: () => {
-            console.log("離開預定panel_search")    
-        },
-        onEnterBack: () => {
-            console.log("從end點進入預定panel_search")
-        },
-        onLeaveBack:() => {
-            console.log("從trigger點離開預定")
+        toggleActions: "play reverse play reverse", // 進入時播放，離開時反轉，回滾時再次播放
+        animation: gsap.to(".chat", { // 將動畫直接放入
+            duration: 0.5,
+            opacity: 0.8,
+            ease: "none",
+            // scrub:1,
+        }),
+        onEnter:()=>{
+            gsap.set(".story", { textContent: "車位常常在眼前錯過嗎?" });
         }
     });
     //這段是要拿來放星星的
