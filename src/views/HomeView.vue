@@ -1,13 +1,14 @@
 <script setup>
-import { onMounted } from 'vue';
-import { scrollanimation } from '@/js/scroll';
-import SearchInputComponent from '@/components/SearchInputComponent.vue';
+import { onMounted } from "vue";
+import { scrollanimation } from "@/js/scroll";
+import SearchInputComponent from "@/components/SearchInputComponent.vue";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 const searchQuery = ref("");
 
+//前往新路由重新定向
 const SearchHandler = (searchQuery) => {
   if (searchQuery) {
     router.push({
@@ -17,8 +18,7 @@ const SearchHandler = (searchQuery) => {
   }
 };
 
-
-onMounted(()=>{
+onMounted(() => {
   try {
     scrollanimation();
   } catch (error) {
@@ -27,50 +27,52 @@ onMounted(()=>{
 });
 </script>
 
-
 <template>
   <div class="view-container">
     <section class="view-point">
       <div class="main_stars">
         <div class="sun">
-          <img src="@/images/Sun.svg" alt="">
+          <img src="@/images/Sun.svg" alt="" />
         </div>
         <div class="moon">
-          <img src="@/images/Moon.svg" alt="">
+          <img src="@/images/Moon.svg" alt="" />
         </div>
       </div>
-      <div class="buildings" style="--width:300px;--quantity:7">
-        <div class="building" style="--position:1">
-          <img src="@/images/school.svg" alt="">
+      <div class="buildings" style="--width: 300px; --quantity: 7">
+        <div class="building" style="--position: 1">
+          <img src="@/images/school.svg" alt="" />
         </div>
-        <div class="building" style="--position:2">
-          <img src="@/images/apartment.svg" alt="">
+        <div class="building" style="--position: 2">
+          <img src="@/images/apartment.svg" alt="" />
         </div>
-        <div class="building" style="--position:3">
-          <img src="@/images/cityscape.svg" alt="">
+        <div class="building" style="--position: 3">
+          <img src="@/images/cityscape.svg" alt="" />
         </div>
-        <div class="building" style="--position:4">
-          <img src="@/images/apartment_small.svg" alt="">
+        <div class="building" style="--position: 4">
+          <img src="@/images/apartment_small.svg" alt="" />
         </div>
-        <div class="building" style="--position:5">
-          <img src="@/images/convenience_store.svg" alt="">
+        <div class="building" style="--position: 5">
+          <img src="@/images/convenience_store.svg" alt="" />
         </div>
-        <div class="building" style="--position:6">
-          <img src="@/images/apartment_rent.svg" alt="">
+        <div class="building" style="--position: 6">
+          <img src="@/images/apartment_rent.svg" alt="" />
         </div>
-        <div class="building" style="--position:7">
-          <img src="@/images/residential_area.svg" alt="">
+        <div class="building" style="--position: 7">
+          <img src="@/images/residential_area.svg" alt="" />
         </div>
       </div>
       <div class="box box1"></div>
       <div class="box box2"></div>
       <div class="box box3"></div>
       <div class="box box4"></div>
-    </section>    
+    </section>
     <section class="panel title">
       <div class="component">
         <div id="searchbar">
-          <SearchInputComponent @search="SearchHandler" v-model="searchQuery"></SearchInputComponent>
+          <SearchInputComponent
+            @search="SearchHandler"
+            v-model="searchQuery"
+          ></SearchInputComponent>
         </div>
       </div>
       <div id="car_container">
@@ -88,32 +90,32 @@ onMounted(()=>{
 </template>
 
 <style lang="css" scoped>
-.box{
+.box {
   width: 30px;
   height: 30px;
   background-color: blueviolet;
 }
-.box1{
+.box1 {
   position: sticky;
-  top:0;
+  top: 0;
 }
-.box2{
+.box2 {
   opacity: 0;
 }
 /*太陽跟月亮*/
-.main_stars{
+.main_stars {
   display: flex;
   justify-content: space-between;
 }
 .sun * {
-  height:100px;
+  height: 100px;
 }
 .moon * {
-  height:100px;
+  height: 100px;
 }
 
 /* 建築物部分 */
-.buildings{
+.buildings {
   pointer-events: none;
   position: absolute;
   bottom: 15vmin;
@@ -122,16 +124,16 @@ onMounted(()=>{
   flex-wrap: nowrap;
   padding: 0;
 }
-.building{
+.building {
   position: relative;
   bottom: 0;
 }
-.building img{
+.building img {
   width: 40vmin;
 }
 
 /* 這是拿來做一個視野窗來放我要載入的東西 */
-.view-point{
+.view-point {
   pointer-events: none;
   position: fixed;
   width: 100vw;
@@ -141,8 +143,8 @@ onMounted(()=>{
   /* background-color: rgb(0, 255, 191); */
 }
 
-.title{
-  padding:0;
+.title {
+  padding: 0;
   height: 100vh;
   background-color: black;
   position: relative;
@@ -157,7 +159,7 @@ onMounted(()=>{
   z-index: 2000;
 }
 
-#searchbar{
+#searchbar {
   position: absolute;
   /* height: 80vh; */
   width: 100%;
@@ -165,34 +167,33 @@ onMounted(()=>{
   justify-items: center;
 }
 
-
-.panel{
+.panel {
   width: 100vw;
   height: 100vh;
 }
 
-.panel_search{
+.panel_search {
   background-color: green;
 }
 
-.panel_reserve{
+.panel_reserve {
   background-color: gray;
 }
 
-.panel_test{
+.panel_test {
   height: 98vh;
   background-color: aquamarine;
   padding: 0;
 }
 
 .view-container {
-  position: relative;  /* 關鍵：確保子元素相對這個容器定位 */
-  overflow: hidden;    /* 防止子元素超出這個區域 */
-  min-height: 500vh;    /* 留出足夠的空間讓動畫運行 */
+  position: relative; /* 關鍵：確保子元素相對這個容器定位 */
+  overflow: hidden; /* 防止子元素超出這個區域 */
+  min-height: 500vh; /* 留出足夠的空間讓動畫運行 */
 }
 /* 車子部分 */
-#car_container{
-  background-image: url('../images/road.png');
+#car_container {
+  background-image: url("../images/road.png");
   background-size: contain;
   /* background-color: gray; */
   height: 15vmin;
@@ -205,21 +206,19 @@ onMounted(()=>{
   align-items: center;
   /* align-content: center; */
 }
-#car,#car_path{
+#car,
+#car_path {
   height: 15vmin;
   position: absolute;
   /* bottom:1vh; */
   right: 10px;
 }
-#car{
+#car {
   width: 15vmin;
   position: absolute;
   top: 0;
   align-content: center;
-  animation:shakeCar 0.5s ease-in-out infinite;
-}
-#car_path{
-  /* animation: moveCar 5s linear infinite; */
+  animation: shakeCar 0.5s ease-in-out infinite;
 }
 
 @keyframes moveCar {
@@ -229,7 +228,8 @@ onMounted(()=>{
 }
 
 @keyframes shakeCar {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0); /* 垂直方向震動 */
   }
   50% {
@@ -237,8 +237,7 @@ onMounted(()=>{
   }
 }
 
-
-.footer{
+.footer {
   z-index: 1001;
 }
 </style>

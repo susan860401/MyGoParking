@@ -23,8 +23,6 @@ const searchMarkerGroup = ref(null); // 用於搜尋標記
 const userLocationMarker = ref(null); // 用來存放用戶定位的標記
 const parkingLots = ref([]); // 儲存所有停車場資訊
 const displayedParkingLots = ref([]); // 儲存顯示的10個停車場
-const destinationLat = ref(null); //儲存目的地經緯度
-const destinationLon = ref(null);
 const isLoading = ref(false);
 const markerMap = ref(new Map()); // 用於存儲每個停車場的標記
 
@@ -55,10 +53,6 @@ const SearchHandler = async (searchQuery) => {
       const lat = parseFloat(data.latitude);
       const lon = parseFloat(data.longitude);
 
-      // 保存目的地經緯度
-      destinationLat.value = lat;
-      destinationLon.value = lon;
-
       if (!searchMarkerGroup.value) {
         searchMarkerGroup.value = L.layerGroup().addTo(map.value);
       }
@@ -75,7 +69,7 @@ const SearchHandler = async (searchQuery) => {
       map.value.setView([lat, lon], 15);
       updateUrlQuery(searchQuery);
       // 更新顯示的停車場
-      updateDisplayLots();
+      updateDisplayLots(lat, lon);
     } else {
       Swal.fire({
         icon: "error",
@@ -147,11 +141,9 @@ const locatePlace = () => {
         userLocationMarker.value = L.marker([e.latitude, e.longitude]).addTo(
           map.value
         );
-        destinationLat.value = e.latitude;
-        destinationLon.value = e.longitude;
-        updateDisplayLots();
         // 設置地圖視圖到用戶位置
         map.value.setView([e.latitude, e.longitude], 18);
+        updateDisplayLots(e.latitude, e.longitude);
       },
       onLocationerror: () => {
         Swal.fire({
@@ -165,20 +157,10 @@ const locatePlace = () => {
 };
 
 //show 10 lots data
-const updateDisplayLots = () => {
-  // 確保已經有目的地的經緯度
-  if (destinationLat.value === null || destinationLon.value === null) {
-    console.error("目的地經緯度未定義");
-    return;
-  }
+const updateDisplayLots = (lat, lon) => {
   displayedParkingLots.value = parkingLots.value
     .map((lot) => {
-      const distance = calculateDistance(
-        destinationLat.value,
-        destinationLon.value,
-        lot.latitude,
-        lot.longitude
-      );
+      const distance = calculateDistance(lat, lon, lot.latitude, lot.longitude);
       return { ...lot, distance };
     })
     .sort((a, b) => a.distance - b.distance);
@@ -287,11 +269,9 @@ onMounted(async () => {
     // 初始化 LayerGroup
     markerGroup.value = L.layerGroup().addTo(map.value); // 停車場標記
     searchMarkerGroup.value = L.layerGroup().addTo(map.value); // 搜尋標記
-    isLoading.value = true; // 顯示 loading 畫面
-    await loadParkingLots();
-    isLoading.value = false; // 資料載入完成，隱藏 loading 畫面
+    loadParkingLots();
 
-    const destinationFromHome = route.query.searchQuery;
+    const destinationFromHome = route.query.searchQuery; //查詢home傳來的參數
     if (destinationFromHome) {
       await SearchHandler(destinationFromHome); //自動搜尋跟定位
     }
@@ -413,7 +393,7 @@ onBeforeUnmount(() => {
 }
 
 .card:hover {
-  box-shadow: 0 0 15px rgba(243, 6, 6, 0.986); /* 卡片懸停效果 */
+  box-shadow: 0 0 15px rgb(139, 133, 133); /* 卡片懸停效果 */
 }
 
 .card-title {
