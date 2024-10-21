@@ -8,7 +8,7 @@ import EditProfileView from "./views/CustomerCenter/EditProfileView.vue";
 import ParkingOrderView from "./views/CustomerCenter/ParkingOrderView.vue";
 import ParkingRecordView from "./views/CustomerCenter/ParkingRecordView.vue";
 import CouponView from "./views/CustomerCenter/CouponView.vue";
-import SignUpView from "./views/signUpView.vue";
+import SignUpView from "./views/SignUpView.vue";
 import SignInView from "./views/SignInView.vue";
 import NotFound from "./views/NotFound.vue";
 
