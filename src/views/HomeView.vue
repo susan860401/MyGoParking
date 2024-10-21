@@ -102,6 +102,8 @@ onMounted(()=>{
 }
 /*太陽跟月亮*/
 .main_stars{
+  position: absolute;
+  width: 80%;
   display: flex;
   justify-content: space-between;
 }
@@ -138,6 +140,9 @@ onMounted(()=>{
   height: 100vh;
   opacity: 0.7;
   z-index: 1000;
+  display: flex;
+  justify-items: center;
+  justify-content: center;
   /* background-color: rgb(0, 255, 191); */
 }
 

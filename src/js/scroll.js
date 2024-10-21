@@ -1,9 +1,28 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { MotionPathPlugin } from 'gsap/all';
 
 export function scrollanimation(){
     LoadSVG();
     gsap.registerPlugin(ScrollTrigger);
+    gsap.registerPlugin(MotionPathPlugin);
+
+
+    // 
+    // gsap.registerPlugin(MotionPathPlugin);
+
+    // gsap.to("#element", {
+    //     duration: 5,
+    //     motionPath: {
+    //     path: "#myPath",
+    //     align: "#myPath",
+    //     autoRotate: true
+    //     }
+    // });
+
+    // 
+
+
 
     ScrollTrigger.create({
         trigger: ".panel_search",
