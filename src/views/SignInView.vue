@@ -1,28 +1,26 @@
 <script setup>
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
 
-import { ref } from 'vue';
+import { ref } from "vue";
 
-const API_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/login`
+const API_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/login`;
 
 const user = ref({
-  "email":"",
-  "password":""
-})
+  email: "",
+  password: "",
+});
 
-const send = async()=>{
-    const response = await fetch(API_URL,{
-        method:'POST',
-        body:JSON.stringify(user.value),
-        headers:{'Content-Type':'application/json'}
-    })
-    if(response.ok){
-       const datas = await response.json()
-       alert(datas.message)
-    }
-
-    
-}
+const send = async () => {
+  const response = await fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify(user.value),
+    headers: { "Content-Type": "application/json" },
+  });
+  if (response.ok) {
+    const datas = await response.json();
+    alert(datas.message);
+  }
+};
 </script>
 
 <template>
@@ -70,11 +68,8 @@ const send = async()=>{
                 class="php-email-form"
               >
                 <h3>登入</h3>
-                <p>
-                  請輸入信箱及密碼
-                </p>
+                <p>請輸入信箱及密碼</p>
                 <div class="row gy-3">
-
                   <div class="col-md-12">
                     <input
                       type="email"
@@ -94,33 +89,37 @@ const send = async()=>{
                       name="psw"
                       placeholder="請輸入密碼"
                       required
-                      v-model="user.password" 
+                      v-model="user.password"
                       id="password"
                     />
                   </div>
-                  
 
                   <div class="col-md-12 text-center">
                     <div class="loading">Loading</div>
                     <div class="error-message"></div>
-                    <div class="sent-message">
-                      您已成功登入!
-                    </div>
+                    <div class="sent-message">您已成功登入!</div>
 
                     <button type="submit">登入</button>
                   </div>
                 </div>
               </form>
               <div class="row">
-                    <div class="col-12">
-                        <hr class="mt-5 mb-4 border-secondary-subtle">
-                        <div class="d-flex gap-2 gap-md-4 flex-column flex-md-row justify-content-md-center">
-
-                            <RouterLink :to="{ name: 'register' }" class="link-secondary text-decoration-none">註冊新帳號</RouterLink>
-                            <a href="#!" class="link-secondary text-decoration-none">忘記密碼</a>
-                        </div>
-                    </div>
+                <div class="col-12">
+                  <hr class="mt-5 mb-4 border-secondary-subtle" />
+                  <div
+                    class="d-flex gap-2 gap-md-4 flex-column flex-md-row justify-content-md-center"
+                  >
+                    <RouterLink
+                      :to="{ name: 'signUp' }"
+                      class="link-secondary text-decoration-none"
+                      >註冊新帳號</RouterLink
+                    >
+                    <a href="#!" class="link-secondary text-decoration-none"
+                      >忘記密碼</a
+                    >
+                  </div>
                 </div>
+              </div>
             </div>
             <!-- End Quote Form -->
           </div>
