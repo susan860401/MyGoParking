@@ -201,7 +201,16 @@ const AddMarkerToMap = async () => {
     const iconClass = lot.validSpace > 0 ? "lotsIcon" : "lotsIcon2"; // 根據可用車位判斷class
     const lotsIcon = L.divIcon({
       className: iconClass,
-      html: `<div>${lot.validSpace}</div>`,
+      html: `<div style="width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              line-height: 40px;
+              font-size: 14px;
+              text-align: center;
+              color: white;
+              font-weight: bold;
+              border: 2px solid white;
+              background-color: #4caf50;">${lot.validSpace}</div>`,
       iconSize: [40, 40],
       iconAnchor: [20, 20],
     });
@@ -380,7 +389,7 @@ onBeforeUnmount(() => {
   </div>
 </template>
 
-<style>
+<style scoped>
 .card {
   border: 1px solid #e3e3e3;
   border-radius: 8px;
@@ -412,7 +421,7 @@ onBeforeUnmount(() => {
   border-radius: 50%;
 }
 
-.lotsIcon div {
+/*.lotsIcon div {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -422,11 +431,11 @@ onBeforeUnmount(() => {
   color: white;
   font-weight: bold;
   border: 2px solid white;
-  background-color: #4caf50; /* 綠色背景表示可用 */
+  background-color: #4caf50; 
 }
 .lotsIcon2 {
   display: inline-block;
-  background-color: transparent; /* 不設置背景，直接顯示內部元素 */
+  background-color: transparent; 
   border-radius: 50%;
 }
 
@@ -440,8 +449,8 @@ onBeforeUnmount(() => {
   color: white;
   font-weight: bold;
   border: 2px solid white;
-  background-color: #e72e0d; /* 綠色背景表示可用 */
-}
+  background-color: #e72e0d; 
+}*/
 
 .map-loading-overlay {
   position: absolute;
