@@ -17,8 +17,42 @@ import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
           用戶中心
         </template>
       </BreadcrumbsComponent>
+
+      <!-- 內容區 含左側選單-->
+      <section id="service-details" class="service-details">
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+          <div class="row gy-4">
+            <!-- 左側選單 -->
+            <div class="col-lg-4">
+              <div class="services-list">
+                <RouterLink activeClass="active" :to="{ name: 'edit-profile' }"
+                  >用戶基本資訊</RouterLink
+                >
+                <RouterLink activeClass="active" :to="{ name: 'set-plate' }"
+                  >車牌設定</RouterLink
+                >
+                <RouterLink activeClass="active" :to="{ name: 'parking-order' }"
+                  >預定紀錄</RouterLink
+                >
+                <RouterLink
+                  activeClass="active"
+                  :to="{ name: 'parking-record' }"
+                  >停車紀錄</RouterLink
+                >
+                <a href="#">月租中心</a>
+                <RouterLink activeClass="active" :to="{ name: 'coupon' }"
+                  >優惠券專區</RouterLink
+                >
+              </div>
+            </div>
+            <!-- 載入conponent區塊 -->
+            <div class="col-lg-8">
+              <RouterView></RouterView>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
-    <RouterView></RouterView>
   </div>
 </template>
 
