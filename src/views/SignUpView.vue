@@ -1,18 +1,12 @@
-<script setup>
-import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
-</script>
-
 <template>
   <div>
     <main id="main">
       <!-- 麵包屑 -->
       <BreadcrumbsComponent>
         <template #title>
-          <!-- 插入到 title 插槽 -->
           <h2>Sign Up</h2>
         </template>
         <template #page>
-          <!-- 插入到 page 插槽 -->
           註冊
         </template>
       </BreadcrumbsComponent>
@@ -30,7 +24,6 @@ import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
                   itaque perspiciatis fuga ipsum perspiciatis. Eum amet fugiat
                   totam nisi possimus ut delectus dicta.
                 </p>
-
                 <p>
                   Aliquam velit deserunt autem. Inventore et saepe. Tenetur
                   suscipit eligendi labore culpa eos. Deserunt porro magni qui
@@ -40,65 +33,61 @@ import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
             </div>
 
             <div class="col-lg-5" data-aos="fade">
+              <h3>註冊</h3>
+                <p>
+                  請輸入信箱及密碼
+                </p>
               <form
-                action="forms/quote.php"
-                method="post"
+                name="userData"
+                id="registerForm"
+                novalidate @submit.prevent="validate"
                 class="php-email-form"
               >
-                <h3>Get a quote</h3>
-                <p>
-                  Vel nobis odio laboriosam et hic voluptatem. Inventore vitae
-                  totam. Rerum repellendus enim linead sero park flows.
-                </p>
-                <div class="row gy-3">
-                  <div class="col-md-12">
-                    <input
-                      type="text"
-                      name="name"
-                      class="form-control"
-                      placeholder="Name"
-                      required
-                    />
-                  </div>
-
-                  <div class="col-md-12">
-                    <input
+              <div class="row gy-3">
+                <div class="col-md-12 input-group" >
+                  <input
                       type="email"
                       class="form-control"
-                      name="email"
-                      placeholder="Email"
+                      name="useremail"
+                      v-model.trim="userData.useremail"
+                      placeholder="請輸入Email帳號"
+                      id="email"
                       required
-                    />
-                  </div>
-
-                  <div class="col-md-12">
+                  />
+                  <small v-if="!validity.emailRequired || !validity.emailFormat" class="text-danger">請輸入正確電子郵件格式</small><br>
+                </div>
+                  <div class="col-md-12 input-group">
                     <input
                       type="text"
                       class="form-control"
-                      name="phone"
-                      placeholder="Phone"
+                      name="license"
+                      v-model.trim="userData.license"
+                      placeholder="請輸入車牌號碼"
                       required
                     />
+                    <small v-if="validity.submitted && (!validity.licenseRequired || !validity.licenseFormat)" class="text-danger">車牌號碼格式不正確<br>(英文三碼-數字四碼)例: ABC-123</small>
                   </div>
 
-                  <div class="col-md-12">
-                    <textarea
+                  <div class="col-md-12 input-group">
+                    <input
+                      type="password"
                       class="form-control"
-                      name="message"
-                      rows="6"
-                      placeholder="Message"
+                      name="psw"
+                      v-model.trim="userData.psw"
+                      placeholder="請輸入密碼"
                       required
-                    ></textarea>
+                    />
+                    <small v-if="validity.submitted && (!validity.pswRequired || !validity.pswFormat)" class="text-danger">請輸入正確密碼格式</small>
                   </div>
-
+                  
                   <div class="col-md-12 text-center">
                     <div class="loading">Loading</div>
                     <div class="error-message"></div>
                     <div class="sent-message">
-                      Your quote request has been sent successfully. Thank you!
+                      您已註冊成功!!
                     </div>
 
-                    <button type="submit">Get a quote</button>
+                    <button type="submit">註冊</button>
                   </div>
                 </div>
               </form>
@@ -113,3 +102,85 @@ import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
 </template>
 
 <style lang="css" scoped></style>
+
+<script setup>
+import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
+import { ref } from 'vue';
+
+const BASE_URL = import.meta.env.VITE_API_BASEURL;
+const API_URL = `${BASE_URL}/Customers`; 
+
+//讀取Categories資料
+const loadCategories = async()=>{
+         const response = await fetch(API_URL)
+         const datas = await response.json()
+         console.log(datas)
+                  
+}
+loadCategories();
+
+const userData = ref({
+    "psw": "",
+    "useremail": "",
+    "license": "",
+    
+});
+
+const validity = ref({
+    "emailRequired": true,
+    "pswRequired": true,
+    "licenseRequired": true,
+    "pswFormat": true,
+    "emailFormat": true,
+    "licenseFormat": true,
+    "submitted": false,
+});
+
+const emailRule = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const pswRule = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+]{8,}$/;
+const licenseRule = /^[A-Z]{3}-\d{4}$/;
+
+const validate = async () => {
+    //validity.value.submitted = true; // 設置提交狀態為真
+    const { useremail, license, psw } = userData.value;
+
+    validity.value.licenseRequired = license.length > 0;
+    validity.value.pswRequired = psw.length > 0;
+    validity.value.emailRequired = useremail.length > 0;
+
+    validity.value.pswFormat = pswRule.test(psw);
+    validity.value.emailFormat = emailRule.test(useremail);
+    validity.value.licenseFormat = licenseRule.test(license);
+
+    validity.value.isValid = validity.value.pswRequired && 
+                             validity.value.emailRequired && 
+                             validity.value.emailFormat && 
+                             validity.value.pswFormat && 
+                             validity.value.licenseRequired && 
+                             validity.value.licenseFormat;
+
+    if (validity.value.isValid) {
+        // const formData = new FormData(document.userData);
+        const data = {
+            UserId: 0,  // 預設值，如果是自動生成的，可以忽略或設為 null
+            Username: "Null",
+            Password: userData.value.psw,
+            Salt: "Null",  // 如果由伺服器生成，可以留空
+            Email: userData.value.useremail,
+            Phone: "Null",  // 如果不需要電話號碼，可以保持空值
+            LicensePlate: userData.value.license
+        };
+        
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'  // 確保發送的是 JSON 格式
+            },
+            body: JSON.stringify(data) 
+        });
+        if (response.ok) {
+            alert('註冊成功!!');
+        }
+    }
+};
+</script>

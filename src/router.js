@@ -5,11 +5,13 @@ import GuideView from "./views/GuideView.vue";
 import CustomerServiceView from "./views/CustomerServiceView.vue";
 import CustomerCenterView from "./views/CustomerCenter/CustomerCenterView.vue";
 import EditProfileView from "./views/CustomerCenter/EditProfileView.vue";
+import SetLicensePlateView from "./views/CustomerCenter/SetLicensePlateView.vue";
 import ParkingOrderView from "./views/CustomerCenter/ParkingOrderView.vue";
 import ParkingRecordView from "./views/CustomerCenter/ParkingRecordView.vue";
 import CouponView from "./views/CustomerCenter/CouponView.vue";
 import SignInView from "./views/SignInView.vue";
 import NotFound from "./views/NotFound.vue";
+import MonthlyRentView from "./views/MonthlyRentView.vue";
 import SignUpView from "./views/SignUpView.vue";
 
 const routes = [
@@ -34,15 +36,25 @@ const routes = [
     name: "service",
   },
   {
+    path: "/MonthlyRent",
+    component: MonthlyRentView,
+    name: "MonthlyRent",
+  },
+  {
     path: "/CustomerCenter",
+    redirect: { name: "edit-profile" }, // 進入 /customer 時自動跳轉到 /customer/edit-profile
     component: CustomerCenterView,
     name: "customer",
     children: [
       {
-        path: "", // 空路徑表默認子路由
+        path: "edit-profile", // 空路徑表默認子路由
         component: EditProfileView, // 默認顯示資料修改畫面
         name: "edit-profile",
-        alias: "/edit-profile", //別名
+      },
+      {
+        path: "set-licensePlate", // 空路徑表默認子路由
+        component: SetLicensePlateView, // 默認顯示資料修改畫面
+        name: "set-plate",
       },
       {
         path: "parking-order",
