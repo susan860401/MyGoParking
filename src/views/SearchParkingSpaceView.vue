@@ -101,7 +101,7 @@ const loadParkingLots = async () => {
     return;
   }
   try {
-    const res = await fetch(`${BASE_URL}/GetParkingLots`);
+    const res = await fetch(`${BASE_URL}/ParkingLot/GetParkingLots`);
     if (!res.ok) {
       throw new Error("Server無法獲取停車場數據");
     }
