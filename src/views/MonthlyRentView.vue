@@ -1,0 +1,200 @@
+<script setup>
+import { ref, computed } from 'vue';
+import BreadcrumbsComponent from '@/components/BreadcrumbsComponent.vue';
+import axios from 'axios';
+// 定義方案資料
+const planData = {
+    oneMonth: {
+        label: '1個月',
+        price: '3500',
+        description: '適合短期停車需求，彈性靈活，無需長期綁約。',
+        features: ['無綁約，可隨時取消', '方便的自動續約功能', '支援多種付款方式'],
+        savings: '',
+    },
+    threeMonths: {
+        label: '3個月',
+        price: '3400',
+        description: '享有優惠價格，適合中期停車需求。',
+        features: ['比單月更划算', '推薦方案，特別優惠', '可提前續約，保障車位'],
+        savings: '比1個月方案每月省100元',
+    },
+    sixMonths: {
+        label: '6個月',
+        price: '3200',
+        description: '適合長期停車需求，節省更多費用。',
+        features: ['半年合約，享有長期優惠', '固定車位保障', '免費升級停車服務'],
+        savings: '比1個月方案每月省300元',
+    },
+    twelveMonths: {
+        label: '12個月',
+        price: '3000',
+        description: '最划算的年度合約方案，省下更多。',
+        features: ['年度最低價格', '專屬客戶服務', '參加會員活動資格'],
+        savings: '比1個月方案每月省500元',
+    },
+};
+
+const selectedPlanKey = ref('twelveMonths');
+const selectedPlan = ref(planData.twelveMonths);
+
+const savingsMessage = computed(() =>
+    selectedPlan.value.savings ? `此方案 ${selectedPlan.value.savings}` : ''
+);
+
+const selectPlan = (planKey) => {
+    selectedPlan.value = planData[planKey];
+    console.log(selectedPlan.value)
+    selectedPlanKey.value = planKey;
+};
+
+//-----------------------------------------------------------
+let baseLoginPayUrl = 'https://localhost:7077/api/LinePay/';
+
+function requestPayment() {
+    const amount = parseInt(selectedPlan.value.price, 10); // 取得當前方案的價格
+    const generatePackageId = () => `pkg_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+    // 交易訂單資料
+    let payment = {
+        amount: amount, // 使用選中方案的價格
+        currency: "TWD",
+        orderId: Date.now().toString(), // 使用 Timestamp 當作 orderId
+        packages: [
+            {
+                id: generatePackageId(),
+                amount: `${selectedPlan.value.price}`, // 套用選中方案的價格
+                name: selectedPlan.value.label, // 套用方案名稱
+                products: [
+                    {
+                        name: `${selectedPlan.value.label} 方案`,
+                        quantity: 1, // 假設一筆訂單只包含一個方案
+                        price: amount,
+                    }
+                ]
+            },
+        ],
+        RedirectUrls: {
+            ConfirmUrl: "http://localhost:5173/MonthlyRent",
+            CancelUrl: "https://c4f0-61-63-154-173.jp.ngrok.io/api/LinePay/Cancel",
+        },
+    };
+
+    // 送出交易申請至商家伺服器
+    axios.post(`${baseLoginPayUrl}Create`, payment, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then((response) => {
+            const paymentUrl = response.data.info.paymentUrl.web;
+            window.location.href = paymentUrl;
+        })
+        .catch((error) => {
+            console.error('交易失敗:', error);
+        });
+}
+</script>
+
+<template>
+    <div>
+        <main id="main">
+            <BreadcrumbsComponent>
+                <template #title>
+                    <h2>月租付款</h2>
+                </template>
+                <template #page>月租付款</template>
+            </BreadcrumbsComponent>
+
+            <div class="container py-5">
+                <h2 class="text-center mb-3">選擇您的月租停車方案</h2>
+                <p class="text-center text-muted">彈性付款方案，滿足您的停車需求</p>
+
+                <ul class="nav justify-content-evenly mb-4" id="planTabs">
+                    <li class="nav-item" style="width: 23%;" v-for="(plan, key) in planData" :key="key">
+                        <div class="plan-option" :class="{ active: selectedPlanKey === key }" @click="selectPlan(key)">
+                            {{ plan.label }}
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane show active" id="planContent">
+                        <div class="text-center p-5 bg-white rounded shadow">
+                            <h1>{{ selectedPlan.price }}</h1>
+                            <p class="text-muted">{{ selectedPlan.description }}</p>
+                            <ul class="list-unstyled">
+                                <li v-for="feature in selectedPlan.features" :key="feature" class="feature-item">
+                                    {{ feature }}
+                                </li>
+                            </ul>
+                            <p v-if="savingsMessage" class="text-success mt-3">
+                                {{ savingsMessage }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button class="btn btn-warning btn-lg" @click="requestPayment()">
+                        立即付款
+                    </button>
+                </div>
+            </div>
+        </main>
+        <div id="paymentFormContainer"></div>
+    </div>
+</template>
+
+<style lang="css" scoped>
+.plan-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    position: relative;
+}
+
+.plan-option::before {
+    content: '○';
+    font-size: 20px;
+    color: #ddd;
+    margin-right: 10px;
+    transition: color 0.3s;
+}
+
+.plan-option.active::before {
+    content: '✔' !important;
+    color: #007bff !important;
+}
+
+.plan-option.active {
+    border-color: #007bff !important;
+    background: #e7f1ff !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.tab-content h1 {
+    font-size: 3rem;
+}
+
+.feature-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.feature-item::before {
+    content: '✔';
+    color: #28a745;
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+.btn-lg:hover {
+    background-color: #ffc107;
+}
+</style>
