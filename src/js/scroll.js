@@ -28,7 +28,7 @@ export function scrollanimation(){
         // pin: "#car_container",
         // pinSpacer:false,
         onEnter: () => {
-            gsap.set("#car_container", { backgroundImage: "url('src/images/road.png')"});
+            //gsap.set("#car_container", { backgroundImage: "url('src/images/road.png')"});
             gsap.to(".main_stars",{opacity:"1"});
             //gsap.set("#car_container", { backgroundColor: "blue"});
         },
@@ -93,7 +93,7 @@ export function scrollanimation(){
 
         },
         onLeave: () => {
-            gsap.set("#car_container", { backgroundImage:"none"});
+            //gsap.set("#car_container", { backgroundImage:"none"});
             gsap.set(".main_stars",{duration:0.5,opacity:"0"});
         },
         onEnterBack: () => {

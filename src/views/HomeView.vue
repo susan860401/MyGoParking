@@ -64,6 +64,13 @@ onMounted(()=>{
           <img src="@/images/residential_area.svg" alt="">
         </div>
       </div>
+      <div id="car_container">
+        <div id="car_path">
+          <div id="car">
+            <!-- <img id="car" src="@/images/car.svg"></img> -->
+          </div>
+        </div>
+      </div>
       <div class="box box1"></div>
       <div class="box box2"></div>
       <div class="box box3"></div>
@@ -73,13 +80,6 @@ onMounted(()=>{
       <div class="component">
         <div id="searchbar">
           <SearchInputComponent @search="SearchHandler" v-model="searchQuery"></SearchInputComponent>
-        </div>
-      </div>
-      <div id="car_container">
-        <div id="car_path">
-          <div id="car">
-            <!-- <img id="car" src="@/images/car.svg"></img> -->
-          </div>
         </div>
       </div>
     </section>
@@ -224,7 +224,7 @@ onMounted(()=>{
   /* background-color: gray; */
   height: 15vmin;
   width: 100vw;
-  /* position: fixed; */
+  position: absolute;
   z-index: 1000;
   bottom: 0;
   right: 0;
