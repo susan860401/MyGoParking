@@ -27,14 +27,14 @@
                 >Home</RouterLink
               >
             </li>
-            <li>
+            <!-- <li>
               <RouterLink
                 class="nav-link"
                 activeClass="active"
                 :to="{ name: 'search' }"
                 >查找停車位</RouterLink
               >
-            </li>
+            </li> -->
             <li>
               <RouterLink
                 class="nav-link"
