@@ -124,4 +124,13 @@
 #test {
   /* position: fixed; */
 }
+/* #header::before{
+  content: "";
+  background-color: transparent;
+  border: 5px solid white;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  filter: blur(5px);
+} */
 </style>

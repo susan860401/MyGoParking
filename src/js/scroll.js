@@ -2,134 +2,101 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 export function scrollanimation(){
+    LoadSVG();
     gsap.registerPlugin(ScrollTrigger);
 
-
-    let sections = gsap.utils.toArray(".panel");
-
-    let scrollTween = gsap.to(sections, {
-        xPercent: -100 * (sections.length - 1),
-        ease: "none", // <-- IMPORTANT!
-        scrollTrigger: {
-        trigger: ".panels",
-        pin: true,
-        scrub: 2,
-        // snap: {
-        //     snapTo: (value) => Math.round(value * (sections.length - 1)) / (sections.length - 1), // 精確對齊每個區塊
-        //     duration: {min: 0.2, max: 0.5},  // 調整對齊動畫的持續時間
-        //     ease: "power1.inOut"             // 平滑對齊過渡
-        // },
-        // end: "+=3000"
-        end: () => "+=" + (sections.length * window.innerWidth)
-        }
-    });
-    gsap.set(".car-parked", {x:"+10vw",y:""});
-    gsap.set(".box-1, .box-2", {x:"-20vw",y:"10vh"});
-    ScrollTrigger.defaults({markers: {startColor: "white", endColor: "white"}});
-
-    // red section
-    gsap.to(".box-1", {
-    y: "-2vh",
-    x: "-60vw",
-    duration: 2,
-    // ease: "elastic",
-    ease:"none",
-    scrollTrigger: {
-        // trigger: ".box-1",
-        trigger: ".red",
-        containerAnimation: scrollTween,
-        // start: "left center",
-        start: "center 51%",
-        end:"center 20%",
-        toggleActions: "play none none reset",
-        // toggleActions:"play reverse reverse reset",
-        // scrub: true,
-        id: "1",
-    }
-    });
-
-    
-    // 首先，將車輛移動到第一個位置
-    // 首先，將車輛向前移動一小段
-    // GSAP動畫設定
-    gsap.to(".car-parked", {
-        x: "20vw", // 向右移動一小段
-        y: "-20vh",
-        duration: 1,
-        ease: "none",
-        scrollTrigger: {
-            trigger: ".red", // 觸發器
-            containerAnimation: scrollTween,
-            start: "center 51%", // 開始時的參考點
-            end: "center 20%", // 離開觸發器的點
-            toggleActions: "play none none reset",
-            id:"car",
+    ScrollTrigger.create({
+        trigger: ".panel_search",
+        start: "top bottom",
+        endTrigger:".footer", 
+        end: "17% bottom", // 200px past the start 
+        // pin: "#car_container",
+        // pinSpacer:false,
+        onEnter: () => {
+            gsap.set("#car_container", { backgroundImage: "url('src/images/road.png')"});
+            //gsap.set("#car_container", { backgroundColor: "blue"});
+        },
+        onUpdate: (self) => {
+        // 獲取滾動的進度
+        const progress = self.progress; // 進度 0 到 1
+        // 根據進度計算車子移動距離
+        const moveDistance = progress * 100; // 根據需要調整比例
+        // 更新車子的位置
+        //gsap.set("#car_path", { x: `-${moveDistance}vw` }); //這是立即性
+        gsap.to("#car_path", { duration: 0.5, x: `-${moveDistance}vw`, y: 0, opacity: 1 });
+        // gsap.set("#car_container", { backgroundColor: 'gray'});
+        // gsap.set(".view-point",{opacity:'1'});
+        // 計算建築物的移動距離
+        const totalBuildingMoveDistance = progress * (buildingWidth * buildingCount);
+        //gsap.set(buildings, { x: `${totalBuildingMoveDistance}px` });
+        gsap.to(buildings, { duration: 0.5, x: `${totalBuildingMoveDistance}px`, y: 0, opacity: 1 });
+        // const buildingMoveDistance = moveDistance * (buildingWidth * buildingCount / (buildingWidth * buildingCount * 2)); // 調整比例
+        // gsap.set(buildings, { x: `${buildingMoveDistance}px` });
+        gsap.set("#car_container", { backgroundImage: "url('src/images/road.png')"});
+        },
+        onLeave: () => {
+            gsap.set("#car_container", { backgroundImage:"none"});
         }
     });
     
 
-
-
+    const buildings = document.querySelector(".buildings");
+    const buildingWidth = document.querySelector(".building").offsetWidth;
+    const buildingCount = buildings.children.length;
     
-
-
-
-
-    
-    
-
-
-
-
-    // gray section
-    gsap.to(".box-2", {
-    y: -120,
-    backgroundColor: "#1e90ff",
-    ease: "none",
-    scrollTrigger: {
-        trigger: ".box-2",
-        // trigger: ".gray",
-        containerAnimation: scrollTween,
-        start: "center 65%",
-        end: "center 20%",
-        scrub: true,
-        id: "2"
+    // 生成克隆的元素並放在原始元素的右邊
+    for (let i = 0; i < buildingCount; i++) {
+        const clone = buildings.children[i].cloneNode(true);
+        buildings.appendChild(clone); // 確保克隆的元素在原始元素的右邊
     }
+    
+    // 設置建築物的父容器寬度，以便它能夠容納兩組建築物
+    buildings.style.width = `${buildingWidth * buildingCount * 2}px`;
+    
+    gsap.set(buildings,{right:"0%"})
+    // 使用 GSAP 來控制從左到右的無縫滑動, 無限循環動畫
+    // gsap.to(buildings, {
+    //     x: `${buildingWidth * buildingCount}px`, // 向左移動整個容器的寬度
+    //     duration: 20,  // 控制動畫速度
+    //     ease: "linear",  // 線性動畫
+    //     repeat: -1  // 無限循環
+    // });
+    
+
+
+
+    // const carContainer = document.querySelector("#car_path");
+    const viewContainer = document.querySelector(".view-container");
+    
+    const timeline = gsap.timeline({
+        scrollTrigger: {
+            trigger: viewContainer,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: true // 使滾動和動畫同步
+        }
     });
 
-    // purple section
-    ScrollTrigger.create({
-    trigger: ".box-3",
-    containerAnimation: scrollTween,
-    toggleClass: "active",
-    start: "center 60%",
-    id: "3"
+    const search_timeline = gsap.timeline({
+        scrollTrigger:{
+            trigger:".panel_search",
+            start:"top bottom",
+            end:"bottom bottom",
+            scrub:true
+        }
     });
+    
+    
+    timeline.to(".box1",{ x: 100})
+    search_timeline.to(".box2",{x:"50vw",opacity:1,duration:1})
 
-    // green section
-    ScrollTrigger.create({
-    trigger: ".green",
-    containerAnimation: scrollTween,
-    start: "center 65%",
-    end: "center 51%",
-    onEnter: () => console.log("enter"),
-    onLeave: () => console.log("leave"),
-    onEnterBack: () => console.log("enterBack"),
-    onLeaveBack: () => console.log("leaveBack"),
-    onToggle: self => console.log("active", self.isActive),
-    id: "4"
-    });
+}
 
-    // only show the relevant section's markers at any given time
-    gsap.set(".gsap-marker-start, .gsap-marker-end, .gsap-marker-scroller-start, .gsap-marker-scroller-end", {autoAlpha: 0});
-    ["red","gray","purple","green"].forEach((triggerClass, i) => {
-    ScrollTrigger.create({
-        trigger: "." + triggerClass,
-        containerAnimation: scrollTween,
-        start: "left 30%",
-        end: i === 3 ? "right right" : "right 30%",
-        markers: false,
-        onToggle: self => gsap.to(".marker-" + (i+1), {duration: 0.25, autoAlpha: self.isActive ? 1 : 0})
-    });
+function LoadSVG(){
+    fetch("src/images/car.svg")
+    .then((response) => {return response.text();})
+    .then((svg)=>{
+        // console.log(svg)
+        document.getElementById("car").innerHTML=svg;
     });
 }
