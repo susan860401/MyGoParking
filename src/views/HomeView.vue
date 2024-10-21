@@ -39,6 +39,8 @@ onMounted(()=>{
           <img src="@/images/Moon.svg" alt="">
         </div>
       </div>
+      <div class="sky">
+      </div>
       <div class="buildings" style="--width:300px;--quantity:7">
         <div class="building" style="--position:1">
           <img src="@/images/school.svg" alt="">
@@ -75,15 +77,17 @@ onMounted(()=>{
       </div>
       <div id="car_container">
         <div id="car_path">
-          <div id="car"></div>
-          <!-- <img id="car" src="@/images/ot140.svg"></img> -->
+          <div id="car">
+            <!-- <img id="car" src="@/images/car.svg"></img> -->
+          </div>
+          
         </div>
       </div>
     </section>
-    <section class="panel panel_search"></section>
-    <section class="panel panel_reserve"></section>
-    <section class="panel panel_test"></section>
-    <section class="panel panel_test"></section>
+    <section class="panel panel_search">search</section>
+    <section class="panel panel_test">test</section>
+    <section class="panel panel_reserve">reserve</section>
+    <section class="panel panel_test">test</section>
   </div>
 </template>
 
@@ -102,17 +106,20 @@ onMounted(()=>{
 }
 /*太陽跟月亮*/
 .main_stars{
+  top:90%;
   position: absolute;
-  width: 80%;
+  width: 185vh;
   display: flex;
   justify-content: space-between;
+  /* rotate:70deg; */
 }
 .sun * {
-  height:100px;
+  height:20vmin;
 }
 .moon * {
-  height:100px;
+  height:20vmin;
 }
+
 
 /* 建築物部分 */
 .buildings{
@@ -138,8 +145,8 @@ onMounted(()=>{
   position: fixed;
   width: 100vw;
   height: 100vh;
-  opacity: 0.7;
-  z-index: 1000;
+  opacity: 0.5;
+  /* z-index: 1; */
   display: flex;
   justify-items: center;
   justify-content: center;
@@ -149,12 +156,13 @@ onMounted(()=>{
 .title{
   padding:0;
   height: 100vh;
-  background-color: black;
+  /* background-color: black; */
   position: relative;
   display: flex;
   /* justify-content: center; */
   /* justify-items: center; */
   align-items: center;
+  z-index: 0;
 }
 /* 搜尋欄 */
 .component * {
@@ -174,6 +182,7 @@ onMounted(()=>{
 .panel{
   width: 100vw;
   height: 100vh;
+  font-size: 300px;
 }
 
 .panel_search{
@@ -185,9 +194,23 @@ onMounted(()=>{
 }
 
 .panel_test{
-  height: 98vh;
-  background-color: aquamarine;
+  height: 100vh;
+  /* background-color: sienna; */
   padding: 0;
+  /* animation: sky 10s infinite; */
+}
+
+
+@keyframes sky{
+  0%{
+    background-color: skyblue;
+  }
+  50%{
+    background-color: #FF8600;
+  }
+  100%{
+    background-color: #000;
+  }
 }
 
 .view-container {
@@ -202,29 +225,34 @@ onMounted(()=>{
   /* background-color: gray; */
   height: 15vmin;
   width: 100vw;
-  position: fixed;
+  /* position: fixed; */
   z-index: 1000;
   bottom: 0;
   right: 0;
-  flex: content;
-  align-items: center;
+  /* flex: content; */
+  /* align-items: center; */
   /* align-content: center; */
 }
 #car,#car_path{
   height: 15vmin;
+  width: 15vmin;
   position: absolute;
   /* bottom:1vh; */
   right: 10px;
+  display: flex;
 }
 #car{
-  width: 15vmin;
+  /* width: 15vmin; */
   position: absolute;
-  top: 0;
-  align-content: center;
   animation:shakeCar 0.5s ease-in-out infinite;
 }
-#car_path{
-  /* animation: moveCar 5s linear infinite; */
+#car svg {
+    position: absolute;
+    top:100px;
+    right: 0;
+    width: 100%; /* 讓 SVG 寬度填滿容器 */
+    height: auto; /* 保持 SVG 的比例 */
+    display: block; /* 移除 inline 元素的額外間距 */
 }
 
 @keyframes moveCar {
@@ -242,8 +270,11 @@ onMounted(()=>{
   }
 }
 
+#header{
+  z-index:1001;
+}
 
-.footer{
-  z-index: 1001;
+#footer{
+  z-index:1001;
 }
 </style>
