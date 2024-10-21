@@ -31,6 +31,14 @@ onMounted(()=>{
 <template>
   <div class="view-container">
     <section class="view-point">
+      <div class="main_stars">
+        <div class="sun">
+          <img src="@/images/Sun.svg" alt="">
+        </div>
+        <div class="moon">
+          <img src="@/images/Moon.svg" alt="">
+        </div>
+      </div>
       <div class="buildings" style="--width:300px;--quantity:7">
         <div class="building" style="--position:1">
           <img src="@/images/school.svg" alt="">
@@ -91,6 +99,17 @@ onMounted(()=>{
 }
 .box2{
   opacity: 0;
+}
+/*太陽跟月亮*/
+.main_stars{
+  display: flex;
+  justify-content: space-between;
+}
+.sun * {
+  height:100px;
+}
+.moon * {
+  height:100px;
 }
 
 /* 建築物部分 */
