@@ -262,7 +262,7 @@ onMounted(async () => {
   if (map.value === null) {
     //初始化地圖
     map.value = L.map("map").setView([22.6273, 120.3014], 15); //高雄經緯度
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "EasyPark © OpenStreetMap",
     }).addTo(map.value);
     locatePlace();
