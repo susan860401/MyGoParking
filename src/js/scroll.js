@@ -190,6 +190,25 @@ export function scrollanimation(){
         }
     });
 
+    //測試讓我的view-point 可以不要蓋到.footer
+    const fixedDiv = document.querySelector('.view-point');
+    const footer = document.querySelector('.footer');
+    const footerHeight = footer.offsetHeight; // 獲取 footer 的高度
+    console.log(fixedDiv)
+    console.log(footer)
+    ScrollTrigger.create({
+        trigger: footer,
+        start: "top bottom", // 當 footer 的頂部與 viewport 的頂部相接時觸發
+        end: `+=${footerHeight}`, // 結束位置為 footer 高度
+        onUpdate: (self) => {
+            // 根據滾動的進度計算移動的距離
+            const moveAmount = footerHeight * self.progress; // 計算應該向上移動的距離
+            gsap.set(fixedDiv, { y: -moveAmount }); // 將 fixed div 向上移動
+        },
+        markers: true // 可選，方便調試
+    });
+
+
 
     gsap.to(".buildings", {
         scrollTrigger: {

@@ -80,7 +80,6 @@ onMounted(()=>{
           <div id="car">
             <!-- <img id="car" src="@/images/car.svg"></img> -->
           </div>
-          
         </div>
       </div>
     </section>
