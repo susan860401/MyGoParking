@@ -4,8 +4,6 @@ import SearchInputComponent from "@/components/SearchInputComponent.vue";
 import Swal from "sweetalert2";
 import "leaflet/dist/leaflet.css";
 import "leaflet/dist/leaflet.js";
-import "@fortawesome/fontawesome-free/css/all.min.css";
-import "@fortawesome/fontawesome-free/js/all.min.js";
 import "leaflet.locatecontrol/dist/L.Control.Locate.min.css";
 import "leaflet.locatecontrol/dist/L.Control.Locate.min.js";
 import "leaflet.markercluster/dist/MarkerCluster.css";
@@ -106,6 +104,9 @@ const loadParkingLots = async () => {
       throw new Error("Server無法獲取停車場數據");
     }
     const data = await res.json();
+    data.forEach((lot) => {
+      lot.isETC = lot.etcSpace > 0;
+    });
     parkingLots.value = data;
     AddMarkerToMap();
   } catch (error) {
@@ -146,11 +147,11 @@ const locatePlace = () => {
         userLocationMarker.value = L.marker([e.latitude, e.longitude]).addTo(
           map.value
         );
-        // 設置地圖視圖到用戶位置
-        map.value.setView([e.latitude, e.longitude], 18);
         destinationLat.value = e.latitude;
         destinationLon.value = e.longitude;
         updateDisplayLots();
+        // 設置地圖視圖到用戶位置
+        map.value.setView([e.latitude, e.longitude], 18);
       },
       onLocationerror: () => {
         Swal.fire({
@@ -199,31 +200,36 @@ const AddMarkerToMap = async () => {
   await new Promise((resolve) => setTimeout(resolve, 2000));
   displayedParkingLots.value.forEach((lot) => {
     const iconClass = lot.validSpace > 0 ? "lotsIcon" : "lotsIcon2"; // 根據可用車位判斷class
+    const backgroundColor = lot.validSpace > 0 ? "#4caf50" : "#e72e0d"; // 綠色表示可用，紅色表示不可用
     const lotsIcon = L.divIcon({
       className: iconClass,
-      html: `<div style="width: 40px;
-              height: 40px;
-              border-radius: 50%;
-              line-height: 40px;
-              font-size: 14px;
-              text-align: center;
-              color: white;
-              font-weight: bold;
-              border: 2px solid white;
-              background-color: #4caf50;">${lot.validSpace}</div>`,
+      html: `<div style="
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        line-height: 40px;
+        font-size: 14px;
+        text-align: center;
+        color: white;
+        font-weight: bold;
+        border: 2px solid white;
+        background-color: ${backgroundColor};">${lot.validSpace}</div>`,
       iconSize: [40, 40],
       iconAnchor: [20, 20],
     });
-    const marker = L.marker(
-      [lot.latitude, lot.longitude],
-      {
-        icon: lotsIcon,
-      },
-      13
-    );
-    markerClusterGroup.value.addLayer(marker);
-    // 將 marker 存入 markerMap，使用 lotId 進行關聯
-    markerMap.value.set(lot.lotId, marker);
+    const existingMarker = markerMap.value.get(lot.lotId);
+    if (!existingMarker) {
+      const marker = L.marker(
+        [lot.latitude, lot.longitude],
+        {
+          icon: lotsIcon,
+        },
+        13
+      );
+      markerClusterGroup.value.addLayer(marker);
+      // 將 marker 存入 markerMap，使用 lotId 進行關聯
+      markerMap.value.set(lot.lotId, marker);
+    }
   });
   // 將 MarkerClusterGroup 添加到地圖
   if (map.value) {
@@ -364,12 +370,22 @@ onBeforeUnmount(() => {
                         >
                           <div class="card-body">
                             <h3 class="card-title">{{ lot.lotName }}</h3>
-                            <p>
-                              費用：
-                              <span style="color: red">
-                                {{ lot.weekdayRate }}
-                              </span>
-                            </p>
+                            <div class="d-flex justify-content-between">
+                              <p style="font-weight: 700">
+                                費用：
+                                <span style="color: red">
+                                  {{ lot.weekdayRate }}
+                                </span>
+                              </p>
+                              <span v-if="lot.isETC" class="ms-2"
+                                ><i
+                                  class="fa-solid fa-charging-station fa-beat-fade"
+                                ></i
+                              ></span>
+                              <a href=""
+                                ><img src="/Navigation.png" width="30px"
+                              /></a>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -415,43 +431,6 @@ onBeforeUnmount(() => {
   position: relative;
   z-index: 1;
 }
-.lotsIcon {
-  display: inline-block;
-  background-color: transparent; /* 不設置背景，直接顯示內部元素 */
-  border-radius: 50%;
-}
-
-/*.lotsIcon div {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  line-height: 40px;
-  font-size: 14px;
-  text-align: center;
-  color: white;
-  font-weight: bold;
-  border: 2px solid white;
-  background-color: #4caf50; 
-}
-.lotsIcon2 {
-  display: inline-block;
-  background-color: transparent; 
-  border-radius: 50%;
-}
-
-.lotsIcon2 div {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  line-height: 40px;
-  font-size: 14px;
-  text-align: center;
-  color: white;
-  font-weight: bold;
-  border: 2px solid white;
-  background-color: #e72e0d; 
-}*/
-
 .map-loading-overlay {
   position: absolute;
   top: 0;
