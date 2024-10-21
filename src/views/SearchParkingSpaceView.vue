@@ -15,7 +15,7 @@ import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
-const API_URL = `${BASE_URL}?address=`;
+const API_URL = `${BASE_URL}/ParkingLot?address=`;
 const router = useRouter();
 const route = useRoute();
 const map = ref(null);
