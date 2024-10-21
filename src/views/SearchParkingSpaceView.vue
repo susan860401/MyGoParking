@@ -349,7 +349,18 @@ onBeforeUnmount(() => {
                           @mouseover="focusOnMarker(lot.lotId)"
                         >
                           <div class="card-body">
-                            <h3 class="card-title">{{ lot.lotName }}</h3>
+                            <h3 class="card-title d-flex">
+                              {{ lot.lotName }}
+                              <div
+                                class="d-flex text-center"
+                                style="width: 80px; height: 25px"
+                              >
+                                <img style="width: 20px" src="/Walk.gif" />
+                                <span style="font-size: 15px; color: blue"
+                                  >{{ lot.distance.toFixed(2) }}km</span
+                                >
+                              </div>
+                            </h3>
                             <div class="d-flex justify-content-between">
                               <p style="font-weight: 700">
                                 費用：
