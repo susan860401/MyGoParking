@@ -25,12 +25,8 @@ export function scrollanimation(){
         start: "top bottom",
         endTrigger:".footer", 
         end: "17% bottom", // 200px past the start 
-        // pin: "#car_container",
-        // pinSpacer:false,
         onEnter: () => {
-            //gsap.set("#car_container", { backgroundImage: "url('src/images/road.png')"});
             gsap.to(".main_stars",{opacity:"1"});
-            //gsap.set("#car_container", { backgroundColor: "blue"});
         },
         onUpdate: (self) => {
         // 獲取滾動的進度
@@ -38,16 +34,10 @@ export function scrollanimation(){
         // 根據進度計算車子移動距離
         const moveDistance = progress * 100; // 根據需要調整比例
         // 更新車子的位置
-        //gsap.set("#car_path", { x: `-${moveDistance}vw` }); //這是立即性
         gsap.to("#car_path", { duration: 0.5, x: `-${moveDistance}vw`, y: 0, opacity: 1 });
-        // gsap.set("#car_container", { backgroundColor: 'gray'});
-        // gsap.set(".view-point",{opacity:'1'});
         // 計算建築物的移動距離
         const totalBuildingMoveDistance = progress * (buildingWidth * buildingCount);
-        //gsap.set(buildings, { x: `${totalBuildingMoveDistance}px` });
         gsap.to(buildings, { duration: 0.5, x: `${totalBuildingMoveDistance}px`, y: 0, opacity: 1 });
-        // const buildingMoveDistance = moveDistance * (buildingWidth * buildingCount / (buildingWidth * buildingCount * 2)); // 調整比例
-        // gsap.set(buildings, { x: `${buildingMoveDistance}px` });
         gsap.set("#car_container", { backgroundImage: "url('src/images/road.png')"});
 
         //太陽跟月亮的旋轉
@@ -61,18 +51,6 @@ export function scrollanimation(){
         //天空背景顏色
         let color;
         let color_progress = progress * 1.1;
-        /*
-        if (color_progress <= 0.3) {
-            // 當進度小於或等於 0.25 時，從 skyblue 到 skyblue (保持 skyblue)
-            color = "#87CEEB";
-        } else if (color_progress > 0.3 && color_progress <= 0.4) {
-        // 當進度在 0.25 到 0.5 之間時，從 skyblue 到 #FF8600
-        color = gsap.utils.interpolate("#87CEEB", "#FF8600", (progress - 0.3) * 7); // 調整速度
-        } else if (color_progress > 0.4) {
-        // 當進度大於 0.5 時，從 #FF8600 到 #000
-        color = gsap.utils.interpolate("#FF8600", "#000", (progress - 0.4) * 10);
-        }
-        */
         if (color_progress <= 0.3) {
             // 保持 skyblue 顏色
             color = "#87CEEB"; // skyblue
@@ -86,14 +64,10 @@ export function scrollanimation(){
         // 從橙色到黑色過渡
             color = gsap.utils.interpolate("#FF8600", "#000", (color_progress - 0.4) * 10);
         }
-
-
-
         gsap.to(".view-point", { backgroundColor: color });
 
         },
         onLeave: () => {
-            //gsap.set("#car_container", { backgroundImage:"none"});
             gsap.set(".main_stars",{duration:0.5,opacity:"0"});
         },
         onEnterBack: () => {
@@ -101,27 +75,36 @@ export function scrollanimation(){
         }
     });
 
-    //這段是要拿來放搜尋文字的
+    //這段是要拿來放故事的
     ScrollTrigger.create({
         trigger:".panel_search",
-        start:"25% bottom",
+        start:"50% bottom",
         //endTrigger:"",
         end:"bottom bottom",
-        onEnter: () => {
-            console.log("進入panel_search")
-        },
-        onUpdate: () => {
-
-        },
-        onLeave: () => {
-            console.log("離開panel_search")    
-        },
-        onEnterBack: () => {
-            console.log("從end點進入panel_search")
-        },
-        onLeaveBack:() => {
-            console.log("從trigger點離開")
+        toggleActions: "play reverse play reverse", // 進入時播放，離開時反轉，回滾時再次播放
+        animation: gsap.to(".chat", { // 將動畫直接放入
+            duration: 0.5,
+            opacity: 0.8,
+            ease: "none",
+            // scrub:1,
+        }),
+        onEnter:()=>{
+            gsap.set(".story", { textContent: "想要找停車場嗎?" });
         }
+    });
+    //這段是跳出功能
+    ScrollTrigger.create({
+        trigger:".panel_search_follow",
+        start:"top bottom",
+        //endTrigger:"",
+        end:"50% bottom",
+        toggleActions: "play reverse play reverse", // 進入時播放，離開時反轉，回滾時再次播放
+        animation: gsap.to(".phone", { // 將動畫直接放入
+            duration: 0.5,
+            opacity: 1,
+            ease: "none",
+            // scrub:1,
+        })
     });
     //這段是要拿來放雲的
     ScrollTrigger.create({
@@ -129,21 +112,12 @@ export function scrollanimation(){
         start:"top bottom",
         endTrigger:".panel_reserve",
         end:"top bottom",
-        onEnter: () => {
-            console.log("進入panel_search")
-        },
-        onUpdate: () => {
-
-        },
-        onLeave: () => {
-            console.log("離開panel_search")    
-        },
-        onEnterBack: () => {
-            console.log("從end點進入panel_search")
-        },
-        onLeaveBack:() => {
-            console.log("從trigger點離開")
-        }
+        toggleActions: "play reverse play reverse", // 進入時播放，離開時反轉，回滾時再次播放
+        animation: gsap.to(".sky", { // 將動畫直接放入
+            duration: 1,
+            opacity: 0.8,
+            ease: "power1.out"
+        })
     });
     //這段是要拿來放預定文字的
     ScrollTrigger.create({
@@ -172,22 +146,13 @@ export function scrollanimation(){
         trigger:".panel_reserve",
         start:"top bottom",
         endTrigger:".footer",
-        end:"top bottom",
-        onEnter: () => {
-            console.log("進入星星panel_search")
-        },
-        onUpdate: () => {
-
-        },
-        onLeave: () => {
-            console.log("離開星星panel_search")    
-        },
-        onEnterBack: () => {
-            console.log("從end點進入星星panel_search")
-        },
-        onLeaveBack:() => {
-            console.log("從trigger點離開星星")
-        }
+        end:"bottom bottom",
+        toggleActions: "play reverse play reverse", // 進入時播放，離開時反轉，回滾時再次播放
+        animation: gsap.to(".stars", { // 將動畫直接放入
+            duration: 1,
+            opacity: 1,
+            ease: "power1.out"
+        })
     });
 
     //測試讓我的view-point 可以不要蓋到.footer
@@ -205,7 +170,7 @@ export function scrollanimation(){
             const moveAmount = footerHeight * self.progress; // 計算應該向上移動的距離
             gsap.set(fixedDiv, { y: -moveAmount }); // 將 fixed div 向上移動
         },
-        markers: true // 可選，方便調試
+        markers: false // 可選，方便調試
     });
 
 
@@ -277,6 +242,7 @@ export function scrollanimation(){
     timeline.to(".box1",{ x: 100})
     search_timeline.to(".box2",{x:"50vw",opacity:1,duration:1})
 
+    //console.log(document.getElementById('#stars'))
 }
 
 function LoadSVG(){
@@ -286,4 +252,34 @@ function LoadSVG(){
         // console.log(svg)
         document.getElementById("car").innerHTML=svg;
     });
+
+    fetch("src/images/stars.svg")
+    .then((response) => {return response.text();})
+    .then((svg)=>{
+        //console.log(svg)
+        document.querySelector('.stars').innerHTML=svg;
+
+        const stars = document.querySelectorAll('#stars g');
+        /*
+        stars.forEach((star) => {
+            const randomDelay = Math.random() * 2; // 隨機延遲時間（0 - 2秒）
+            star.style.animationDelay = `${randomDelay}s`;
+            star.style.animation = "twinkle 3s infinite"; // 設定動畫
+        });
+        */
+        stars.forEach((star) => {
+            const randomDelay = Math.random() * 2; // 隨機延遲時間（0 - 2秒）
+            const randomDuration = 2 + Math.random() * 4; // 隨機持續時間（2 到 4 秒）
+            //star.style.animationDelay = `${randomDelay}s`;
+            // 如果需要使用 GSAP，這裡可以直接使用 GSAP 的動畫功能
+            gsap.to(star, {
+                opacity: 0, // 或其他你想要的屬性
+                duration: randomDuration,
+                repeat: -1,
+                yoyo: true, // 讓動畫往返
+                delay: randomDelay, // 隨機延遲
+            });
+        });
+        console.log(stars);
+    })
 }
