@@ -31,27 +31,25 @@ onMounted(()=>{
 <template>
   <div class="view-container">
     <section class="view-point">
-      <div class="parking">
-        <div id="parking_slot">
-          <img src="@/images/parking_slot.png" alt="">
-        </div>
-        <div id="parked_car1">
-          <img src="@/images/car_parked1.svg" alt="">
-        </div>
-        <div id="parked_car2">
-          <img src="@/images/car_parked2.svg" alt="">
-        </div>
-        <div id="parked_car3">
-          <img src="@/images/car_parked3.svg" alt="">
-        </div>
-      </div>
-      <div class="phone">
+      <div class="phone" id="phone1">
         <img src="@/images/phone.svg" alt="">
         <div class="function">
           <div class="function_desc">試試我們的功能吧</div>
           <div class="component">
             <div id="searchbar">
               <SearchInputComponent @search="SearchHandler" v-model="searchQuery"></SearchInputComponent>
+            </div>
+          </div>
+          <img src="@/images/location.svg" alt="">
+        </div>
+      </div>
+      <div class="phone" id="phone2">
+        <img src="@/images/phone.svg" alt="">
+        <div class="function">
+          <div class="function_desc">試試我們的功能吧</div>
+          <div class="component">
+            <div id="searchbar">
+              我這邊要放預定或加入會員的連結
             </div>
           </div>
           <img src="@/images/location.svg" alt="">
@@ -109,10 +107,24 @@ onMounted(()=>{
       <div class="question">
         <img src="@/images/question_cloud.svg" alt="">
         <div class="parking_icon">
-          <i class="fa-solid fa-square-parking fa-5x"></i>
+          <i class="fa-solid fa-square-parking"></i>
         </div>
       </div>
       <div id="car_container">
+        <div class="parking">
+        <div id="parking_slot">
+          <img src="@/images/parking_slot.png" alt="">
+        </div>
+        <div id="parked_car1">
+          <img src="@/images/car_parked1.svg" alt="">
+        </div>
+        <div id="parked_car2">
+          <img src="@/images/car_parked2.svg" alt="">
+        </div>
+        <div id="parked_car3">
+          <img src="@/images/car_parked3.svg" alt="">
+        </div>
+      </div>
         <div id="car_path">
           <div id="car">
             <div id="car_body">
@@ -149,20 +161,16 @@ onMounted(()=>{
 @media (max-width:850px) {
   .phone{
     width: 100vw;
-    border:10px solid black;
+    /* border:10px solid black; */
     display: flex;
     justify-items: center;
     justify-content: center;
   }
   .phone img{
     width: 130vw;
-    /* position: absolute; */
-    /* left: -5%; */
   }
   .function {
-    /* display: flex; */
     justify-content: center;
-    /* align-items: center; */
     align-content: center;
     flex-wrap: nowrap;
   }
@@ -209,7 +217,7 @@ onMounted(()=>{
   left: 50%; /* 將文字置於水平中間 */
   transform: translate(-65%, -75%); /* 平移使文字居中 */
   color: black; /* 設定文字顏色，使其在圖片上清晰可見 */
-  font-size: 1.5rem; /* 根據需求調整文字大小 */
+  font-size: 4vmin; /* 根據需求調整文字大小 */
   text-align: center;
 }
 
@@ -391,11 +399,12 @@ onMounted(()=>{
 .parking{
   position: absolute;
   /* top:85vmin; */
-  left: 10%;
+  left: 65%;
   bottom: 9vmin;
   z-index: 5000;
   display: flex;
-  opacity: 0;
+  opacity: 1;
+  z-index: -1;
 }
 #parking_slot img{
   height: 5vmin;
@@ -405,9 +414,10 @@ onMounted(()=>{
 #parked_car1{
   position: absolute;
   bottom: -3vmin;
-  left: 4vmin;
+  left: -10vmin;
   height: 15vmin;
   width: 15vmin;
+  opacity: 0;
 }
 
 #parked_car2{
@@ -442,6 +452,7 @@ onMounted(()=>{
   height: 15vmin;
   width: 15vmin;
   position: absolute;
+  top:1vmin;
   right: 10px;
   display: flex;
   z-index: -1;
@@ -467,29 +478,30 @@ onMounted(()=>{
 }
 
 .question{
-  opacity: 0;
-}
-
-.question{
   position: absolute;
-  right: 10vmin;
-  bottom: 8vmin;
+  right: 16vmin;
+  bottom: 16vmin;
   height: 15vmin;
   width: 15vmin;
+  opacity: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .question img{
   position: absolute;
-  right: 10vmin;
-  bottom: 8vmin;
+  /* right: 10vmin; */
+  /* bottom: 8vmin; */
   height: 15vmin;
   width: 15vmin;
 }
 
 .parking_icon{
   position: absolute;
-  right: 90%;
-  bottom: 80%;
+  /* right: 95%; */
+  /* bottom: 80%; */
+  font-size: 8vmin;
 }
 
 

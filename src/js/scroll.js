@@ -36,12 +36,17 @@ export function scrollanimation(){
         // 更新車子的位置
         gsap.to("#car_path", { duration: 0.5, x: `-${moveDistance*2}vw`, y: 0, opacity: 1 });
         // 更新車子旁邊的對話雲的位置
+        console.log(progress)
         if(progress===0){
             gsap.to(".question",{duration: 0.5, opacity:0})
-        }else if(progress > 0.15){
-            gsap.to(".question",{duration: 0.5, opacity:0})
+        }else if(0 < progress && progress < 0.15){
+            gsap.to(".question",{duration: 0.5, x: `-${moveDistance}vw`, opacity:1})
+        }else if(0.4 < progress && progress < 0.6){
+            gsap.to(".question",{duration: 0.5, x: `-${moveDistance}vw`, opacity:1})
+        }else if(0.8 < progress && progress < 1){
+            console.log("測試測試")
         }else{
-            gsap.to(".question", { duration: 0.5, x: `-${moveDistance}vw`, y: 0, opacity: 1 });
+            gsap.to(".question", { duration: 0.5, x: `-${moveDistance}vw`, y: 0, opacity: 0 });
         }
         // 計算道路距離
         gsap.to("#car_container", { duration: 0.5, x: `${moveDistance}vw`, y: 0, opacity: 1 });
@@ -112,7 +117,7 @@ export function scrollanimation(){
         //endTrigger:"",
         end:"50% bottom",
         toggleActions: "play reverse play reverse", // 進入時播放，離開時反轉，回滾時再次播放
-        animation: gsap.to(".phone", { // 將動畫直接放入
+        animation: gsap.to("#phone1", { // 將動畫直接放入
             duration: 0.5,
             opacity: 1,
             ease: "none",
@@ -122,18 +127,33 @@ export function scrollanimation(){
     // 這段是放停車位出現後被其他車子搶走
     ScrollTrigger.create({
         trigger:".panel_search_follow",
-        start:"60% bottom",
+        start:"bottom bottom",
         endTrigger:".footer",
-        end:"top bottom",
+        end:"bottom bottom",
         toggleActions: "play reverse play reverse", // 進入時播放，離開時反轉，回滾時再次播放
-        animation: gsap.to(".parking", { // 將動畫直接放入
+        animation: gsap.to("#parked_car1", { // 將動畫直接放入
             duration: 0.5,
+            left: '4vmin',
             opacity: 1,
             ease: "none",
             // scrub:1,
         })
     });
-
+    //搶車位的y軸偏移
+    ScrollTrigger.create({
+        trigger:".panel_search_follow",
+        start:"80% bottom",
+        endTrigger:".panel_reserve_follow",
+        end:"50% bottom",
+        toggleActions: "play reverse play reverse", // 進入時播放，離開時反轉，回滾時再次播放
+        animation: gsap.to("#car_body", { // 將動畫直接放入
+            duration: 0.5,
+            y:"-3vmin",
+            opacity: 1,
+            ease: "none",
+            // scrub:1,
+        })
+    });
     //這段是要拿來放雲的
     ScrollTrigger.create({
         trigger:".panel_search",
@@ -151,8 +171,8 @@ export function scrollanimation(){
     ScrollTrigger.create({
         trigger:".panel_reserve",
         start:"25% bottom",
-        endTrigger:".footer",
-        end:"top bottom",
+        //endTrigger:".panel_reserve_follow",
+        end:"80% bottom",
         toggleActions: "play reverse play reverse", // 進入時播放，離開時反轉，回滾時再次播放
         animation: gsap.to(".chat", { // 將動畫直接放入
             duration: 0.5,
@@ -162,8 +182,27 @@ export function scrollanimation(){
         }),
         onEnter:()=>{
             gsap.set(".story", { textContent: "車位常常在眼前錯過嗎?" });
+        },
+        onLeave:()=>{
+
         }
     });
+
+    //這段放預約的提示
+    ScrollTrigger.create({
+        trigger:".panel_reserve",
+        start:"80% bottom",
+        endTrigger:".panel_reserve_follow",
+        end:"50% bottom",
+        toggleActions: "play reverse play reverse", // 進入時播放，離開時反轉，回滾時再次播放
+        animation: gsap.to("#phone2", { // 將動畫直接放入
+            duration: 0.5,
+            opacity: 1,
+            ease: "none",
+            // scrub:1,
+        })
+    });
+
     //這段是要拿來放星星的
     ScrollTrigger.create({
         trigger:".panel_reserve",
