@@ -132,7 +132,8 @@ const locatePlace = () => {
         outOfView: "setView",
         inViewNotFollowing: "inView",
       },
-      onLocationfound: (e) => {
+      onLocationFound: (e) => {
+        console.log("定位找到：", e);
         // 移除先前的 userLocationMarker 標記
         if (userLocationMarker.value) {
           map.value.removeLayer(userLocationMarker.value);
@@ -145,7 +146,7 @@ const locatePlace = () => {
         map.value.setView([e.latitude, e.longitude], 18);
         updateDisplayLots(e.latitude, e.longitude);
       },
-      onLocationerror: () => {
+      onLocationError: () => {
         Swal.fire({
           icon: "error",
           title: "Oops...",
@@ -373,7 +374,9 @@ onBeforeUnmount(() => {
                                   class="fa-solid fa-charging-station fa-beat-fade"
                                 ></i
                               ></span>
-                              <a href=""
+                              <a
+                                :href="`https://www.google.com/maps/search/?api=1&query=${lot.latitude},${lot.longitude}`"
+                                target="_blank"
                                 ><img src="/Navigation.png" width="30px"
                               /></a>
                             </div>
