@@ -54,8 +54,8 @@
                       id="email"
                       required
                   />
-                  <small v-if="!validity.emailRequired || !validity.emailFormat" class="text-danger">請輸入正確電子郵件格式</small><br>
                 </div>
+                <small v-if="!validity.emailRequired || !validity.emailFormat" class="text-danger">請輸入正確電子郵件格式</small><br>
                   <div class="col-md-12 input-group">
                     <input
                       type="text"
@@ -65,8 +65,8 @@
                       placeholder="請輸入車牌號碼"
                       required
                     />
-                    <small v-if="validity.submitted && (!validity.licenseRequired || !validity.licenseFormat)" class="text-danger">車牌號碼格式不正確<br>(英文三碼-數字四碼)例: ABC-123</small>
                   </div>
+                  <small v-if="validity.submitted && (!validity.licenseRequired || !validity.licenseFormat)" class="text-danger">請輸入正確車牌號碼格式<br>(英文三碼 數字四碼)例: ABC123</small>
 
                   <div class="col-md-12 input-group">
                     <input
@@ -138,7 +138,7 @@ const validity = ref({
 
 const emailRule = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const pswRule = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+]{8,}$/;
-const licenseRule = /^[A-Z]{3}-\d{4}$/;
+const licenseRule = /^[A-Z]{3}\d{4}$/;
 
 const validate = async () => {
     //validity.value.submitted = true; // 設置提交狀態為真
@@ -180,6 +180,7 @@ const validate = async () => {
         });
         if (response.ok) {
             alert('註冊成功!!');
+            window.location.href = '/';
         }
     }
 };
