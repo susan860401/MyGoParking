@@ -272,7 +272,7 @@ onBeforeUnmount(() => {
         </template>
       </BreadcrumbsComponent>
 
-      <!-- ======= About Section ======= -->
+      <!-- ======= Map Section ======= -->
       <section id="about" class="about">
         <div class="row ms-2 me-2" data-aos="fade-up">
           <div class="col-md-4">
