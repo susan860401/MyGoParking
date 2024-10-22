@@ -1,7 +1,7 @@
 <script setup>
-import { onMounted } from 'vue';
-import { scrollanimation } from '@/js/scroll';
-import SearchInputComponent from '@/components/SearchInputComponent.vue';
+import { onMounted } from "vue";
+import { scrollanimation } from "@/js/scroll";
+import SearchInputComponent from "@/components/SearchInputComponent.vue";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
@@ -17,8 +17,7 @@ const SearchHandler = (searchQuery) => {
   }
 };
 
-
-onMounted(()=>{
+onMounted(() => {
   try {
     scrollanimation();
   } catch (error) {
@@ -27,53 +26,53 @@ onMounted(()=>{
 });
 </script>
 
-
 <template>
   <div class="view-container">
     <section class="view-point">
       <div class="phone" id="phone1">
-        <img src="@/images/phone.svg" alt="">
+        <img src="@/images/phone.svg" alt="" />
         <div class="function">
           <div class="function_desc">試試我們的功能吧</div>
           <div class="component">
             <div id="searchbar">
-              <SearchInputComponent @search="SearchHandler" v-model="searchQuery"></SearchInputComponent>
+              <SearchInputComponent
+                @search="SearchHandler"
+                v-model="searchQuery"
+              ></SearchInputComponent>
             </div>
           </div>
-          <img src="@/images/location.svg" alt="">
+          <img src="@/images/location.svg" alt="" />
         </div>
       </div>
       <div class="phone" id="phone2">
-        <img src="@/images/phone.svg" alt="">
+        <img src="@/images/phone.svg" alt="" />
         <div class="function">
           <div class="function_desc">試試我們的功能吧</div>
           <div class="component">
-            <div id="searchbar">
-              我這邊要放預定或加入會員的連結
-            </div>
+            <div id="searchbar">我這邊要放預定或加入會員的連結</div>
           </div>
-          <img src="@/images/location.svg" alt="">
+          <img src="@/images/location.svg" alt="" />
         </div>
       </div>
       <div class="chat">
-        <img src="@/images/chat_small.svg" alt="">
+        <img src="@/images/chat_small.svg" alt="" />
         <div class="story" id="story">不知道去哪邊找停車場嗎?</div>
       </div>
       <div class="main_stars">
         <div class="sun">
-          <img src="@/images/Sun.svg" alt="">
+          <img src="@/images/Sun.svg" alt="" />
         </div>
         <div class="moon">
-          <img src="@/images/Moon.svg" alt="">
+          <img src="@/images/Moon.svg" alt="" />
         </div>
       </div>
       <div class="sky">
         <div class="cloud_back">
-          <img id="cloud_long1" src="@/images/cloud_long.svg" alt="">
+          <img id="cloud_long1" src="@/images/cloud_long.svg" alt="" />
         </div>
         <div class="cloud_front">
-          <img id="cloud_big1" src="@/images/cloud_big1.svg" alt="">
-          <img id="cloud_small1" src="@/images/cloud_small.svg" alt="">
+          <img id="cloud_big1" src="@/images/cloud_big1.svg" alt="" />
+          <img id="cloud_small1" src="@/images/cloud_small.svg" alt="" />
         </div>
       </div>
       <div class="night">
@@ -81,50 +80,50 @@ onMounted(()=>{
           <!-- <img src="@/images/Stars.svg" alt=""> -->
         </div>
       </div>
-      <div class="buildings" style="--width:300px;--quantity:7">
-        <div class="building" style="--position:1">
-          <img src="@/images/school.svg" alt="">
+      <div class="buildings" style="--width: 300px; --quantity: 7">
+        <div class="building" style="--position: 1">
+          <img src="@/images/school.svg" alt="" />
         </div>
-        <div class="building" style="--position:2">
-          <img src="@/images/apartment.svg" alt="">
+        <div class="building" style="--position: 2">
+          <img src="@/images/apartment.svg" alt="" />
         </div>
-        <div class="building" style="--position:3">
-          <img src="@/images/cityscape.svg" alt="">
+        <div class="building" style="--position: 3">
+          <img src="@/images/cityscape.svg" alt="" />
         </div>
-        <div class="building" style="--position:4">
-          <img src="@/images/apartment_small.svg" alt="">
+        <div class="building" style="--position: 4">
+          <img src="@/images/apartment_small.svg" alt="" />
         </div>
-        <div class="building" style="--position:5">
-          <img src="@/images/convenience_store.svg" alt="">
+        <div class="building" style="--position: 5">
+          <img src="@/images/convenience_store.svg" alt="" />
         </div>
-        <div class="building" style="--position:6">
-          <img src="@/images/apartment_rent.svg" alt="">
+        <div class="building" style="--position: 6">
+          <img src="@/images/apartment_rent.svg" alt="" />
         </div>
-        <div class="building" style="--position:7">
-          <img src="@/images/residential_area.svg" alt="">
+        <div class="building" style="--position: 7">
+          <img src="@/images/residential_area.svg" alt="" />
         </div>
       </div>
       <div class="question">
-        <img src="@/images/question_cloud.svg" alt="">
+        <img src="@/images/question_cloud.svg" alt="" />
         <div class="parking_icon">
           <i class="fa-solid fa-square-parking"></i>
         </div>
       </div>
       <div id="car_container">
         <div class="parking">
-        <div id="parking_slot">
-          <img src="@/images/parking_slot.png" alt="">
+          <div id="parking_slot">
+            <img src="@/images/parking_slot.png" alt="" />
+          </div>
+          <div id="parked_car1">
+            <img src="@/images/car_parked1.svg" alt="" />
+          </div>
+          <div id="parked_car2">
+            <img src="@/images/car_parked2.svg" alt="" />
+          </div>
+          <div id="parked_car3">
+            <img src="@/images/car_parked3.svg" alt="" />
+          </div>
         </div>
-        <div id="parked_car1">
-          <img src="@/images/car_parked1.svg" alt="">
-        </div>
-        <div id="parked_car2">
-          <img src="@/images/car_parked2.svg" alt="">
-        </div>
-        <div id="parked_car3">
-          <img src="@/images/car_parked3.svg" alt="">
-        </div>
-      </div>
         <div id="car_path">
           <div id="car">
             <div id="car_body">
@@ -133,7 +132,7 @@ onMounted(()=>{
           </div>
         </div>
       </div>
-    </section>    
+    </section>
     <section class="panel title">title</section>
     <section class="panel panel_search">search</section>
     <section class="panel panel_test panel_search_follow">test</section>
@@ -144,8 +143,8 @@ onMounted(()=>{
 
 <style lang="css" scoped>
 /* 手機 */
-.phone{
-  pointer-events:auto;
+.phone {
+  pointer-events: auto;
   position: absolute;
   left: 0;
   z-index: 4000;
@@ -158,15 +157,15 @@ onMounted(()=>{
   align-items: center;
 }
 
-@media (max-width:850px) {
-  .phone{
+@media (max-width: 850px) {
+  .phone {
     width: 100vw;
     /* border:10px solid black; */
     display: flex;
     justify-items: center;
     justify-content: center;
   }
-  .phone img{
+  .phone img {
     width: 130vw;
   }
   .function {
@@ -174,16 +173,16 @@ onMounted(()=>{
     align-content: center;
     flex-wrap: nowrap;
   }
-  .function_desc{
+  .function_desc {
     font-size: 1.3rem;
   }
 }
 
-.phone img{
+.phone img {
   height: 100vh;
 }
-.function{
-  pointer-events:auto;
+.function {
+  pointer-events: auto;
   position: absolute;
   width: 60%;
   height: 70%;
@@ -193,7 +192,7 @@ onMounted(()=>{
   align-items: center;
   align-content: center;
 }
-.function img{
+.function img {
   display: block;
   /* position: relative; */
   height: fit-content;
@@ -201,17 +200,17 @@ onMounted(()=>{
 }
 
 /* 情境對話 */
-.chat{
+.chat {
   position: absolute;
   right: 0;
   z-index: 3000;
   opacity: 0;
 }
-.chat img{
+.chat img {
   width: 100vmin;
   display: block;
 }
-.story{
+.story {
   position: absolute;
   top: 50%; /* 將文字置於垂直中間 */
   left: 50%; /* 將文字置於水平中間 */
@@ -222,83 +221,82 @@ onMounted(()=>{
 }
 
 /*太陽跟月亮和星星*/
-.main_stars{
-  top:95%;
+.main_stars {
+  top: 95%;
   position: absolute;
   width: 185vh;
   display: flex;
   justify-content: space-between;
 }
 .sun * {
-  height:20vmin;
+  height: 20vmin;
 }
 .moon * {
-  height:20vmin;
+  height: 20vmin;
 }
-.stars{
+.stars {
   opacity: 0;
   height: 50%;
   width: 100vmax;
 }
-#stars g{
+#stars g {
   width: 100vw;
   animation: twinkle 3s infinite;
 }
 
-@keyframes twinkle{
-  0%{
+@keyframes twinkle {
+  0% {
     opacity: 0;
   }
-  25%{
+  25% {
     opacity: 0.5;
   }
-  50%{
+  50% {
     opacity: 1;
   }
-  75%{
+  75% {
     opacity: 0.5;
   }
-  100%{
+  100% {
     opacity: 0;
   }
 }
 
 /* 天空 */
-.sky{
+.sky {
   position: absolute;
   width: 100%;
   opacity: 0;
 }
-.cloud_front{
+.cloud_front {
   position: absolute;
-  top:10vmax;
+  top: 10vmax;
   width: 100%;
   display: flex;
   justify-content: space-around;
 }
-.cloud_back{
+.cloud_back {
   height: 30vmin;
   width: 100vmax;
   top: 5vmin;
   position: absolute;
 }
-#cloud_big1{
-  top:10vmin;
+#cloud_big1 {
+  top: 10vmin;
   width: 70vmin;
 }
-#cloud_small1{
+#cloud_small1 {
   width: 30vmin;
 }
-#cloud_long1{
+#cloud_long1 {
   height: inherit;
   position: absolute;
   left: -10%;
   z-index: -1;
 }
 
-
 /* 建築物部分 */
-.buildings{
+.buildings {
   pointer-events: none;
   position: absolute;
   bottom: 15vmin;
@@ -307,16 +305,16 @@ onMounted(()=>{
   flex-wrap: nowrap;
   padding: 0;
 }
-.building{
+.building {
   position: relative;
   bottom: 0;
 }
-.building img{
+.building img {
   width: 50vmin;
 }
 
 /* 這是拿來做一個視野窗來放我要載入的東西 */
-.view-point{
+.view-point {
   pointer-events: none;
   position: fixed;
   width: 100vw;
@@ -326,77 +324,76 @@ onMounted(()=>{
   justify-content: center;
 }
 
-.title{
-  padding:0;
+.title {
+  padding: 0;
   height: 100vh;
   position: relative;
   align-items: center;
 }
 /* 搜尋欄 */
-.component{
+.component {
   height: 10vh;
   margin-top: 1vh;
 }
 .component * {
+  pointer-events: auto;
   height: 5vh;
   z-index: 2000;
   position: relative;
 }
-#searchbar{
+#searchbar {
   position: absolute;
   width: 100%;
   justify-content: center;
   justify-items: center;
 }
-#searchbar div{
+#searchbar div {
   width: 100%;
 }
 
-
-.panel{
+.panel {
   width: 100vw;
   height: 100vh;
   font-size: 300px;
   z-index: -1;
 }
 
-.panel_search{
+.panel_search {
   background-color: green;
 }
 
-.panel_reserve{
+.panel_reserve {
   background-color: gray;
 }
 
-.panel_test{
+.panel_test {
   height: 100vh;
   /* background-color: sienna; */
   padding: 0;
   /* animation: sky 10s infinite; */
 }
 
-
-@keyframes sky{
-  0%{
+@keyframes sky {
+  0% {
     background-color: skyblue;
   }
-  50%{
-    background-color: #FF8600;
+  50% {
+    background-color: #ff8600;
   }
-  100%{
+  100% {
     background-color: #000;
   }
 }
 
 .view-container {
-  position: relative;  /* 關鍵：確保子元素相對這個容器定位 */
-  overflow: hidden;    /* 防止子元素超出這個區域 */
-  min-height: 500vh;    /* 留出足夠的空間讓動畫運行 */
+  position: relative; /* 關鍵：確保子元素相對這個容器定位 */
+  overflow: hidden; /* 防止子元素超出這個區域 */
+  min-height: 500vh; /* 留出足夠的空間讓動畫運行 */
 }
 
 /* 停車格 */
 
-.parking{
+.parking {
   position: absolute;
   /* top:85vmin; */
   left: 65%;
@@ -406,12 +403,12 @@ onMounted(()=>{
   opacity: 1;
   z-index: -1;
 }
-#parking_slot img{
+#parking_slot img {
   height: 5vmin;
   /* width: 7vmin; */
 }
 
-#parked_car1{
+#parked_car1 {
   position: absolute;
   bottom: -3vmin;
   left: -10vmin;
@@ -420,7 +417,7 @@ onMounted(()=>{
   opacity: 0;
 }
 
-#parked_car2{
+#parked_car2 {
   position: absolute;
   bottom: -3vmin;
   left: 22vmin;
@@ -428,7 +425,7 @@ onMounted(()=>{
   width: 15vmin;
 }
 
-#parked_car3{
+#parked_car3 {
   position: absolute;
   bottom: -3vmin;
   left: 39vmin;
@@ -436,10 +433,9 @@ onMounted(()=>{
   width: 15vmin;
 }
 
-
 /* 車子部分 */
-#car_container{
-  background-image: url('../images/road.png');
+#car_container {
+  background-image: url("../images/road.png");
   background-size: contain;
   height: 15vmin;
   width: 400vw;
@@ -448,18 +444,20 @@ onMounted(()=>{
   bottom: 0;
   right: 0;
 }
-#car,#car_path,#car_body{
+#car,
+#car_path,
+#car_body {
   height: 15vmin;
   width: 15vmin;
   position: absolute;
-  top:1vmin;
+  top: 1vmin;
   right: 10px;
   display: flex;
   z-index: -1;
 }
 
-#car{
-  animation:shakeCar 0.5s ease-in-out infinite;
+#car {
+  animation: shakeCar 0.5s ease-in-out infinite;
 }
 
 @keyframes moveCar {
@@ -469,7 +467,8 @@ onMounted(()=>{
 }
 
 @keyframes shakeCar {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0); /* 垂直方向震動 */
   }
   50% {
@@ -477,7 +476,7 @@ onMounted(()=>{
   }
 }
 
-.question{
+.question {
   position: absolute;
   right: 16vmin;
   bottom: 16vmin;
@@ -489,7 +488,7 @@ onMounted(()=>{
   align-items: center;
 }
 
-.question img{
+.question img {
   position: absolute;
   /* right: 10vmin; */
   /* bottom: 8vmin; */
@@ -497,20 +496,19 @@ onMounted(()=>{
   width: 15vmin;
 }
 
-.parking_icon{
+.parking_icon {
   position: absolute;
   /* right: 95%; */
   /* bottom: 80%; */
   font-size: 8vmin;
 }
 
-
 /* 標題跟footer的部分 */
-#header{
-  z-index:1001;
+#header {
+  z-index: 1001;
 }
 
-#footer{
-  z-index:1001;
+#footer {
+  z-index: 1001;
 }
 </style>
