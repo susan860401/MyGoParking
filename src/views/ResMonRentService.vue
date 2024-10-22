@@ -1,5 +1,9 @@
 <script setup>
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
+const lotName = route.query.lotName;
 </script>
 
 <template>
@@ -15,7 +19,9 @@ import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
           預約、月租服務
         </template>
       </BreadcrumbsComponent>
-      <section></section>
+      <section>
+        <h2>{{ lotName }}</h2>
+      </section>
     </main>
   </div>
 </template>

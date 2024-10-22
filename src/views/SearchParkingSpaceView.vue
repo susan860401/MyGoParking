@@ -4,8 +4,6 @@ import SearchInputComponent from "@/components/SearchInputComponent.vue";
 import Swal from "sweetalert2";
 import "leaflet/dist/leaflet.css";
 import "leaflet/dist/leaflet.js";
-import "leaflet.locatecontrol/dist/L.Control.Locate.min.css";
-import "leaflet.locatecontrol/dist/L.Control.Locate.min.js";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster/dist/leaflet.markercluster.js";
@@ -37,6 +35,17 @@ var locationIcon = L.icon({
 
 const updateUrlQuery = (newQuery) => {
   router.push({ name: "search", query: { searchQuery: newQuery } });
+};
+
+// ResMon 方法裡加上導航邏輯
+const ResMon = (lot) => {
+  router.push({
+    name: "resmon", // 目標路由的名稱
+    query: {
+      lotId: lot.lotId, // 傳遞選中的停車場 ID
+      lotName: lot.lotName, // 傳遞選中的停車場名稱
+    },
+  });
 };
 
 const SearchHandler = async (searchQuery) => {
@@ -87,9 +96,6 @@ const SearchHandler = async (searchQuery) => {
   }
 };
 
-//轉跳預約月租服務
-const ResMon = () => {};
-
 // 載入停車場
 const loadParkingLots = async () => {
   if (!map.value) {
@@ -127,7 +133,6 @@ const updateDisplayLots = (lat, lon) => {
     .sort((a, b) => a.distance - b.distance);
   AddMarkerToMap();
 };
-
 //停車場加上marker
 const AddMarkerToMap = async () => {
   isLoading.value = true;
@@ -261,7 +266,7 @@ onBeforeUnmount(() => {
   <div>
     <main id="main">
       <!-- 麵包屑 -->
-      <BreadcrumbsComponent>
+      <BreadcrumbsComponent backgroundImage="/homePage.jpg">
         <template #title>
           <!-- 插入到 title 插槽 -->
           <h2>Search Parking</h2>
@@ -307,7 +312,7 @@ onBeforeUnmount(() => {
                           :ref="'parkingLotCard-' + index"
                           class="card mb-4"
                           @mouseover="focusOnMarker(lot.lotId)"
-                          @click="ResMon"
+                          @click="ResMon(lot)"
                         >
                           <div class="card-body">
                             <h3 class="card-title d-flex">

@@ -13,6 +13,7 @@ import SignInView from "./views/SignInView.vue";
 import NotFound from "./views/NotFound.vue";
 import MonthlyRentView from "./views/MonthlyRentView.vue";
 import SignUpView from "./views/SignUpView.vue";
+import ResMonRentService from "./views/ResMonRentService.vue";
 
 const routes = [
   {
@@ -84,6 +85,11 @@ const routes = [
     path: "/signIn",
     component: SignInView,
     name: "signIn",
+  },
+  {
+    path: "/resmon",
+    component: ResMonRentService,
+    name: "resmon",
   },
   {
     path: "/:pathMatch(.*)*",

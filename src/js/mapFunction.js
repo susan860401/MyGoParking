@@ -6,6 +6,7 @@ import "leaflet.locatecontrol/dist/L.Control.Locate.min.js";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster/dist/leaflet.markercluster.js";
+import router from "@/router";
 
 //抓定位：Leaflet.Locate
 export const locatePlace = (mapRef) => {
@@ -26,10 +27,10 @@ export const locatePlace = (mapRef) => {
         outOfView: "setView",
         inViewNotFollowing: "inView",
       },
-      onLocationError: () => {
+      onLocationerror: () => {
         Swal.fire({
           icon: "error",
-          title: "Oops...",
+          title: "定位錯誤",
           text: "無法取得當前位置，請確保定位已啟用!",
         });
       },

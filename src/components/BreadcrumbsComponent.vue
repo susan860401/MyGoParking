@@ -1,12 +1,20 @@
-<script setup></script>
+<script setup>
+const props = defineProps({
+  backgroundImage: {
+    type: String,
+    default: "src/assets/images/breadcrumbs-bg.jpg",
+  },
+});
+</script>
 
 <template>
   <div>
     <!-- Breadcrumbs.vue -->
     <div
       class="breadcrumbs d-flex align-items-center"
-      style="background-image: url('/src/assets/images/breadcrumbs-bg.jpg')"
+      :style="{ backgroundImage: `url(${backgroundImage})` }"
     >
+      <!--根據props設置每個vue背景-->
       <div
         class="container position-relative d-flex flex-column align-items-center"
         data-aos="fade"
