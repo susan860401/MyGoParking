@@ -6,6 +6,7 @@ import axios from 'axios';
 const planData = {
     oneMonth: {
         label: '1個月',
+        money: '3500/月',
         price: '3500',
         description: '適合短期停車需求，彈性靈活，無需長期綁約。',
         features: ['無綁約，可隨時取消', '方便的自動續約功能', '支援多種付款方式'],
@@ -13,21 +14,24 @@ const planData = {
     },
     threeMonths: {
         label: '3個月',
-        price: '3400',
+        money: '3400/月',
+        price: '10200',
         description: '享有優惠價格，適合中期停車需求。',
         features: ['比單月更划算', '推薦方案，特別優惠', '可提前續約，保障車位'],
         savings: '比1個月方案每月省100元',
     },
     sixMonths: {
         label: '6個月',
-        price: '3200',
+        money: '3200/月',
+        price: '19200',
         description: '適合長期停車需求，節省更多費用。',
         features: ['半年合約，享有長期優惠', '固定車位保障', '免費升級停車服務'],
         savings: '比1個月方案每月省300元',
     },
     twelveMonths: {
         label: '12個月',
-        price: '3000',
+        money: '3000/月',
+        price: '36000',
         description: '最划算的年度合約方案，省下更多。',
         features: ['年度最低價格', '專屬客戶服務', '參加會員活動資格'],
         savings: '比1個月方案每月省500元',
@@ -48,7 +52,7 @@ const selectPlan = (planKey) => {
 };
 
 //-----------------------------------------------------------
-let baseLoginPayUrl = 'https://localhost:7077/api/LinePay/';
+const baseLoginPayUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay/`;
 
 function requestPayment() {
     const amount = parseInt(selectedPlan.value.price, 10); // 取得當前方案的價格
@@ -73,7 +77,7 @@ function requestPayment() {
             },
         ],
         RedirectUrls: {
-            ConfirmUrl: "http://localhost:5173/MonthlyRent",
+            ConfirmUrl: "http://localhost:5173/MonthlyConfirm",
             CancelUrl: "https://c4f0-61-63-154-173.jp.ngrok.io/api/LinePay/Cancel",
         },
     };
@@ -119,7 +123,8 @@ function requestPayment() {
                 <div class="tab-content">
                     <div class="tab-pane show active" id="planContent">
                         <div class="text-center p-5 bg-white rounded shadow">
-                            <h1>{{ selectedPlan.price }}</h1>
+                            <h1>{{ selectedPlan.money }}</h1>
+                            <p>總付款{{ selectedPlan.price }}元</p>
                             <p class="text-muted">{{ selectedPlan.description }}</p>
                             <ul class="list-unstyled">
                                 <li v-for="feature in selectedPlan.features" :key="feature" class="feature-item">

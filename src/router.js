@@ -13,6 +13,7 @@ import SignInView from "./views/SignInView.vue";
 import NotFound from "./views/NotFound.vue";
 import MonthlyRentView from "./views/MonthlyRentView.vue";
 import SignUpView from "./views/SignUpView.vue";
+import MonthlyConfirmView from "./views/MonthlyConfirmView.vue";
 
 const routes = [
   {
@@ -39,6 +40,11 @@ const routes = [
     path: "/MonthlyRent",
     component: MonthlyRentView,
     name: "MonthlyRent",
+  },
+  {
+    path: "/MonthlyConfirm",
+    component: MonthlyConfirmView,
+    name: "MonthlyConfirm",
   },
   {
     path: "/CustomerCenter",
