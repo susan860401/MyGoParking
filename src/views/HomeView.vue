@@ -144,7 +144,7 @@ onMounted(() => {
 <style lang="css" scoped>
 /* 手機 */
 .phone {
-  pointer-events: auto;
+  /* pointer-events: auto; */
   position: absolute;
   left: 0;
   z-index: 4000;
@@ -182,7 +182,7 @@ onMounted(() => {
   height: 100vh;
 }
 .function {
-  pointer-events: auto;
+  /* pointer-events: auto; */
   position: absolute;
   width: 60%;
   height: 70%;
@@ -297,7 +297,7 @@ onMounted(() => {
 
 /* 建築物部分 */
 .buildings {
-  pointer-events: none;
+  /* pointer-events: none; */
   position: absolute;
   bottom: 15vmin;
   display: flex;
@@ -315,13 +315,13 @@ onMounted(() => {
 
 /* 這是拿來做一個視野窗來放我要載入的東西 */
 .view-point {
-  pointer-events: none;
+  /* pointer-events: none; */
   position: fixed;
   width: 100vw;
   height: 100vh;
   display: flex;
   justify-items: center;
-  justify-content: center;
+  justify-content: center;  
 }
 
 .title {
@@ -336,9 +336,9 @@ onMounted(() => {
   margin-top: 1vh;
 }
 .component * {
-  pointer-events: auto;
+  /* pointer-events: auto; */
   height: 5vh;
-  z-index: 2000;
+  z-index: 1000;
   position: relative;
 }
 #searchbar {

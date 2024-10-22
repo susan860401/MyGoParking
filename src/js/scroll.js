@@ -122,7 +122,15 @@ export function scrollanimation(){
             opacity: 1,
             ease: "none",
             // scrub:1,
-        })
+        }),
+        onEnter:()=>{
+            document.getElementById('phone1').style.zIndex="3000";
+            document.getElementById('phone2').style.zIndex="-1";
+        },
+        onEnterBack:()=>{
+            document.getElementById('phone1').style.zIndex="3000";
+            document.getElementById('phone2').style.zIndex="-1";
+        }
     });
     // 這段是放停車位出現後被其他車子搶走
     ScrollTrigger.create({
@@ -200,7 +208,15 @@ export function scrollanimation(){
             opacity: 1,
             ease: "none",
             // scrub:1,
-        })
+        }),
+        onEnter:()=>{
+            document.getElementById('phone1').style.zIndex="-1";
+            document.getElementById('phone2').style.zIndex="3000";
+        },
+        onEnterBack:()=>{
+            document.getElementById('phone1').style.zIndex="-1";
+            document.getElementById('phone2').style.zIndex="3000";
+        }
     });
 
     //這段是要拿來放星星的
