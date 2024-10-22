@@ -1,14 +1,20 @@
 <script setup>
-import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
 
+import BreadcrumbsComponent from '@/components/BreadcrumbsComponent.vue';
 import { ref } from 'vue';
 
-const API_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/login`
+
+
+const BASE_URL = import.meta.env.VITE_API_BASEURL;
+const API_URL = `${BASE_URL}/Customers/login`; 
+
 
 const user = ref({
   "email":"",
   "password":""
 })
+
+
 
 const send = async()=>{
     const response = await fetch(API_URL,{
@@ -17,11 +23,15 @@ const send = async()=>{
         headers:{'Content-Type':'application/json'}
     })
     if(response.ok){
-       const datas = await response.json()
-       alert(datas.message)
+       const datas = await response.json();//取得會員資訊
+       localStorage.setItem('user', JSON.stringify(data));
+       alert('登入成功!!');
+       window.location.href = '/';
     }
-
-    
+   else {
+            alert('登入失敗');
+            console.error('登入失敗');
+        }   
 }
 </script>
 
@@ -31,14 +41,13 @@ const send = async()=>{
       <!-- 麵包屑 -->
       <BreadcrumbsComponent>
         <template #title>
-          <!-- 插入到 title 插槽 -->
           <h2>Sign In</h2>
         </template>
         <template #page>
-          <!-- 插入到 page 插槽 -->
           登入
         </template>
       </BreadcrumbsComponent>
+      
 
       <!-- ======= Get Started Section ======= -->
       <section id="get-started" class="get-started section-bg">
@@ -116,7 +125,7 @@ const send = async()=>{
                         <hr class="mt-5 mb-4 border-secondary-subtle">
                         <div class="d-flex gap-2 gap-md-4 flex-column flex-md-row justify-content-md-center">
 
-                            <RouterLink :to="{ name: 'register' }" class="link-secondary text-decoration-none">註冊新帳號</RouterLink>
+                            <RouterLink :to="{ name: 'signUp' }" class="link-secondary text-decoration-none">註冊新帳號</RouterLink>
                             <a href="#!" class="link-secondary text-decoration-none">忘記密碼</a>
                         </div>
                     </div>
