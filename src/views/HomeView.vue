@@ -323,9 +323,6 @@ onMounted(() => {
   align-content: center;
   animation: shakeCar 0.5s ease-in-out infinite;
 }
-#car_path {
-  /* animation: moveCar 5s linear infinite; */
-}
 
 @keyframes moveCar {
   to {
