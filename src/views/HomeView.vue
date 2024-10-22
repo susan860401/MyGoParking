@@ -31,6 +31,20 @@ onMounted(()=>{
 <template>
   <div class="view-container">
     <section class="view-point">
+      <div class="parking">
+        <div id="parking_slot">
+          <img src="@/images/parking_slot.png" alt="">
+        </div>
+        <div id="parked_car1">
+          <img src="@/images/car_parked1.svg" alt="">
+        </div>
+        <div id="parked_car2">
+          <img src="@/images/car_parked2.svg" alt="">
+        </div>
+        <div id="parked_car3">
+          <img src="@/images/car_parked3.svg" alt="">
+        </div>
+      </div>
       <div class="phone">
         <img src="@/images/phone.svg" alt="">
         <div class="function">
@@ -99,9 +113,6 @@ onMounted(()=>{
         </div>
       </div>
       <div id="car_container">
-        <div id="parking_slot">
-          <img src="@/images/parking_slot.png" alt="">
-        </div>
         <div id="car_path">
           <div id="car">
             <div id="car_body">
@@ -124,31 +135,60 @@ onMounted(()=>{
 .phone{
   pointer-events:auto;
   position: absolute;
-  left: -5%;
-  bottom: -5%;
+  left: 0;
   z-index: 4000;
   opacity: 0;
+  height: 100vh;
+  width: auto;
+  display: flex;
+  justify-items: center;
+  justify-content: center;
+  align-items: center;
 }
+
+@media (max-width:850px) {
+  .phone{
+    width: 100vw;
+    border:10px solid black;
+    display: flex;
+    justify-items: center;
+    justify-content: center;
+  }
+  .phone img{
+    width: 130vw;
+    /* position: absolute; */
+    /* left: -5%; */
+  }
+  .function {
+    /* display: flex; */
+    justify-content: center;
+    /* align-items: center; */
+    align-content: center;
+    flex-wrap: nowrap;
+  }
+  .function_desc{
+    font-size: 1.3rem;
+  }
+}
+
 .phone img{
-  height: 90vh;
+  height: 100vh;
 }
 .function{
   pointer-events:auto;
   position: absolute;
   width: 60%;
-  height: 60%;
-  top: 50%; /* 將文字置於垂直中間 */
-  left: 50%; /* 將文字置於水平中間 */
-  transform: translate(-47%, -60%); /* 平移使文字居中 */
+  height: 70%;
   color: black; /* 設定文字顏色，使其在圖片上清晰可見 */
-  font-size: 2rem; /* 根據需求調整文字大小 */
+  font-size: 1.5rem; /* 根據需求調整文字大小 */
   text-align: center;
+  align-items: center;
+  align-content: center;
 }
 .function img{
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 80%;
+  display: block;
+  /* position: relative; */
+  height: fit-content;
   width: 100%;
 }
 
@@ -285,12 +325,17 @@ onMounted(()=>{
   align-items: center;
 }
 /* 搜尋欄 */
+.component{
+  height: 10vh;
+  margin-top: 1vh;
+}
 .component * {
+  height: 5vh;
   z-index: 2000;
+  position: relative;
 }
 #searchbar{
   position: absolute;
-  top:10%;
   width: 100%;
   justify-content: center;
   justify-items: center;
@@ -342,21 +387,52 @@ onMounted(()=>{
 }
 
 /* 停車格 */
-#parking_slot{
+
+.parking{
   position: absolute;
-  top:2%;
+  /* top:85vmin; */
+  left: 10%;
+  bottom: 9vmin;
+  z-index: 5000;
+  display: flex;
+  opacity: 0;
 }
 #parking_slot img{
-  height: 4vmin;
+  height: 5vmin;
   /* width: 7vmin; */
 }
+
+#parked_car1{
+  position: absolute;
+  bottom: -3vmin;
+  left: 4vmin;
+  height: 15vmin;
+  width: 15vmin;
+}
+
+#parked_car2{
+  position: absolute;
+  bottom: -3vmin;
+  left: 22vmin;
+  height: 15vmin;
+  width: 15vmin;
+}
+
+#parked_car3{
+  position: absolute;
+  bottom: -3vmin;
+  left: 39vmin;
+  height: 15vmin;
+  width: 15vmin;
+}
+
 
 /* 車子部分 */
 #car_container{
   background-image: url('../images/road.png');
   background-size: contain;
   height: 15vmin;
-  width: 100vw;
+  width: 400vw;
   position: absolute;
   z-index: 1000;
   bottom: 0;
@@ -368,6 +444,7 @@ onMounted(()=>{
   position: absolute;
   right: 10px;
   display: flex;
+  z-index: -1;
 }
 
 #car{

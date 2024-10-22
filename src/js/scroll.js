@@ -34,9 +34,8 @@ export function scrollanimation(){
         // 根據進度計算車子移動距離
         const moveDistance = progress * 100; // 根據需要調整比例
         // 更新車子的位置
-        gsap.to("#car_path", { duration: 0.5, x: `-${moveDistance}vw`, y: 0, opacity: 1 });
+        gsap.to("#car_path", { duration: 0.5, x: `-${moveDistance*2}vw`, y: 0, opacity: 1 });
         // 更新車子旁邊的對話雲的位置
-        
         if(progress===0){
             gsap.to(".question",{duration: 0.5, opacity:0})
         }else if(progress > 0.15){
@@ -44,6 +43,8 @@ export function scrollanimation(){
         }else{
             gsap.to(".question", { duration: 0.5, x: `-${moveDistance}vw`, y: 0, opacity: 1 });
         }
+        // 計算道路距離
+        gsap.to("#car_container", { duration: 0.5, x: `${moveDistance}vw`, y: 0, opacity: 1 });
         // 計算建築物的移動距離
         const totalBuildingMoveDistance = progress * (buildingWidth * buildingCount);
         gsap.to(buildings, { duration: 0.5, x: `${totalBuildingMoveDistance}px`, y: 0, opacity: 1 });
@@ -118,20 +119,20 @@ export function scrollanimation(){
             // scrub:1,
         })
     });
-    //這段是放停車位出現後被其他車子搶走
-    // ScrollTrigger.create({
-    //     trigger:".panel_search_follow",
-    //     start:"50% bottom",
-    //     //endTrigger:"",
-    //     end:"bottom bottom",
-    //     toggleActions: "play reverse play reverse", // 進入時播放，離開時反轉，回滾時再次播放
-    //     animation: gsap.to("", { // 將動畫直接放入
-    //         duration: 0.5,
-    //         opacity: 1,
-    //         ease: "none",
-    //         // scrub:1,
-    //     })
-    // });
+    // 這段是放停車位出現後被其他車子搶走
+    ScrollTrigger.create({
+        trigger:".panel_search_follow",
+        start:"60% bottom",
+        endTrigger:".footer",
+        end:"top bottom",
+        toggleActions: "play reverse play reverse", // 進入時播放，離開時反轉，回滾時再次播放
+        animation: gsap.to(".parking", { // 將動畫直接放入
+            duration: 0.5,
+            opacity: 1,
+            ease: "none",
+            // scrub:1,
+        })
+    });
 
     //這段是要拿來放雲的
     ScrollTrigger.create({
