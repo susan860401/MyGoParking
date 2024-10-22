@@ -11,6 +11,7 @@ import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster/dist/leaflet.markercluster.js";
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { locatePlace } from "@/js/mapFunction";
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const API_URL = `${BASE_URL}/ParkingLot?address=`;
@@ -86,6 +87,9 @@ const SearchHandler = async (searchQuery) => {
   }
 };
 
+//轉跳預約月租服務
+const ResMon = () => {};
+
 // 載入停車場
 const loadParkingLots = async () => {
   if (!map.value) {
@@ -111,50 +115,6 @@ const loadParkingLots = async () => {
       text: "無法加載停車場數據，請稍後再試!",
     });
   }
-};
-
-//抓定位：Leaflet.Locate
-const locatePlace = () => {
-  L.control
-    .locate({
-      position: "topleft",
-      locateOptions: {
-        enableHighAccuracy: true,
-      },
-      strings: {
-        title: "定位我的位置",
-        metersUnit: "公尺",
-        feetUnit: "英尺",
-        popup: "距離誤差：{distance}{unit}以內",
-      },
-      clickBehavior: {
-        inView: "setView",
-        outOfView: "setView",
-        inViewNotFollowing: "inView",
-      },
-      onLocationFound: (e) => {
-        console.log("定位找到：", e);
-        // 移除先前的 userLocationMarker 標記
-        if (userLocationMarker.value) {
-          map.value.removeLayer(userLocationMarker.value);
-        }
-        // 設置新的 userLocationMarker 標記
-        userLocationMarker.value = L.marker([e.latitude, e.longitude]).addTo(
-          map.value
-        );
-        // 設置地圖視圖到用戶位置
-        map.value.setView([e.latitude, e.longitude], 18);
-        updateDisplayLots(e.latitude, e.longitude);
-      },
-      onLocationError: () => {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "無法取得當前位置，請確保定位已啟用!",
-        });
-      },
-    })
-    .addTo(map.value);
 };
 
 //show 10 lots data
@@ -266,12 +226,11 @@ onMounted(async () => {
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "EasyPark © OpenStreetMap",
     }).addTo(map.value);
-    locatePlace();
+    locatePlace(map.value);
     // 初始化 LayerGroup
     markerGroup.value = L.layerGroup().addTo(map.value); // 停車場標記
     searchMarkerGroup.value = L.layerGroup().addTo(map.value); // 搜尋標記
     loadParkingLots();
-
     const destinationFromHome = route.query.searchQuery; //查詢home傳來的參數
     if (destinationFromHome) {
       await SearchHandler(destinationFromHome); //自動搜尋跟定位
@@ -348,6 +307,7 @@ onBeforeUnmount(() => {
                           :ref="'parkingLotCard-' + index"
                           class="card mb-4"
                           @mouseover="focusOnMarker(lot.lotId)"
+                          @click="ResMon"
                         >
                           <div class="card-body">
                             <h3 class="card-title d-flex">
