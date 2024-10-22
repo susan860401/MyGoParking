@@ -46,7 +46,6 @@ onMounted(()=>{
       <div class="chat">
         <img src="@/images/chat_small.svg" alt="">
         <div class="story" id="story">不知道去哪邊找停車場嗎?</div>
-        <i class="fa-solid fa-square-parking"></i>
       </div>
       <div class="main_stars">
         <div class="sun">
@@ -93,20 +92,26 @@ onMounted(()=>{
           <img src="@/images/residential_area.svg" alt="">
         </div>
       </div>
+      <div class="question">
+        <img src="@/images/question_cloud.svg" alt="">
+        <div class="parking_icon">
+          <i class="fa-solid fa-square-parking fa-5x"></i>
+        </div>
+      </div>
       <div id="car_container">
+        <div id="parking_slot">
+          <img src="@/images/parking_slot.png" alt="">
+        </div>
         <div id="car_path">
           <div id="car">
-            <!-- <img id="car" src="@/images/car.svg"></img> -->
+            <div id="car_body">
+              <!-- <img id="car" src="@/images/car.svg"></img> -->
+            </div>
           </div>
         </div>
       </div>
-      <div class="box box1"></div>
-      <div class="box box2"></div>
-      <div class="box box3"></div>
-      <div class="box box4"></div>
     </section>    
-    <section class="panel title">
-    </section>
+    <section class="panel title">title</section>
     <section class="panel panel_search">search</section>
     <section class="panel panel_test panel_search_follow">test</section>
     <section class="panel panel_reserve">reserve</section>
@@ -115,18 +120,6 @@ onMounted(()=>{
 </template>
 
 <style lang="css" scoped>
-.box{
-  width: 30px;
-  height: 30px;
-  background-color: blueviolet;
-}
-.box1{
-  position: sticky;
-  top:0;
-}
-.box2{
-  opacity: 0;
-}
 /* 手機 */
 .phone{
   pointer-events:auto;
@@ -187,7 +180,6 @@ onMounted(()=>{
   width: 185vh;
   display: flex;
   justify-content: space-between;
-  /* rotate:70deg; */
 }
 .sun * {
   height:20vmin;
@@ -201,7 +193,6 @@ onMounted(()=>{
   width: 100vmax;
 }
 #stars g{
-  /* display: block; */
   width: 100vw;
   animation: twinkle 3s infinite;
 }
@@ -273,7 +264,7 @@ onMounted(()=>{
   bottom: 0;
 }
 .building img{
-  width: 40vmin;
+  width: 50vmin;
 }
 
 /* 這是拿來做一個視野窗來放我要載入的東西 */
@@ -282,28 +273,19 @@ onMounted(()=>{
   position: fixed;
   width: 100vw;
   height: 100vh;
-  /* opacity: 0.5; */
-  /* z-index: 1; */
   display: flex;
   justify-items: center;
   justify-content: center;
-  /* background-color: rgb(0, 255, 191); */
 }
 
 .title{
   padding:0;
   height: 100vh;
-  /* background-color: black; */
   position: relative;
-  /* display: flex; */
-  /* justify-content: center; */
-  /* justify-items: center; */
   align-items: center;
-  /* z-index: -1; */
 }
 /* 搜尋欄 */
 .component * {
-  /* display: inline-block; */
   z-index: 2000;
 }
 #searchbar{
@@ -358,41 +340,38 @@ onMounted(()=>{
   overflow: hidden;    /* 防止子元素超出這個區域 */
   min-height: 500vh;    /* 留出足夠的空間讓動畫運行 */
 }
+
+/* 停車格 */
+#parking_slot{
+  position: absolute;
+  top:2%;
+}
+#parking_slot img{
+  height: 4vmin;
+  /* width: 7vmin; */
+}
+
 /* 車子部分 */
 #car_container{
   background-image: url('../images/road.png');
   background-size: contain;
-  /* background-color: gray; */
   height: 15vmin;
   width: 100vw;
   position: absolute;
   z-index: 1000;
   bottom: 0;
   right: 0;
-  /* flex: content; */
-  /* align-items: center; */
-  /* align-content: center; */
 }
-#car,#car_path{
+#car,#car_path,#car_body{
   height: 15vmin;
   width: 15vmin;
   position: absolute;
-  /* bottom:1vh; */
   right: 10px;
   display: flex;
 }
+
 #car{
-  /* width: 15vmin; */
-  position: absolute;
   animation:shakeCar 0.5s ease-in-out infinite;
-}
-#car svg {
-    position: absolute;
-    top:100px;
-    right: 0;
-    width: 100%; /* 讓 SVG 寬度填滿容器 */
-    height: auto; /* 保持 SVG 的比例 */
-    display: block; /* 移除 inline 元素的額外間距 */
 }
 
 @keyframes moveCar {
@@ -410,6 +389,34 @@ onMounted(()=>{
   }
 }
 
+.question{
+  opacity: 0;
+}
+
+.question{
+  position: absolute;
+  right: 10vmin;
+  bottom: 8vmin;
+  height: 15vmin;
+  width: 15vmin;
+}
+
+.question img{
+  position: absolute;
+  right: 10vmin;
+  bottom: 8vmin;
+  height: 15vmin;
+  width: 15vmin;
+}
+
+.parking_icon{
+  position: absolute;
+  right: 90%;
+  bottom: 80%;
+}
+
+
+/* 標題跟footer的部分 */
 #header{
   z-index:1001;
 }

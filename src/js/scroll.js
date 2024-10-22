@@ -35,6 +35,15 @@ export function scrollanimation(){
         const moveDistance = progress * 100; // 根據需要調整比例
         // 更新車子的位置
         gsap.to("#car_path", { duration: 0.5, x: `-${moveDistance}vw`, y: 0, opacity: 1 });
+        // 更新車子旁邊的對話雲的位置
+        
+        if(progress===0){
+            gsap.to(".question",{duration: 0.5, opacity:0})
+        }else if(progress > 0.15){
+            gsap.to(".question",{duration: 0.5, opacity:0})
+        }else{
+            gsap.to(".question", { duration: 0.5, x: `-${moveDistance}vw`, y: 0, opacity: 1 });
+        }
         // 計算建築物的移動距離
         const totalBuildingMoveDistance = progress * (buildingWidth * buildingCount);
         gsap.to(buildings, { duration: 0.5, x: `${totalBuildingMoveDistance}px`, y: 0, opacity: 1 });
@@ -90,7 +99,10 @@ export function scrollanimation(){
         }),
         onEnter:()=>{
             gsap.set(".story", { textContent: "想要找停車場嗎?" });
-        }
+        },
+        onEnterBack:()=>{
+            gsap.set(".story", { textContent: "想要找停車場嗎?" });
+        },
     });
     //這段是跳出功能
     ScrollTrigger.create({
@@ -260,7 +272,7 @@ function LoadSVG(){
     .then((response) => {return response.text();})
     .then((svg)=>{
         // console.log(svg)
-        document.getElementById("car").innerHTML=svg;
+        document.getElementById("car_body").innerHTML=svg;
     });
 
     fetch("src/images/stars.svg")
