@@ -2,9 +2,11 @@
 import { ref, computed } from 'vue';
 import BreadcrumbsComponent from '@/components/BreadcrumbsComponent.vue';
 import axios from 'axios';
-// 定義方案資料
+
+// 方案資料
 const planData = {
     oneMonth: {
+        id: "oneMonth",
         label: '1個月',
         money: '3500/月',
         price: '3500',
@@ -13,6 +15,7 @@ const planData = {
         savings: '',
     },
     threeMonths: {
+        id: "threeMonths",
         label: '3個月',
         money: '3400/月',
         price: '10200',
@@ -21,6 +24,7 @@ const planData = {
         savings: '比1個月方案每月省100元',
     },
     sixMonths: {
+        id: "sixMonths",
         label: '6個月',
         money: '3200/月',
         price: '19200',
@@ -29,6 +33,7 @@ const planData = {
         savings: '比1個月方案每月省300元',
     },
     twelveMonths: {
+        id: "twelveMonths",
         label: '12個月',
         money: '3000/月',
         price: '36000',
@@ -38,65 +43,95 @@ const planData = {
     },
 };
 
+// 設定選中的方案
 const selectedPlanKey = ref('twelveMonths');
-const selectedPlan = ref(planData.twelveMonths);
+const selectedPlan = ref(planData[selectedPlanKey.value]);
 
 const savingsMessage = computed(() =>
     selectedPlan.value.savings ? `此方案 ${selectedPlan.value.savings}` : ''
 );
 
 const selectPlan = (planKey) => {
-    selectedPlan.value = planData[planKey];
-    console.log(selectedPlan.value)
-    selectedPlanKey.value = planKey;
+    if (planData[planKey]) {
+        selectedPlan.value = planData[planKey];
+        selectedPlanKey.value = planKey;
+        console.log('已選擇方案:', selectedPlan.value);
+    } else {
+        console.error('無效的方案 Key:', planKey);
+    }
 };
 
-//-----------------------------------------------------------
+// API 基本路徑
 const baseLoginPayUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay/`;
 
-function requestPayment() {
-    const amount = parseInt(selectedPlan.value.price, 10); // 取得當前方案的價格
-    const generatePackageId = () => `pkg_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
-    // 交易訂單資料
-    let payment = {
-        amount: amount, // 使用選中方案的價格
+async function validatePlan() {
+    const payload = {
+        planId: selectedPlan.value.id,
+        amount: parseInt(selectedPlan.value.price, 10),
+    };
+
+    try {
+        const response = await axios.post(`${baseLoginPayUrl}Validate`, payload, {
+            headers: { 'Content-Type': 'application/json' },
+        });
+        console.log('驗證結果:', response.data);
+        alert('方案驗證成功。');
+        return response.data.isValid;
+    } catch (error) {
+        console.error('方案驗證失敗:', error.response?.data?.message || error.message);
+        alert('方案驗證失敗，請確認後再試。');
+        return false;
+    }
+}
+
+
+
+
+
+// 建立交易請求
+async function requestPayment() {
+    const isValid = await validatePlan();
+    if (!isValid) return; // 若驗證失敗，中止支付流程
+
+    const payment = {
+        amount: parseInt(selectedPlan.value.price, 10),
         currency: "TWD",
-        orderId: Date.now().toString(), // 使用 Timestamp 當作 orderId
+        orderId: Date.now().toString(),
+        planId: selectedPlan.value.id,
         packages: [
             {
-                id: generatePackageId(),
-                amount: `${selectedPlan.value.price}`, // 套用選中方案的價格
-                name: selectedPlan.value.label, // 套用方案名稱
+                id: `pkg_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
+                amount: `${selectedPlan.value.price}`,
+                name: selectedPlan.value.label,
                 products: [
                     {
-                        name: `${selectedPlan.value.label} 方案`,
-                        quantity: 1, // 假設一筆訂單只包含一個方案
-                        price: amount,
-                    }
-                ]
+                        name: `${selectedPlan.value.label}方案`,
+                        quantity: 1,
+                        price: parseInt(selectedPlan.value.price, 10),
+                    },
+                ],
             },
         ],
         RedirectUrls: {
-            ConfirmUrl: "http://localhost:5173/MonthlyConfirm",
-            CancelUrl: "https://c4f0-61-63-154-173.jp.ngrok.io/api/LinePay/Cancel",
+            ConfirmUrl: `${window.location.origin}/MonthlyConfirm`,
+            CancelUrl: `${baseLoginPayUrl}Cancel`,
         },
     };
 
-    // 送出交易申請至商家伺服器
-    axios.post(`${baseLoginPayUrl}Create`, payment, {
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-        .then((response) => {
-            const paymentUrl = response.data.info.paymentUrl.web;
-            window.location.href = paymentUrl;
-        })
-        .catch((error) => {
-            console.error('交易失敗:', error);
+    try {
+        const response = await axios.post(`${baseLoginPayUrl}Create`, payment, {
+            headers: { 'Content-Type': 'application/json' },
         });
+        const paymentUrl = response.data.info.paymentUrl.web;
+        console.log('前往支付頁面:', paymentUrl);
+        window.location.href = paymentUrl;
+    } catch (error) {
+        console.error('交易失敗:', error);
+        alert('交易失敗，請稍後再試。');
+    }
 }
 </script>
+
 
 <template>
     <div>
