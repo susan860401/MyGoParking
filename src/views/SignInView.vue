@@ -16,7 +16,9 @@ const send = async () => {
   });
   if (response.ok) {
     const datas = await response.json(); //取得會員資訊
+    console.log(datas);
     localStorage.setItem("user", JSON.stringify(datas));
+    localStorage.setItem("userId", datas.userId);
     alert("登入成功!!");
     window.location.href = "/";
   } else {
