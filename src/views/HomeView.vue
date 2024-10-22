@@ -30,6 +30,35 @@ onMounted(() => {
 <template>
   <div class="view-container">
     <section class="view-point">
+      <div class="phone" id="phone1">
+        <img src="@/images/phone.svg" alt="" />
+        <div class="function">
+          <div class="function_desc">試試我們的功能吧</div>
+          <div class="component">
+            <div id="searchbar">
+              <SearchInputComponent
+                @search="SearchHandler"
+                v-model="searchQuery"
+              ></SearchInputComponent>
+            </div>
+          </div>
+          <img src="@/images/location.svg" alt="" />
+        </div>
+      </div>
+      <div class="phone" id="phone2">
+        <img src="@/images/phone.svg" alt="" />
+        <div class="function">
+          <div class="function_desc">試試我們的功能吧</div>
+          <div class="component">
+            <div id="searchbar">我這邊要放預定或加入會員的連結</div>
+          </div>
+          <img src="@/images/location.svg" alt="" />
+        </div>
+      </div>
+      <div class="chat">
+        <img src="@/images/chat_small.svg" alt="" />
+        <div class="story" id="story">不知道去哪邊找停車場嗎?</div>
+      </div>
       <div class="main_stars">
         <div class="sun">
           <img src="@/images/Sun.svg" alt="" />
@@ -76,16 +105,34 @@ onMounted(() => {
         </div>
       </div>
       <div id="car_container">
+        <div class="parking">
+          <div id="parking_slot">
+            <img src="@/images/parking_slot.png" alt="" />
+          </div>
+          <div id="parked_car1">
+            <img src="@/images/car_parked1.svg" alt="" />
+          </div>
+          <div id="parked_car2">
+            <img src="@/images/car_parked2.svg" alt="" />
+          </div>
+          <div id="parked_car3">
+            <img src="@/images/car_parked3.svg" alt="" />
+          </div>
+        </div>
         <div id="car_path">
-          <div id="car"></div>
-          <!-- <img id="car" src="@/images/ot140.svg"></img> -->
+          <div id="car">
+            <div id="car_body">
+              <!-- <img id="car" src="@/images/car.svg"></img> -->
+            </div>
+          </div>
         </div>
       </div>
     </section>
-    <section class="panel panel_search"></section>
-    <section class="panel panel_reserve"></section>
-    <section class="panel panel_test"></section>
-    <section class="panel panel_test"></section>
+    <section class="panel title">title</section>
+    <section class="panel panel_search">search</section>
+    <section class="panel panel_test panel_search_follow">test</section>
+    <section class="panel panel_reserve">reserve</section>
+    <section class="panel panel_test panel_reserve_follow">test</section>
   </div>
 </template>
 
@@ -138,22 +185,22 @@ onMounted(() => {
   position: fixed;
   width: 100vw;
   height: 100vh;
-  opacity: 0.7;
-  z-index: 1000;
-  /* background-color: rgb(0, 255, 191); */
+  display: flex;
+  justify-items: center;
+  justify-content: center;
 }
 
 .title {
   padding: 0;
   height: 100vh;
-  background-color: black;
   position: relative;
-  display: flex;
-  /* justify-content: center; */
-  /* justify-items: center; */
   align-items: center;
 }
 /* 搜尋欄 */
+.component {
+  height: 10vh;
+  margin-top: 1vh;
+}
 .component * {
   /* display: inline-block; */
   z-index: 2000;
@@ -161,15 +208,19 @@ onMounted(() => {
 
 #searchbar {
   position: absolute;
-  /* height: 80vh; */
   width: 100%;
   justify-content: center;
   justify-items: center;
+}
+#searchbar div {
+  width: 100%;
 }
 
 .panel {
   width: 100vw;
   height: 100vh;
+  font-size: 300px;
+  z-index: -1;
 }
 
 .panel_search {
@@ -184,6 +235,19 @@ onMounted(() => {
   height: 98vh;
   background-color: aquamarine;
   padding: 0;
+  /* animation: sky 10s infinite; */
+}
+
+@keyframes sky {
+  0% {
+    background-color: skyblue;
+  }
+  50% {
+    background-color: #ff8600;
+  }
+  100% {
+    background-color: #000;
+  }
 }
 
 .view-container {
@@ -191,20 +255,59 @@ onMounted(() => {
   overflow: hidden; /* 防止子元素超出這個區域 */
   min-height: 500vh; /* 留出足夠的空間讓動畫運行 */
 }
+
+/* 停車格 */
+
+.parking {
+  position: absolute;
+  /* top:85vmin; */
+  left: 65%;
+  bottom: 9vmin;
+  z-index: 5000;
+  display: flex;
+  opacity: 1;
+  z-index: -1;
+}
+#parking_slot img {
+  height: 5vmin;
+  /* width: 7vmin; */
+}
+
+#parked_car1 {
+  position: absolute;
+  bottom: -3vmin;
+  left: -10vmin;
+  height: 15vmin;
+  width: 15vmin;
+  opacity: 0;
+}
+
+#parked_car2 {
+  position: absolute;
+  bottom: -3vmin;
+  left: 22vmin;
+  height: 15vmin;
+  width: 15vmin;
+}
+
+#parked_car3 {
+  position: absolute;
+  bottom: -3vmin;
+  left: 39vmin;
+  height: 15vmin;
+  width: 15vmin;
+}
+
 /* 車子部分 */
 #car_container {
   background-image: url("../images/road.png");
   background-size: contain;
-  /* background-color: gray; */
   height: 15vmin;
-  width: 100vw;
-  position: fixed;
+  width: 400vw;
+  position: absolute;
   z-index: 1000;
   bottom: 0;
   right: 0;
-  flex: content;
-  align-items: center;
-  /* align-content: center; */
 }
 #car,
 #car_path {
