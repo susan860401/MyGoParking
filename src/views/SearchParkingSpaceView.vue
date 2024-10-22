@@ -339,11 +339,6 @@ onBeforeUnmount(() => {
                                   class="fa-solid fa-charging-station fa-beat-fade"
                                 ></i
                               ></span>
-                              <a
-                                :href="`https://www.google.com/maps/search/?api=1&query=${lot.latitude},${lot.longitude}`"
-                                target="_blank"
-                                ><img src="/Navigation.png" width="30px"
-                              /></a>
                             </div>
                           </div>
                         </div>
