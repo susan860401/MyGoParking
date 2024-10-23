@@ -327,6 +327,11 @@ onBeforeUnmount(() => {
                                 >
                               </div>
                             </h3>
+                            <p style="font-weight: 700">
+                              剩餘車位：<span style="color: chocolate">{{
+                                lot.validSpace
+                              }}</span>
+                            </p>
                             <div class="d-flex justify-content-between">
                               <p style="font-weight: 700">
                                 費用：
