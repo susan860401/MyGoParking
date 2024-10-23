@@ -179,6 +179,8 @@ const validate = async () => {
             body: JSON.stringify(data) 
         });
         if (response.ok) {
+            localStorage.setItem("user", JSON.stringify(data));
+            localStorage.setItem("userId", data.userId);
             alert('註冊成功!!');
             window.location.href = '/';
         }

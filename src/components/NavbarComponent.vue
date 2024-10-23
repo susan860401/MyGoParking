@@ -1,4 +1,30 @@
-<script setup></script>
+<script setup>
+
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router'; // 引入 useRouter
+
+const router = useRouter(); // 獲取 router 實例
+
+const isLoggedIn = ref(false); // 登入狀態
+const isFinished = ref(false); //是否完成通知
+
+const checkLoginStatus = () => {
+  isLoggedIn.value = !!localStorage.getItem('userId');
+};
+
+// 登出功能：清除 localStorage 導向登入頁面
+const logout = () => {
+  localStorage.removeItem('userId'); // 清除 userId
+  isLoggedIn.value = false;
+  router.push('/signIn'); // 導去登入頁面
+  alert('已成功登出')
+};
+
+onMounted(() => {
+  checkLoginStatus(); // 在元件加載時檢查登入狀態
+});
+
+</script>
 
 <template>
   <div>
@@ -52,12 +78,12 @@
               >
             </li>
             <!-- 用戶中心選單 -->
-            <li class="dropdown">
+            <li v-show="isLoggedIn" class="dropdown">
               <RouterLink
                 class="nav-link"
                 activeClass="active"
                 to="/CustomerCenter"
-                ><span>用戶中心</span>
+                ><span><i v-show="isFinished" class="fa-solid fa-bell fa-beat"></i><i> </i>用戶中心</span>
                 <i class="bi bi-chevron-down dropdown-indicator"></i
               ></RouterLink>
               <ul>
@@ -95,21 +121,24 @@
                 </li>
               </ul>
             </li>
-            <li>
+            <li v-show="!isLoggedIn">
               <RouterLink
-                class="nav-link"
+                class="nav-link" 
                 activeClass="active"
                 :to="{ name: 'signUp' }"
-                >Sign Up</RouterLink
+                >註冊</RouterLink
               >
             </li>
-            <li>
+            <li v-show="!isLoggedIn">
               <RouterLink
                 class="nav-link"
                 activeClass="active"
                 :to="{ name: 'signIn' }"
-                >Sign In</RouterLink
+                >登入</RouterLink
               >
+            </li>
+            <li v-show="isLoggedIn">
+                <button class="btn btn-light" @click="logout">登出</button>
             </li>
           </ul>
         </nav>
@@ -121,6 +150,8 @@
 </template>
 
 <style lang="css" scoped>
+
+
 #test {
   /* position: fixed; */
 }
