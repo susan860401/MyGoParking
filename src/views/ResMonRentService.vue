@@ -52,7 +52,7 @@ onMounted(async () => {
         <div class="container">
           <div class="row">
             <div class="col-lg-5">
-              <div class="card mb-3">
+              <div class="card">
                 <Carousel>
                   <Slide
                     v-for="(img, index) in lotsInfo?.lotImages"
@@ -69,11 +69,6 @@ onMounted(async () => {
                     <Pagination />
                   </template>
                 </Carousel>
-                <!-- <img
-                  :src="lotsInfo?.lotImages[0]"
-                  class="card-img-top"
-                  :alt="lotsInfo?.lotName"
-                /> -->
                 <div class="card-body">
                   <h5 class="card-title">{{ lotsInfo?.lotName }}</h5>
                   <p class="card-text">
