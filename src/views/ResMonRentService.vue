@@ -53,7 +53,7 @@ onMounted(async () => {
           <div class="row">
             <div class="col-lg-5">
               <div class="card">
-                <Carousel>
+                <Carousel :autoplay="2000" :wrapAround="true">
                   <Slide
                     v-for="(img, index) in lotsInfo?.lotImages"
                     :key="index"
