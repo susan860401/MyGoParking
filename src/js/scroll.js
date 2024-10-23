@@ -57,7 +57,7 @@ export function scrollanimation() {
           opacity: 1,
         });
       } else if (0.8 < progress && progress < 1) {
-        console.log("測試測試");
+        // console.log("測試測試"); 
       } else {
         gsap.to(".question", {
           duration: 0.5,
@@ -285,8 +285,8 @@ export function scrollanimation() {
   const fixedDiv = document.querySelector(".view-point");
   const footer = document.querySelector(".footer");
   const footerHeight = footer.offsetHeight; // 獲取 footer 的高度
-  console.log(fixedDiv);
-  console.log(footer);
+  // console.log(fixedDiv);
+  // console.log(footer);
   ScrollTrigger.create({
     trigger: footer,
     start: "top bottom", // 當 footer 的頂部與 viewport 的頂部相接時觸發
@@ -307,7 +307,7 @@ export function scrollanimation() {
       pin: true, // 立即 pin 該元素
       pinSpacing: false, // 可選：如果不想要額外的空間
       onEnter: () => {
-        console.log("pin有運作");
+        // console.log("pin有運作");
       },
     },
   });
@@ -355,12 +355,18 @@ export function scrollanimation() {
     },
   });
 
-  timeline.to(".box1", { x: 100 });
-  search_timeline.to(".box2", { x: "50vw", opacity: 1, duration: 1 });
-
   //console.log(document.getElementById('#stars'))
 }
 
+export function killAnimation() {
+  // 清理所有 ScrollTrigger 和 GSAP 動畫
+  ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+  gsap.killTweensOf("*");
+}
+
+
+
+//載入SVG的BUG
 function LoadSVG() {
   fetch("src/images/car.svg")
     .then((response) => {
@@ -400,6 +406,6 @@ function LoadSVG() {
           delay: randomDelay, // 隨機延遲
         });
       });
-      console.log(stars);
+      // console.log(stars);
     });
 }

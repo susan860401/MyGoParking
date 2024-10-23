@@ -1,9 +1,9 @@
 <script setup>
-import { onMounted } from "vue";
-import { scrollanimation } from "@/js/scroll";
+import { nextTick, onBeforeUnmount, onMounted } from "vue";
+import { scrollanimation, killAnimation } from "@/js/scroll";
 import SearchInputComponent from "@/components/SearchInputComponent.vue";
 import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { onBeforeRouteLeave, useRouter } from "vue-router";
 
 const router = useRouter();
 const searchQuery = ref("");
@@ -24,6 +24,16 @@ onMounted(() => {
     console.error("Error during mounted:", error);
   }
 });
+
+onBeforeUnmount(()=>{
+  killAnimation();
+});
+
+onBeforeRouteLeave(()=>{
+  window.scrollTo(0,0);
+  nextTick();
+});
+
 </script>
 
 <template>
