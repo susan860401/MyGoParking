@@ -12,6 +12,8 @@ const route = useRoute();
 const lotId = route.query.lotId;
 const lotsInfo = ref(null);
 const date = ref();
+const cars = ref([]);
+const selectedCarPlate = ref("");
 
 const getLotsInfo = async () => {
   try {
@@ -21,7 +23,6 @@ const getLotsInfo = async () => {
     if (res.ok) {
       let data = await res.json();
       lotsInfo.value = data;
-      console.log(lotsInfo.value);
     } else {
       throw new Error("無法取得停車場資料");
     }
@@ -30,8 +31,30 @@ const getLotsInfo = async () => {
   }
 };
 
+const getUserCarPlate = async () => {
+  try {
+    const userId = JSON.parse(localStorage.getItem("user")).user;
+    console.log(userId);
+    const res = await fetch(
+      `${BASE_URL}/Reservations/GetUserCarPlate?userId=${userId}`
+    );
+    if (res.ok) {
+      cars.value = await res.json();
+      console.log(cars.value);
+      selectedCarPlate.value =
+        cars.value.length > 0 ? cars.value[0].licensePlate : "";
+      console.log(selectedCarPlate.value);
+    } else {
+      throw new Error("無法取得車輛資料");
+    }
+  } catch (error) {
+    console.error("Error：", error);
+  }
+};
+
 onMounted(async () => {
-  getLotsInfo();
+  await getLotsInfo();
+  await getUserCarPlate();
 });
 </script>
 
@@ -52,40 +75,49 @@ onMounted(async () => {
         <div class="container">
           <div class="row">
             <div class="col-lg-5">
-              <div class="card">
-                <Carousel :autoplay="2000" :wrapAround="true">
-                  <Slide
-                    v-for="(img, index) in lotsInfo?.lotImages"
-                    :key="index"
-                  >
-                    <img
-                      :src="img"
-                      class="card-img-top"
-                      :alt="lotsInfo?.lotName"
-                    />
-                  </Slide>
-                  <template #addons>
-                    <Navigation />
-                    <Pagination />
-                  </template>
-                </Carousel>
-                <div class="card-body">
-                  <h5 class="card-title">{{ lotsInfo?.lotName }}</h5>
-                  <p class="card-text">
-                    <i class="fa-solid fa-map-location-dot me-2"></i
-                    >{{ lotsInfo?.location }}
-                  </p>
-                  <p class="card-text">收費標準：{{ lotsInfo?.rateRules }}</p>
-                  <p class="card-text">
-                    總車位數：{{ lotsInfo?.smallCarSpace }}
-                  </p>
-                  <p class="card-text">電動車位數：{{ lotsInfo?.etcSpace }}</p>
-                  <p class="card-text">電話：{{ lotsInfo?.tel }}</p>
-                  <p class="card-text">
-                    <small class="text-muted"
-                      >剩餘車位：{{ lotsInfo?.validSpace }}</small
+              <div
+                class="row"
+                style="border: 1px solid gray; border-radius: 10px"
+              >
+                <div class="col-lg-12">
+                  <Carousel :autoplay="2000" :wrapAround="true" class="p-0">
+                    <Slide
+                      v-for="(img, index) in lotsInfo?.lotImages"
+                      :key="index"
                     >
-                  </p>
+                      <img
+                        :src="img"
+                        class="card-img-top"
+                        :alt="lotsInfo?.lotName"
+                      />
+                    </Slide>
+                    <template #addons>
+                      <Navigation />
+                      <Pagination />
+                    </template>
+                  </Carousel>
+                </div>
+                <div class="col-lg-12">
+                  <div class="card-body mb-3">
+                    <h5 class="card-title">{{ lotsInfo?.lotName }}</h5>
+                    <p class="card-text">
+                      <i class="fa-solid fa-map-location-dot me-2"></i
+                      >{{ lotsInfo?.location }}
+                    </p>
+                    <p class="card-text">收費標準：{{ lotsInfo?.rateRules }}</p>
+                    <p class="card-text">
+                      總車位數：{{ lotsInfo?.smallCarSpace }}
+                    </p>
+                    <p class="card-text">
+                      電動車位數：{{ lotsInfo?.etcSpace }}
+                    </p>
+                    <p class="card-text">電話：{{ lotsInfo?.tel }}</p>
+                    <p class="card-text">
+                      <small class="text-muted"
+                        >剩餘車位：{{ lotsInfo?.validSpace }}</small
+                      >
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -93,16 +125,22 @@ onMounted(async () => {
               <div class="">
                 <div class="ticket-form p-5">
                   <h2 class="text-dark text-uppercase mb-4">預約</h2>
-                  <form>
+                  <form method="post">
                     <div class="row g-4">
                       <div class="col-12">
-                        <input
-                          type="text"
+                        <label for="licensePlate">選擇車牌：</label>
+                        <select
+                          v-model="selectedCarPlate"
                           class="form-control border-0 py-2"
-                          id="licensePlate"
-                          name="licensePlate"
-                          placeholder="輸入車牌..."
-                        />
+                        >
+                          <option
+                            v-for="(car, index) in cars"
+                            :key="index"
+                            :value="car.licensePlate"
+                          >
+                            {{ car }}
+                          </option>
+                        </select>
                       </div>
                       <div class="col-12">
                         <!-- 使用 VueDatePicker 並綁定 v-model -->
@@ -115,6 +153,7 @@ onMounted(async () => {
                         <button
                           type="button"
                           class="btn btn-primary w-100 py-2 px-5"
+                          @click="submitRes"
                         >
                           Book Now
                         </button>
