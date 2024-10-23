@@ -7,7 +7,7 @@ import axios from 'axios';
 const planData = {
     oneMonth: {
         id: "oneMonth",
-        label: '1個月',
+        label: '1個月方案',
         money: '3500/月',
         price: '3500',
         description: '適合短期停車需求，彈性靈活，無需長期綁約。',
@@ -16,7 +16,7 @@ const planData = {
     },
     threeMonths: {
         id: "threeMonths",
-        label: '3個月',
+        label: '3個月方案',
         money: '3400/月',
         price: '10200',
         description: '享有優惠價格，適合中期停車需求。',
@@ -25,7 +25,7 @@ const planData = {
     },
     sixMonths: {
         id: "sixMonths",
-        label: '6個月',
+        label: '6個月方案',
         money: '3200/月',
         price: '19200',
         description: '適合長期停車需求，節省更多費用。',
@@ -34,7 +34,7 @@ const planData = {
     },
     twelveMonths: {
         id: "twelveMonths",
-        label: '12個月',
+        label: '12個月方案',
         money: '3000/月',
         price: '36000',
         description: '最划算的年度合約方案，省下更多。',
@@ -85,16 +85,25 @@ async function validatePlan() {
 }
 
 
-
-
-
 // 建立交易請求
 async function requestPayment() {
     const isValid = await validatePlan();
     if (!isValid) return; // 若驗證失敗，中止支付流程
 
+
+    const amount = parseInt(selectedPlan.value.price, 10); // 取得選擇方案的金額
+    const paymentInfo = {
+        amount: amount,  // 金額
+        planLabel: selectedPlan.value.label,  // 方案名稱
+    };
+
+    // 儲存金額與方案資訊於 sessionStorage
+    sessionStorage.setItem('paymentInfo', JSON.stringify(paymentInfo))
+
+
+
     const payment = {
-        amount: parseInt(selectedPlan.value.price, 10),  // 總金額
+        amount: amount,  // 總金額
         currency: "TWD",  // 貨幣類型
         orderId: Date.now().toString(),  // 訂單 ID
         planId: selectedPlan.value.id,  // 方案 ID
@@ -105,7 +114,7 @@ async function requestPayment() {
                 name: selectedPlan.value.label,  // 包裹名稱
                 products: [
                     {
-                        name: `${selectedPlan.value.label}方案`,  // 產品名稱
+                        name: selectedPlan.value.label,  // 產品名稱
                         quantity: 1,  // 數量
                         price: parseInt(selectedPlan.value.price, 10),  // 單價
                     },
