@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 const API_URL = "https://localhost:7077/api";
 const parkingRecords = ref([]);
 
@@ -8,6 +9,11 @@ const loadParkingRecords = async () => {
   const datas = await response.json();
   parkingRecords.value = datas;
   console.log(parkingRecords.value);
+};
+
+const router = useRouter();
+const goToDetail = (id) => {
+  router.push(`/CustomerCenter/parking-record/${id}`);
 };
 
 loadParkingRecords();
@@ -33,17 +39,24 @@ loadParkingRecords();
     </div>
 
     <div style="padding: 5px 15px">
-      <div v-for="record in parkingRecords" class="card mb-2">
+      <div
+        v-for="record in parkingRecords"
+        :key="record.entryexitId"
+        @click="goToDetail(record.entryexitId)"
+        class="card mb-2"
+      >
         <div
           class="card-header fw-bold d-flex justify-content-between"
-          style="color: white; background-color: #d8d2c2"
+          style="color: white; background-color: #d9cab3"
         >
           <span>{{ record.lotName }}</span>
           <span>#{{ record.entryexitId }}</span>
         </div>
         <div class="card-body">
           <p class="align-items-center mb-2" style="font-size: 20px">
-            <span><i class="fa-regular fa-clock"></i> 00:50:13</span>
+            <span
+              ><i class="fa-regular fa-clock"></i> {{ record.formatTime }}</span
+            >
           </p>
           <p class="mb-1" style="font-size: 12px">
             <i class="fa-solid fa-car"></i>
