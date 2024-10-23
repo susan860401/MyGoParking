@@ -1,28 +1,62 @@
 <script setup>
 
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router'; // 引入 useRouter
+import { onMounted, onBeforeUnmount, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-const router = useRouter(); // 獲取 router 實例
+const router = useRouter();
+const isLoggedIn = ref(false);
+const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 分鐘
+let timeout;
 
-const isLoggedIn = ref(false); // 登入狀態
-const isFinished = ref(false); //是否完成通知
-
-const checkLoginStatus = () => {
-  isLoggedIn.value = !!localStorage.getItem('userId');
+const logout = () => {
+    localStorage.removeItem('userId'); // 清除 userId
+    isLoggedIn.value = false;
+    alert('已成功登出');
+    router.push('/signIn'); // 導去登入頁面
 };
 
-// 登出功能：清除 localStorage 導向登入頁面
-const logout = () => {
-  localStorage.removeItem('userId'); // 清除 userId
-  isLoggedIn.value = false;
-  router.push('/signIn'); // 導去登入頁面
-  alert('已成功登出')
+const resetTimeout = () => {
+    clearTimeout(timeout);
+    timeout = setTimeout(logout, TIMEOUT_DURATION);
+};
+
+const handleBeforeUnload = (event) => {
+    // 在關閉視窗或重新加載時登出
+    logout();
+    // 可以選擇顯示提示消息，這取決於您的需求
+    // event.returnValue = '您確定要離開此頁面嗎？';
 };
 
 onMounted(() => {
-  checkLoginStatus(); // 在元件加載時檢查登入狀態
+    checkLoginStatus(); // 在元件加載時檢查登入狀態
+    // 監聽用戶活動事件
+    window.addEventListener('mousemove', resetTimeout);
+    window.addEventListener('keypress', resetTimeout);
+    resetTimeout(); // 初始化計時器
+
+    // 監聽關閉視窗事件
+    window.addEventListener('beforeunload', handleBeforeUnload);
 });
+
+onBeforeUnmount(() => {
+    // 清除事件監聽器
+    window.removeEventListener('mousemove', resetTimeout);
+    window.removeEventListener('keypress', resetTimeout);
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+    clearTimeout(timeout);
+});
+
+const checkLoginStatus = () => {
+    // 假設這個函數會檢查 localStorage 中的 userId 來確定用戶是否已登入
+    const userId = localStorage.getItem('userId');
+    isLoggedIn.value = userId !== null;
+    if (!isLoggedIn.value) {
+        // 如果登入，則導向首頁
+        router.push('/home');
+    }
+};
+
+
 
 </script>
 
@@ -78,14 +112,13 @@ onMounted(() => {
               >
             </li>
             <!-- 用戶中心選單 -->
-            <li v-show="isLoggedIn" class="dropdown">
+            <li v-show="!isLoggedIn" class="dropdown">
               <RouterLink
                 class="nav-link"
                 activeClass="active"
                 to="/CustomerCenter"
-                ><span><i v-show="isFinished" class="fa-solid fa-bell fa-beat"></i><i> </i>用戶中心</span>
-                <i class="bi bi-chevron-down dropdown-indicator"></i
-              ></RouterLink>
+                ><span><i class="fa-solid fa-bell fa-beat"></i><i> </i>用戶中心</span>
+                <i class="bi bi-chevron-down dropdown-indicator"></i></RouterLink>
               <ul>
                 <li>
                   <RouterLink
@@ -121,7 +154,7 @@ onMounted(() => {
                 </li>
               </ul>
             </li>
-            <li v-show="!isLoggedIn">
+            <li v-show="isLoggedIn">
               <RouterLink
                 class="nav-link" 
                 activeClass="active"
@@ -129,7 +162,7 @@ onMounted(() => {
                 >註冊</RouterLink
               >
             </li>
-            <li v-show="!isLoggedIn">
+            <li v-show="isLoggedIn">
               <RouterLink
                 class="nav-link"
                 activeClass="active"
@@ -137,7 +170,7 @@ onMounted(() => {
                 >登入</RouterLink
               >
             </li>
-            <li v-show="isLoggedIn">
+            <li v-show="!isLoggedIn">
                 <button class="btn btn-light" @click="logout">登出</button>
             </li>
           </ul>
