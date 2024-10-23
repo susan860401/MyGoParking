@@ -1,9 +1,36 @@
 <script setup>
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
 import { useRoute } from "vue-router";
+import { onMounted, ref } from "vue";
+import VueDatePicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
 
+const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const route = useRoute();
-const lotName = route.query.lotName;
+const lotId = route.query.lotId;
+const lotsInfo = ref(null);
+const date = ref();
+
+const getLotsInfo = async () => {
+  try {
+    const res = await fetch(
+      `${BASE_URL}/Reservations/GetLotsInfo?lotId=${lotId}`
+    );
+    if (res.ok) {
+      let data = await res.json();
+      lotsInfo.value = data;
+      console.log(lotsInfo.value);
+    } else {
+      throw new Error("無法取得停車場資料");
+    }
+  } catch (error) {
+    console.error("Error：", error);
+  }
+};
+
+onMounted(async () => {
+  getLotsInfo();
+});
 </script>
 
 <template>
@@ -20,70 +47,75 @@ const lotName = route.query.lotName;
         </template>
       </BreadcrumbsComponent>
       <section>
-        <h2>{{ lotName }}</h2>
-        <div
-          class="col-xl-5 fadeInRight animated"
-          data-animation="fadeInRight"
-          data-delay="1s"
-          style="animation-delay: 1s"
-        >
-          <div class="ticket-form p-5">
-            <h2 class="text-dark text-uppercase mb-4">預約</h2>
-            <form>
-              <div class="row g-4">
-                <div class="col-12">
-                  <input
-                    type="text"
-                    class="form-control border-0 py-2"
-                    id="name"
-                    placeholder="Your Name"
-                  />
-                </div>
-                <div class="col-12 col-xl-6">
-                  <input
-                    type="email"
-                    class="form-control border-0 py-2"
-                    id="email"
-                    placeholder="Your Email"
-                  />
-                </div>
-                <div class="col-12 col-xl-6">
-                  <input
-                    type="phone"
-                    class="form-control border-0 py-2"
-                    id="phone"
-                    placeholder="Phone"
-                  />
-                </div>
-                <div class="col-12">
-                  <select
-                    class="form-select border-0 py-2"
-                    aria-label="Default select example"
-                  >
-                    <option selected>Select Packages</option>
-                    <option value="1">Family Packages</option>
-                    <option value="2">Basic Packages</option>
-                    <option value="3">Premium Packages</option>
-                  </select>
-                </div>
-                <div class="col-12">
-                  <input class="form-control border-0 py-2" type="date" />
-                </div>
-                <div class="col-12">
-                  <input
-                    type="number"
-                    class="form-control border-0 py-2"
-                    id="number"
-                    placeholder="Guest"
-                  />
-                </div>
-                <div class="col-12">
-                  <button type="button" class="btn btn-primary w-100 py-2 px-5">
-                    Book Now
-                  </button>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-5">
+              <div class="card mb-3">
+                <img
+                  :src="lotsInfo?.lotImages[0]"
+                  class="card-img-top"
+                  :alt="lotsInfo?.lotName"
+                />
+                <div class="card-body">
+                  <h5 class="card-title">{{ lotsInfo?.lotName }}</h5>
+                  <p class="card-text">
+                    <i class="fa-solid fa-map-location-dot"></i
+                    >{{ lotsInfo?.location }}
+                  </p>
+                  <p class="card-text">收費標準：{{ lotsInfo?.rateRules }}</p>
+                  <p class="card-text">
+                    總車位數：{{ lotsInfo?.smallCarSpace }}
+                  </p>
+                  <p class="card-text">電動車位數：{{ lotsInfo?.etcSpace }}</p>
+                  <p class="card-text">電話：{{ lotsInfo?.tel }}</p>
+                  <p class="card-text">
+                    <small class="text-muted"
+                      >剩餘車位：{{ lotsInfo?.validSpace }}</small
+                    >
+                  </p>
                 </div>
               </div>
-            </form>
+            </div>
+            <div class="col-lg-7">
+              <div
+                class="fadeInRight animated"
+                data-animation="fadeInRight"
+                data-delay="1s"
+                style="animation-delay: 1s"
+              >
+                <div class="ticket-form p-5">
+                  <h2 class="text-dark text-uppercase mb-4">預約</h2>
+                  <form>
+                    <div class="row g-4">
+                      <div class="col-12">
+                        <input
+                          type="text"
+                          class="form-control border-0 py-2"
+                          id="licensePlate"
+                          name="licensePlate"
+                          placeholder="輸入車牌..."
+                        />
+                      </div>
+                      <div class="col-12">
+                        <!-- 使用 VueDatePicker 並綁定 v-model -->
+                        <VueDatePicker
+                          v-model="date"
+                          class="form-control border-0"
+                        />
+                      </div>
+                      <div class="col-12">
+                        <button
+                          type="button"
+                          class="btn btn-primary w-100 py-2 px-5"
+                        >
+                          Book Now
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -92,6 +124,10 @@ const lotName = route.query.lotName;
 </template>
 
 <style lang="css" scoped>
+.datepicker {
+  position: relative;
+  z-index: 9999;
+}
 .ticket-form {
   background: rgba(137, 177, 189, 0.979);
   border-radius: 10px;
