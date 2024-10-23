@@ -1,10 +1,11 @@
 <script setup>
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
-import { useRoute } from "vue-router";
-import { onMounted, ref } from "vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
-import { Carousel } from "vue3-carousel";
+import "vue3-carousel/dist/carousel.css";
+import { useRoute } from "vue-router";
+import { onMounted, ref } from "vue";
+import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel";
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const route = useRoute();
@@ -52,12 +53,27 @@ onMounted(async () => {
           <div class="row">
             <div class="col-lg-5">
               <div class="card mb-3">
-                <Carousel> </Carousel>
-                <img
+                <Carousel>
+                  <Slide
+                    v-for="(img, index) in lotsInfo?.lotImages"
+                    :key="index"
+                  >
+                    <img
+                      :src="img"
+                      class="card-img-top"
+                      :alt="lotsInfo?.lotName"
+                    />
+                  </Slide>
+                  <template #addons>
+                    <Navigation />
+                    <Pagination />
+                  </template>
+                </Carousel>
+                <!-- <img
                   :src="lotsInfo?.lotImages[0]"
                   class="card-img-top"
                   :alt="lotsInfo?.lotName"
-                />
+                /> -->
                 <div class="card-body">
                   <h5 class="card-title">{{ lotsInfo?.lotName }}</h5>
                   <p class="card-text">
