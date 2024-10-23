@@ -94,35 +94,39 @@ async function requestPayment() {
     if (!isValid) return; // 若驗證失敗，中止支付流程
 
     const payment = {
-        amount: parseInt(selectedPlan.value.price, 10),
-        currency: "TWD",
-        orderId: Date.now().toString(),
-        planId: selectedPlan.value.id,
+        amount: parseInt(selectedPlan.value.price, 10),  // 總金額
+        currency: "TWD",  // 貨幣類型
+        orderId: Date.now().toString(),  // 訂單 ID
+        planId: selectedPlan.value.id,  // 方案 ID
         packages: [
             {
-                id: `pkg_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
-                amount: `${selectedPlan.value.price}`,
-                name: selectedPlan.value.label,
+                id: `pkg_${Date.now()}_${Math.floor(Math.random() * 10000)}`,  // 包裹 ID
+                amount: parseInt(selectedPlan.value.price, 10),  // 包裹金額
+                name: selectedPlan.value.label,  // 包裹名稱
                 products: [
                     {
-                        name: `${selectedPlan.value.label}方案`,
-                        quantity: 1,
-                        price: parseInt(selectedPlan.value.price, 10),
+                        name: `${selectedPlan.value.label}方案`,  // 產品名稱
+                        quantity: 1,  // 數量
+                        price: parseInt(selectedPlan.value.price, 10),  // 單價
                     },
                 ],
+                userFee: 0,  // 可選：使用者費用
             },
         ],
-        RedirectUrls: {
-            ConfirmUrl: `${window.location.origin}/MonthlyConfirm`,
-            CancelUrl: `${baseLoginPayUrl}Cancel`,
+        redirectUrls: {
+            confirmUrl: `${window.location.origin}/MonthlyConfirm`,  // 確認頁面
+            cancelUrl: `${baseLoginPayUrl}Cancel`,  // 取消頁面
         },
+        options: null,  // 可選：額外選項
     };
 
     try {
         const response = await axios.post(`${baseLoginPayUrl}Create`, payment, {
             headers: { 'Content-Type': 'application/json' },
         });
+
         const paymentUrl = response.data.info.paymentUrl.web;
+
         console.log('前往支付頁面:', paymentUrl);
         window.location.href = paymentUrl;
     } catch (error) {
