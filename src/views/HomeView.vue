@@ -1,5 +1,5 @@
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted } from "vue";
+import { nextTick, onBeforeMount, onBeforeUnmount, onMounted, onUpdated } from "vue";
 import { scrollanimation, killAnimation } from "@/js/scroll";
 import SearchInputComponent from "@/components/SearchInputComponent.vue";
 import { ref } from "vue";
@@ -40,7 +40,7 @@ onBeforeRouteLeave(()=>{
   <div class="view-container">
     <section class="view-point">
       <div class="phone" id="phone1">
-        <img src="@/images/phone.svg" alt="" />
+        <img v-once src="@/images/phone.svg" alt="" />
         <div class="function">
           <div class="function_desc">試試我們的功能吧</div>
           <div class="component">
@@ -51,38 +51,38 @@ onBeforeRouteLeave(()=>{
               ></SearchInputComponent>
             </div>
           </div>
-          <img src="@/images/location.svg" alt="" />
+          <img v-once src="@/images/location.svg" alt="" />
         </div>
       </div>
       <div class="phone" id="phone2">
-        <img src="@/images/phone.svg" alt="" />
+        <img v-once src="@/images/phone.svg" alt="" />
         <div class="function">
           <div class="function_desc">試試我們的功能吧</div>
           <div class="component">
             <div id="searchbar">我這邊要放預定或加入會員的連結</div>
           </div>
-          <img src="@/images/location.svg" alt="" />
+          <img v-once src="@/images/location.svg" alt="" />
         </div>
       </div>
       <div class="chat">
-        <img src="@/images/chat_small.svg" alt="" />
+        <img v-once src="@/images/chat_small.svg" alt="" />
         <div class="story" id="story">不知道去哪邊找停車場嗎?</div>
       </div>
       <div class="main_stars">
         <div class="sun">
-          <img src="@/images/Sun.svg" alt="" />
+          <img v-once src="@/images/Sun.svg" alt="" />
         </div>
         <div class="moon">
-          <img src="@/images/Moon.svg" alt="" />
+          <img v-once src="@/images/Moon.svg" alt="" />
         </div>
       </div>
       <div class="sky">
         <div class="cloud_back">
-          <img id="cloud_long1" src="@/images/cloud_long.svg" alt="" />
+          <img v-once id="cloud_long1" src="@/images/cloud_long.svg" alt="" />
         </div>
         <div class="cloud_front">
-          <img id="cloud_big1" src="@/images/cloud_big1.svg" alt="" />
-          <img id="cloud_small1" src="@/images/cloud_small.svg" alt="" />
+          <img v-once id="cloud_big1" src="@/images/cloud_big1.svg" alt="" />
+          <img v-once id="cloud_small1" src="@/images/cloud_small.svg" alt="" />
         </div>
       </div>
       <div class="night">
@@ -92,29 +92,29 @@ onBeforeRouteLeave(()=>{
       </div>
       <div class="buildings" style="--width: 300px; --quantity: 7">
         <div class="building" style="--position: 1">
-          <img src="@/images/school.svg" alt="" />
+          <img v-once src="@/images/school.svg" alt="" />
         </div>
         <div class="building" style="--position: 2">
-          <img src="@/images/apartment.svg" alt="" />
+          <img v-once src="@/images/apartment.svg" alt="" />
         </div>
         <div class="building" style="--position: 3">
-          <img src="@/images/cityscape.svg" alt="" />
+          <img v-once src="@/images/cityscape.svg" alt="" />
         </div>
         <div class="building" style="--position: 4">
-          <img src="@/images/apartment_small.svg" alt="" />
+          <img v-once src="@/images/apartment_small.svg" alt="" />
         </div>
         <div class="building" style="--position: 5">
-          <img src="@/images/convenience_store.svg" alt="" />
+          <img v-once src="@/images/convenience_store.svg" alt="" />
         </div>
         <div class="building" style="--position: 6">
-          <img src="@/images/apartment_rent.svg" alt="" />
+          <img v-once src="@/images/apartment_rent.svg" alt="" />
         </div>
         <div class="building" style="--position: 7">
-          <img src="@/images/residential_area.svg" alt="" />
+          <img v-once src="@/images/residential_area.svg" alt="" />
         </div>
       </div>
       <div class="question">
-        <img src="@/images/question_cloud.svg" alt="" />
+        <img v-once src="@/images/question_cloud.svg" alt="" />
         <div class="parking_icon">
           <i class="fa-solid fa-square-parking"></i>
         </div>
@@ -122,16 +122,16 @@ onBeforeRouteLeave(()=>{
       <div id="car_container">
         <div class="parking">
           <div id="parking_slot">
-            <img src="@/images/parking_slot.png" alt="" />
+            <img v-once src="@/images/parking_slot.png" alt="" />
           </div>
           <div id="parked_car1">
-            <img src="@/images/car_parked1.svg" alt="" />
+            <img v-once src="@/images/car_parked1.svg" alt="" />
           </div>
           <div id="parked_car2">
-            <img src="@/images/car_parked2.svg" alt="" />
+            <img v-once src="@/images/car_parked2.svg" alt="" />
           </div>
           <div id="parked_car3">
-            <img src="@/images/car_parked3.svg" alt="" />
+            <img v-once src="@/images/car_parked3.svg" alt="" />
           </div>
         </div>
         <div id="car_path">
@@ -143,7 +143,7 @@ onBeforeRouteLeave(()=>{
         </div>
       </div>
     </section>
-    <section class="panel title">title</section>
+    <section class="panel title"><!--title--></section>
     <section class="panel panel_search">search</section>
     <section class="panel panel_test panel_search_follow">test</section>
     <section class="panel panel_reserve">reserve</section>
@@ -335,6 +335,7 @@ onBeforeRouteLeave(()=>{
 }
 
 .title {
+  background-color: skyblue;
   padding: 0;
   height: 100vh;
   position: relative;
