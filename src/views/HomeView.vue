@@ -8,7 +8,6 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 const searchQuery = ref("");
 
-//前往新路由重新定向
 const SearchHandler = (searchQuery) => {
   if (searchQuery) {
     router.push({
@@ -67,6 +66,20 @@ onMounted(() => {
           <img src="@/images/Moon.svg" alt="" />
         </div>
       </div>
+      <div class="sky">
+        <div class="cloud_back">
+          <img id="cloud_long1" src="@/images/cloud_long.svg" alt="" />
+        </div>
+        <div class="cloud_front">
+          <img id="cloud_big1" src="@/images/cloud_big1.svg" alt="" />
+          <img id="cloud_small1" src="@/images/cloud_small.svg" alt="" />
+        </div>
+      </div>
+      <div class="night">
+        <div class="stars">
+          <!-- <img src="@/images/Stars.svg" alt=""> -->
+        </div>
+      </div>
       <div class="buildings" style="--width: 300px; --quantity: 7">
         <div class="building" style="--position: 1">
           <img src="@/images/school.svg" alt="" />
@@ -90,18 +103,10 @@ onMounted(() => {
           <img src="@/images/residential_area.svg" alt="" />
         </div>
       </div>
-      <div class="box box1"></div>
-      <div class="box box2"></div>
-      <div class="box box3"></div>
-      <div class="box box4"></div>
-    </section>
-    <section class="panel title">
-      <div class="component">
-        <div id="searchbar">
-          <SearchInputComponent
-            @search="SearchHandler"
-            v-model="searchQuery"
-          ></SearchInputComponent>
+      <div class="question">
+        <img src="@/images/question_cloud.svg" alt="" />
+        <div class="parking_icon">
+          <i class="fa-solid fa-square-parking"></i>
         </div>
       </div>
       <div id="car_container">
@@ -137,33 +142,162 @@ onMounted(() => {
 </template>
 
 <style lang="css" scoped>
-.box {
-  width: 30px;
-  height: 30px;
-  background-color: blueviolet;
+/* 手機 */
+.phone {
+  /* pointer-events: auto; */
+  position: absolute;
+  left: 0;
+  z-index: 4000;
+  opacity: 0;
+  height: 100vh;
+  width: auto;
+  display: flex;
+  justify-items: center;
+  justify-content: center;
+  align-items: center;
 }
-.box1 {
-  position: sticky;
-  top: 0;
+
+@media (max-width: 850px) {
+  .phone {
+    width: 100vw;
+    /* border:10px solid black; */
+    display: flex;
+    justify-items: center;
+    justify-content: center;
+  }
+  .phone img {
+    width: 130vw;
+  }
+  .function {
+    justify-content: center;
+    align-content: center;
+    flex-wrap: nowrap;
+  }
+  .function_desc {
+    font-size: 1.3rem;
+  }
 }
-.box2 {
+
+.phone img {
+  height: 100vh;
+}
+.function {
+  /* pointer-events: auto; */
+  position: absolute;
+  width: 60%;
+  height: 70%;
+  color: black; /* 設定文字顏色，使其在圖片上清晰可見 */
+  font-size: 1.5rem; /* 根據需求調整文字大小 */
+  text-align: center;
+  align-items: center;
+  align-content: center;
+}
+.function img {
+  display: block;
+  /* position: relative; */
+  height: fit-content;
+  width: 100%;
+}
+
+/* 情境對話 */
+.chat {
+  position: absolute;
+  right: 0;
+  z-index: 3000;
   opacity: 0;
 }
-/*太陽跟月亮*/
+.chat img {
+  width: 100vmin;
+  display: block;
+}
+.story {
+  position: absolute;
+  top: 50%; /* 將文字置於垂直中間 */
+  left: 50%; /* 將文字置於水平中間 */
+  transform: translate(-65%, -75%); /* 平移使文字居中 */
+  color: black; /* 設定文字顏色，使其在圖片上清晰可見 */
+  font-size: 4vmin; /* 根據需求調整文字大小 */
+  text-align: center;
+}
+
+/*太陽跟月亮和星星*/
 .main_stars {
+  top: 95%;
+  position: absolute;
+  width: 185vh;
   display: flex;
   justify-content: space-between;
 }
 .sun * {
-  height: 100px;
+  height: 20vmin;
 }
 .moon * {
-  height: 100px;
+  height: 20vmin;
+}
+.stars {
+  opacity: 0;
+  height: 50%;
+  width: 100vmax;
+}
+#stars g {
+  width: 100vw;
+  animation: twinkle 3s infinite;
+}
+
+@keyframes twinkle {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* 天空 */
+.sky {
+  position: absolute;
+  width: 100%;
+  opacity: 0;
+}
+.cloud_front {
+  position: absolute;
+  top: 10vmax;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+}
+.cloud_back {
+  height: 30vmin;
+  width: 100vmax;
+  top: 5vmin;
+  position: absolute;
+}
+#cloud_big1 {
+  top: 10vmin;
+  width: 70vmin;
+}
+#cloud_small1 {
+  width: 30vmin;
+}
+#cloud_long1 {
+  height: inherit;
+  position: absolute;
+  left: -10%;
+  z-index: -1;
 }
 
 /* 建築物部分 */
 .buildings {
-  pointer-events: none;
+  /* pointer-events: none; */
   position: absolute;
   bottom: 15vmin;
   display: flex;
@@ -176,18 +310,18 @@ onMounted(() => {
   bottom: 0;
 }
 .building img {
-  width: 40vmin;
+  width: 50vmin;
 }
 
 /* 這是拿來做一個視野窗來放我要載入的東西 */
 .view-point {
-  pointer-events: none;
+  /* pointer-events: none; */
   position: fixed;
   width: 100vw;
   height: 100vh;
   display: flex;
   justify-items: center;
-  justify-content: center;
+  justify-content: center;  
 }
 
 .title {
@@ -202,10 +336,11 @@ onMounted(() => {
   margin-top: 1vh;
 }
 .component * {
-  /* display: inline-block; */
-  z-index: 2000;
+  /* pointer-events: auto; */
+  height: 5vh;
+  z-index: 1000;
+  position: relative;
 }
-
 #searchbar {
   position: absolute;
   width: 100%;
@@ -232,8 +367,8 @@ onMounted(() => {
 }
 
 .panel_test {
-  height: 98vh;
-  background-color: aquamarine;
+  height: 100vh;
+  /* background-color: sienna; */
   padding: 0;
   /* animation: sky 10s infinite; */
 }
@@ -310,17 +445,18 @@ onMounted(() => {
   right: 0;
 }
 #car,
-#car_path {
+#car_path,
+#car_body {
   height: 15vmin;
-  position: absolute;
-  /* bottom:1vh; */
-  right: 10px;
-}
-#car {
   width: 15vmin;
   position: absolute;
-  top: 0;
-  align-content: center;
+  top: 1vmin;
+  right: 10px;
+  display: flex;
+  z-index: -1;
+}
+
+#car {
   animation: shakeCar 0.5s ease-in-out infinite;
 }
 
@@ -340,7 +476,39 @@ onMounted(() => {
   }
 }
 
-.footer {
+.question {
+  position: absolute;
+  right: 16vmin;
+  bottom: 16vmin;
+  height: 15vmin;
+  width: 15vmin;
+  opacity: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.question img {
+  position: absolute;
+  /* right: 10vmin; */
+  /* bottom: 8vmin; */
+  height: 15vmin;
+  width: 15vmin;
+}
+
+.parking_icon {
+  position: absolute;
+  /* right: 95%; */
+  /* bottom: 80%; */
+  font-size: 8vmin;
+}
+
+/* 標題跟footer的部分 */
+#header {
+  z-index: 1001;
+}
+
+#footer {
   z-index: 1001;
 }
 </style>
