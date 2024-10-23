@@ -29,7 +29,8 @@
     "swiper": "^11.1.14",
     "vue": "^3.4.29",
     "vue-flatpickr-component": "^11.0.5",
-    "vue-router": "^4.4.5"
+    "vue-router": "^4.4.5",
+    "vue3-carousel": "^0.3.4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.5",

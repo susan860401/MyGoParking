@@ -4,6 +4,7 @@ import { useRoute } from "vue-router";
 import { onMounted, ref } from "vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+import { Carousel } from "vue3-carousel";
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const route = useRoute();
@@ -51,6 +52,7 @@ onMounted(async () => {
           <div class="row">
             <div class="col-lg-5">
               <div class="card mb-3">
+                <Carousel> </Carousel>
                 <img
                   :src="lotsInfo?.lotImages[0]"
                   class="card-img-top"
@@ -59,7 +61,7 @@ onMounted(async () => {
                 <div class="card-body">
                   <h5 class="card-title">{{ lotsInfo?.lotName }}</h5>
                   <p class="card-text">
-                    <i class="fa-solid fa-map-location-dot"></i
+                    <i class="fa-solid fa-map-location-dot me-2"></i
                     >{{ lotsInfo?.location }}
                   </p>
                   <p class="card-text">收費標準：{{ lotsInfo?.rateRules }}</p>
@@ -77,12 +79,7 @@ onMounted(async () => {
               </div>
             </div>
             <div class="col-lg-7">
-              <div
-                class="fadeInRight animated"
-                data-animation="fadeInRight"
-                data-delay="1s"
-                style="animation-delay: 1s"
-              >
+              <div class="">
                 <div class="ticket-form p-5">
                   <h2 class="text-dark text-uppercase mb-4">預約</h2>
                   <form>
