@@ -1,36 +1,112 @@
 t<script setup>
+import router from '@/router';
 import Swal from 'sweetalert2';
 
+// API 基本路徑
+const baseUrl = `${import.meta.env.VITE_API_BASEURL}`;
+
 const reply = async () => {
-  const { value: formValues } = await Swal.fire({
-    title: '意見回復',
-    html:
-      '<div class="row">'+
-      '<div class="d-flex justify-content-evenly align-items-center align-content-center"><label>姓名: </label><input id="name" class="swal2-input" style="width:70%" placeholder="請輸入你的名字"></div>' +
-      '<div class="d-flex justify-content-evenly align-items-center align-content-center"><label>Email: </label><input id="email" class="swal2-input" style="width:70%" placeholder="請輸入你的Email"></div>' +
-      '<textarea id="reply_text" class="swal2-input form-control" style="height:300px;"" placeholder="輸入你的意見"></textarea>' +
-      '</div>',
-    focusConfirm: false,
-    showCancelButton: true,
-    preConfirm: () => {
-      const input1 = document.getElementById('name').value;
-      const input2 = document.getElementById('email').value;
-      const input3 = document.getElementById('reply_text').value;
-      if (!input1 || !input2 || !input3) {
-        Swal.showValidationMessage('所有欄位都必須填寫');
-        return null;
+  const userId = localStorage.getItem("user");
+  if (userId === null || userId === ""){
+    await Swal.fire({
+      title:'請先登入系統',
+      icon:'error',
+      showConfirmButton:true,
+      showCancelButton:true,
+    }).then((result)=>{
+      if(result.isConfirmed){
+        router.push('/signIn');
       }
-      return [input1, input2, input3]; // 返回多個輸入值
-    }
-  });
-  if (formValues) {
-    const reply_object = ({
-      "Name":formValues[0],
-      "Email":formValues[1],
-      "reply":formValues[2]
     })
-    console.log(reply_object);
-    // Swal.fire(JSON.stringify(formValues));
+  }else{
+    /* 舊版本, 我不知道有沒有要允許訪客回復 */
+    // const { value: formValues } = await Swal.fire({
+    // title: '意見回復',
+    // html:
+    //   '<div class="row">' +
+    //   '<div class="d-flex justify-content-evenly align-items-center align-content-center mb-3 row">' +
+    //   '<div class="col-12 col-md-2"><label>姓名: </label></div><input id="name" class="swal2-input" style="width:70%;margin:0" placeholder="請輸入你的名字"></div>' +
+    //   '<div class="d-flex justify-content-evenly align-items-center align-content-center mb-3 row">' +
+    //   '<div class="col-12 col-md-2"><label>Email: </label></div><input id="email" class="swal2-input" style="width:70%;margin:0" placeholder="請輸入你的Email"></div>' +
+    //   '<textarea id="reply_text" class="swal2-input form-control" style="height:300px;" placeholder="輸入你的意見"></textarea>' + // 修正 style 錯誤
+    //   '</div>',
+    // focusConfirm: false,
+    // showCancelButton: true,
+    // preConfirm: () => {
+    //   const input1 = document.getElementById('name').value;
+    //   const input2 = document.getElementById('email').value;
+    //   const input3 = document.getElementById('reply_text').value;
+    //   if (!input1 || !input2 || !input3) {
+    //     Swal.showValidationMessage('所有欄位都必須填寫');
+    //     return null;
+    //   }
+    //   return [input1, input2, input3]; // 返回多個輸入值
+    // }
+    // });
+    // if (formValues) {
+    //   const question_object = ({
+    //     "Name":formValues[0],
+    //     "Email":formValues[1],
+    //     "question":formValues[2]
+    //   })
+    //   console.log(JSON.stringify(question_object));
+    //   // Swal.fire(JSON.stringify(formValues));
+    // }
+    const { value: text } = await Swal.fire({
+      input: "textarea",
+      inputLabel: "意見回復",
+      inputPlaceholder: "請輸入您的意見",
+      inputAttributes: {
+        "aria-label": "請在這輸入您的意見"
+      },
+      showCancelButton: true,
+      preConfirm: () => {
+        const inputValue = Swal.getInput().value; // 獲取當前的輸入值
+        if (inputValue === null || inputValue === "") {
+          Swal.showValidationMessage('請輸入您的意見');
+          return null;
+        }
+      }
+    });
+    if (text) {
+      const question = ({
+        'UserId': userId,
+        'question':text,
+      });
+      try {
+        const response = await fetch(`${baseUrl}/Survey`,{
+          method:"POST",
+          body:JSON.stringify(question),
+          headers:{
+            "Content-Type":"application/json"
+          },
+        })
+        if(response.ok){
+          const data = await response.json();
+          console.log(data)
+            if(data.status === "success"){
+              Swal.fire({
+              title:"感謝您的意見回覆",
+              icon:"success",
+              showConfirmButton:true
+            })
+          }
+        }else{
+          Swal.fire({
+              title:"傳送失敗",
+              icon:"error",
+              showConfirmButton:true
+          })
+        }
+      } catch (error) {
+        Swal.fire({
+          title:"傳送失敗",
+          icon:"error",
+          showConfirmButton:true
+        })
+      }
+      //console.log(JSON.stringify(question));
+    }
   }
 }
 
