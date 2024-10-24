@@ -40,10 +40,11 @@ loadParkingRecords();
 
     <div style="padding: 5px 15px">
       <div
+        id="record"
         v-for="record in parkingRecords"
         :key="record.entryexitId"
         @click="goToDetail(record.entryexitId)"
-        class="card mb-2"
+        class="card mb-2 p-1"
       >
         <div
           class="card-header fw-bold d-flex justify-content-between"
@@ -81,5 +82,10 @@ loadParkingRecords();
 <style lang="css" scoped>
 * {
   margin: 0;
+}
+
+#record:hover {
+  cursor: pointer;
+  border: 3px solid #d8d2c2;
 }
 </style>

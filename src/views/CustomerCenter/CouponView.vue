@@ -145,6 +145,6 @@ loadCoupons();
 <style lang="css" scoped>
 #coupon:hover {
   cursor: pointer;
-  border: 3px solid lightgrey;
+  border: 3px solid #d8d2c2;
 }
 </style>

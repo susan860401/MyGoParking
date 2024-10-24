@@ -18,8 +18,8 @@ loadParkingDetail();
 
 <template>
   <div>
-    <div class="container bg-light">
-      <div class="row">
+    <div class="container mb-2">
+      <div class="row bg-light p-2">
         <h3>{{ parkingInfo.lotName }}</h3>
         <span class="mb-2">高雄市 {{ parkingInfo.district }}</span>
         <!-- 放地圖 -->
@@ -50,6 +50,12 @@ loadParkingDetail();
           </p>
         </div>
       </div>
+
+      <p style="text-align: end; font-size: 18px">
+        <RouterLink :to="{ name: 'parking-record' }"
+          ><i class="fa-solid fa-angles-left"></i>返回</RouterLink
+        >
+      </p>
     </div>
   </div>
 </template>
