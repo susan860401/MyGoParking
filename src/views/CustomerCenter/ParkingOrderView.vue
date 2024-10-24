@@ -111,12 +111,12 @@ loadReservations();
                   class="card mb-3"
                 >
                   <div class="row g-0">
-                    <div class="col-md-6 p-2">
+                    <div class="col-md-6 p-2 img-container">
                       <img
-                        class="rounded"
-                        width="100%"
+                        class="rounded img-fluid"
                         :src="`https://maps.googleapis.com/maps/api/staticmap?center=${res.latitude},${res.longitude}&zoom=18&size=600x300&markers=color:red%7Clabel:P%7C${res.latitude},${res.longitude}&key=AIzaSyALBHIW2HQWkmhCK-VXqGIoTVttRvMTtXo`"
                         alt="Map of {{ res.lotName }}"
+                        style="width: 100%; height: 100%"
                       />
 
                       <!-- <img src="..." class="img-fluid rounded-start" alt="..." /> -->

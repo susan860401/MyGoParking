@@ -4,6 +4,8 @@ import "aos/dist/aos.css";
 import "glightbox/dist/css/glightbox.min.css";
 import "../node_modules/swiper/swiper-bundle.min.css";
 
+import ElementPlus from "element-plus";
+import "element-plus/dist/index.css";
 // import "./assets/libs/purecounter/purecounter_vanilla.js";
 // import "./assets/libs/php-email-form/validate.js";
 
@@ -11,4 +13,7 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
 
-createApp(App).use(router).mount("#app");
+const app = createApp(App);
+app.use(router);
+app.use(ElementPlus);
+app.mount("#app");

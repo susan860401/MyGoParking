@@ -3,9 +3,23 @@ import { ref } from "vue";
 
 const API_URL = "https://localhost:7077/api";
 const coupons = ref([]); //傳回的優惠券放此
+const couponFilter = ref("全部");
 
 const loadCoupons = async () => {
   const response = await fetch(`${API_URL}/Coupons?userId=1`);
+  const datas = await response.json();
+  coupons.value = datas;
+};
+
+const filterCoupon = async () => {
+  if (couponFilter.value == "全部") {
+    loadCoupons();
+    return;
+  }
+  const response = await fetch(
+    `${API_URL}/Coupons/filter?userId=1&filter=${couponFilter.value}`
+  );
+
   const datas = await response.json();
   coupons.value = datas;
 };
@@ -18,6 +32,28 @@ const formatDate = (convertedDate) => {
   const day = String(date.getDate()).padStart(2, "0"); // 確保日期是兩位數
   return `${year}-${month}-${day}`;
 };
+//驗證優惠券是否到期
+const isExpired = (validUntil) => {
+  // 今日日期
+  const today = new Date();
+  const valid = new Date(validUntil);
+
+  // 只比較日期部分 (忽略時間)
+  const todayDateOnly = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  );
+  const convertedDateOnly = new Date(
+    valid.getFullYear(),
+    valid.getMonth(),
+    valid.getDate()
+  );
+  if (todayDateOnly > convertedDateOnly) {
+    return true;
+  }
+  return false;
+};
 
 loadCoupons();
 </script>
@@ -28,13 +64,15 @@ loadCoupons();
       <div class="container mt-0" data-aos="fade-up">
         <div class="col-md-3">
           <select
+            v-model="couponFilter"
+            @change="filterCoupon"
             class="form-select form-select-sm mb-2"
             aria-label=".form-select-sm example"
           >
             <option selected>全部</option>
-            <option value="1">未使用</option>
-            <option value="2">已使用</option>
-            <option value="3">已失效</option>
+            <option value="available">可使用</option>
+            <option value="isUsed">已使用</option>
+            <option value="expired">已失效</option>
           </select>
         </div>
         <div class="row">
@@ -75,10 +113,23 @@ loadCoupons();
                   <p class="mb-1">${{ coupon.discountAmount }} 抵用券</p>
 
                   <p class="card-text mb-1">
-                    <small class="text-muted">未使用</small>
+                    <small
+                      v-if="!coupon.isUsed && !isExpired(coupon.validUntil)"
+                      class="bg-warning"
+                      style="color: white; padding: 2px"
+                      >可使用</small
+                    >
+                    <small v-if="coupon.isUsed" class="txt-muted">已使用</small>
+                    <small
+                      v-if="!coupon.isUsed && isExpired(coupon.validUntil)"
+                      class="txt-light"
+                      >已失效</small
+                    >
                   </p>
-                  <p class="mb-0" style="text-align: end">
-                    # {{ coupon.couponCode }}
+                  <p class="mb-0" style="text-align: end; font-size: 10px">
+                    <span class="rounded-pill bg-light p-2"
+                      ># {{ coupon.couponCode }}</span
+                    >
                   </p>
                 </div>
               </div>
@@ -94,6 +145,6 @@ loadCoupons();
 <style lang="css" scoped>
 #coupon:hover {
   cursor: pointer;
-  border: 3px solid lightgrey;
+  border: 3px solid #d8d2c2;
 }
 </style>

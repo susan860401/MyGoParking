@@ -13,6 +13,7 @@ import SignInView from "./views/SignInView.vue";
 import NotFound from "./views/NotFound.vue";
 import MonthlyRentView from "./views/MonthlyRentView.vue";
 import SignUpView from "./views/SignUpView.vue";
+import ParkingDetailView from "./views/CustomerCenter/ParkingDetailView.vue";
 import MonthlyConfirmView from "./views/MonthlyConfirmView.vue";
 import ResetPsw from "./views/ResetPsw.vue";
 import ResMonRentService from "./views/ResMonRentService.vue";
@@ -73,6 +74,10 @@ const routes = [
         path: "parking-record",
         component: ParkingRecordView,
         name: "parking-record",
+      },
+      {
+        path: "parking-record/:id", //動態路由
+        component: ParkingDetailView,
       },
       {
         path: "coupon",
