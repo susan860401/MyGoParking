@@ -53,52 +53,54 @@ const getUserCarPlate = async () => {
 };
 
 const submitRes = async () => {
-  try {
-    const userId = JSON.parse(localStorage.getItem("user")).user;
-    const payload = {
-      userId,
-      licensePlate: selectedCarPlate.value,
-      resTime: date.value,
-      lotName: lotsInfo.value.lotName,
-    };
-    const res = await fetch(`${BASE_URL}/Reservations/newReservation`, {
+  const userId = JSON.parse(localStorage.getItem("user")).user;
+  const formattedDate = new Date(date.value).toISOString();
+  console.log(formattedDate);
+  const payload = {
+    resTime: formattedDate,
+    lotName: lotsInfo.value.lotName,
+    licensePlate: selectedCarPlate.value,
+  };
+  console.log(payload);
+  let res = await fetch(
+    `${BASE_URL}/Reservations/newReservation?userId=${userId}`,
+    {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
-    });
-    if (res.ok) {
-      const result = await res.json();
-      Swal.fire({
-        title: "Are you sure?",
-        text: "確認是否預約",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "沒錯!",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire({
-            title: "確認!",
-            text: "預約成功!即將轉跳付款頁面!",
-            icon: "success",
-          });
-        } else {
-          const errorData = res.json();
-          // 預約失敗，顯示錯誤訊息
-          Swal.fire("錯誤", errorData.Message, "error");
-        }
-      });
     }
-  } catch (error) {
-    Swal.fire({
-      icon: "error",
-      title: "Oops...",
-      text: error,
-    });
+  );
+  console.log(res);
+
+  let result = res;
+  console.log(result);
+  try {
+  } catch (err) {
+    throw new Error("無效的JSON回應：" + err.message);
   }
+  //   if (res.ok) {
+  //     Swal.fire({
+  //       title: "預約成功",
+  //       text: "即將轉跳付款頁面",
+  //       icon: "success",
+  //     });
+  //   } else {
+  //     // 顯示具體的錯誤訊息
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "錯誤",
+  //       text: result.Message || "發生未知錯誤",
+  //     });
+  //   }
+  // } catch (error) {
+  //   Swal.fire({
+  //     icon: "error",
+  //     title: "Oops...",
+  //     text: error,
+  //   });
+  //}
 };
 
 onMounted(async () => {
@@ -148,12 +150,14 @@ onMounted(async () => {
                 </div>
                 <div class="col-lg-12">
                   <div class="card-body mb-3">
-                    <h5 class="card-title">{{ lotsInfo?.lotName }}</h5>
+                    <h5 class="card-title mb-2" style="font-weight: 700">
+                      {{ lotsInfo?.lotName }}
+                    </h5>
                     <p class="card-text">
                       <a
                         :href="`https://www.google.com/maps/search/?api=1&query=${lotsInfo?.latitude},${lotsInfo?.longitude}`"
                         target="_blank"
-                        ><i class="fa-solid fa-map-location-dot me-2"></i
+                        ><i class="fa-solid fa-map-location-dot fa-bounce"></i
                       ></a>
                       {{ lotsInfo?.location }}
                     </p>
@@ -189,7 +193,7 @@ onMounted(async () => {
                           <option
                             v-for="(car, index) in cars"
                             :key="index"
-                            :value="car.licensePlate"
+                            :value="car"
                           >
                             {{ car }}
                           </option>
