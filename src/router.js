@@ -13,6 +13,7 @@ import SignInView from "./views/SignInView.vue";
 import NotFound from "./views/NotFound.vue";
 import MonthlyRentView from "./views/MonthlyRentView.vue";
 import SignUpView from "./views/SignUpView.vue";
+import MonthlyConfirmView from "./views/MonthlyConfirmView.vue";
 import ResetPsw from "./views/ResetPsw.vue";
 import ResMonRentService from "./views/ResMonRentService.vue";
 
@@ -41,6 +42,11 @@ const routes = [
     path: "/MonthlyRent",
     component: MonthlyRentView,
     name: "MonthlyRent",
+  },
+  {
+    path: "/MonthlyConfirm",
+    component: MonthlyConfirmView,
+    name: "MonthlyConfirm",
   },
   {
     path: "/CustomerCenter",
