@@ -81,6 +81,7 @@ export function scrollanimation() {
         x: `${totalBuildingMoveDistance}px`,
         y: 0,
         opacity: 1,
+        ease:'power1.out',
       });
       gsap.set("#car_container", {
         backgroundImage: "url('src/images/road.png')",
