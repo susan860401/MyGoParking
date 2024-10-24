@@ -1,26 +1,36 @@
-<script setup>
+t<script setup>
 import Swal from 'sweetalert2';
 
 const reply = async () => {
-  const { value: text } = await Swal.fire({
+  const { value: formValues } = await Swal.fire({
     title: '意見回復',
     html:
-      '<input id="swal-input1" class="swal2-input mb-3" placeholder="輸入你的名字">' +
-      '<textarea id="swal-input2" class="swal2-input form-control" style="height:300px;"" placeholder="輸入你的意見">',
+      '<div class="row">'+
+      '<div class="d-flex justify-content-evenly align-items-center align-content-center"><label>姓名: </label><input id="name" class="swal2-input" style="width:70%" placeholder="請輸入你的名字"></div>' +
+      '<div class="d-flex justify-content-evenly align-items-center align-content-center"><label>Email: </label><input id="email" class="swal2-input" style="width:70%" placeholder="請輸入你的Email"></div>' +
+      '<textarea id="reply_text" class="swal2-input form-control" style="height:300px;"" placeholder="輸入你的意見"></textarea>' +
+      '</div>',
     focusConfirm: false,
     showCancelButton: true,
     preConfirm: () => {
-      const input1 = document.getElementById('swal-input1').value;
-      const input2 = document.getElementById('swal-input2').value;
-      if (!input1 || !input2) {
+      const input1 = document.getElementById('name').value;
+      const input2 = document.getElementById('email').value;
+      const input3 = document.getElementById('reply_text').value;
+      if (!input1 || !input2 || !input3) {
         Swal.showValidationMessage('所有欄位都必須填寫');
         return null;
       }
-      return [input1, input2]; // 返回多個輸入值
+      return [input1, input2, input3]; // 返回多個輸入值
     }
   });
-  if (text) {
-    Swal.fire(text);
+  if (formValues) {
+    const reply_object = ({
+      "Name":formValues[0],
+      "Email":formValues[1],
+      "reply":formValues[2]
+    })
+    console.log(reply_object);
+    // Swal.fire(JSON.stringify(formValues));
   }
 }
 
