@@ -1,41 +1,62 @@
 <script setup>
-import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
-import { ref } from "vue";
+    import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
+    import { useRoute } from 'vue-router';
+    import { ref } from "vue";
 
-const API_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/login`;
+    const API_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/reset`;
 
-const user = ref({
-  email: "",
-  password: "",
-});
+    const removeReadonly = (fieldId) => {
+    document.getElementById(fieldId).removeAttribute('readonly');
+    };
 
-const send = async () => {
-  const response = await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify(user.value),
-    headers: { "Content-Type": "application/json" },
-  });
-  if (response.ok) {
-    const datas = await response.json(); //取得會員資訊
-    console.log(datas);
-    localStorage.setItem("user", JSON.stringify(datas));
-    alert("登入成功!!");
-    window.location.href = "/";
-  } else {
-    alert("登入失敗,請重新登入!!");
-  }
-};
+    const user = ref({
+        email: ''
+    });
+
+    // 使用 `useRoute` 獲取路由參數中的 token
+    const route = useRoute();
+    const token = route.query.token; // 從路由 URL 中取得 token
+
+    // 定義狀態
+    const newPassword = ref('');
+
+    // 定義方法
+    const resetPassword = async () => {
+    try {
+        // 使用 fetch 發送 POST 請求
+        const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            token: token,
+            newPassword: newPassword.value
+        })
+        });
+
+        if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        alert('密碼重設成功');
+    } catch (error) {
+        console.error('密碼重設失敗', error);
+        alert('重置密碼過程中出錯');
+    }
+    };
 </script>
 
 <template>
-  <div>
+    <div>
     <main id="main">
       <!-- 麵包屑 -->
       <BreadcrumbsComponent>
         <template #title>
-          <h2>Sign In</h2>
+          <h2>Reset Password</h2>
         </template>
-        <template #page> 登入 </template>
+        <template #page> 重設密碼 </template>
       </BreadcrumbsComponent>
 
       <!-- ======= Get Started Section ======= -->
@@ -62,23 +83,26 @@ const send = async () => {
 
             <div class="col-lg-5" data-aos="fade">
               <form
-                @submit.prevent="send"
+                @submit.prevent="resetPassword"
                 action="forms/quote.php"
                 method="post"
                 class="php-email-form"
+                autocomplete="off"
               >
-                <h3>登入</h3>
-                <p>請輸入信箱及密碼</p>
+                <h3>重設密碼</h3>
+                <p>請輸入信箱</p>
                 <div class="row gy-3">
                   <div class="col-md-12">
                     <input
                       type="email"
                       class="form-control"
-                      name="email"
+                      name="emailField"
                       placeholder="請輸入Email帳號"
                       required
                       v-model="user.email"
-                      id="email"
+                      id="emailField"
+                      readonly
+                    @focus="removeReadonly('emailField')"
                     />
                   </div>
 
@@ -86,42 +110,32 @@ const send = async () => {
                     <input
                       type="password"
                       class="form-control"
-                      name="psw"
-                      placeholder="請輸入密碼"
+                      name="pswField"
+                      placeholder="請輸入新密碼"
                       required
-                      v-model="user.password"
-                      id="password"
+                      v-model="newPassword"
+                      id="pswField"
+                      autocomplete="new-password"
+                      readonly
+                    @focus="removeReadonly('pswField')"
                     />
                   </div>
 
                   <div class="col-md-12 text-center">
                     <div class="loading">Loading</div>
                     <div class="error-message"></div>
-                    <div class="sent-message">您已成功登入!</div>
+                    <div class="sent-message">您已成功設置新密碼!</div>
 
-                    <button type="submit">登入</button>
+                    <button type="submit">申請新密碼</button>
                   </div>
                 </div>
                 <div class="row">
-                  <div class="col-12">
-                    <hr class="mt-5 mb-4 border-secondary-subtle" />
-                    <div
-                      class="d-flex gap-2 gap-md-4 flex-column flex-md-row justify-content-md-center"
-                    >
-                      <RouterLink
-                        :to="{ name: 'signUp' }"
-                        class="link-secondary text-decoration-none"
-                        >註冊新帳號</RouterLink
-                      >
-                      <RouterLink
-                        :to="{ name: 'reset' }"
-                        class="link-secondary text-decoration-none"
-                        >忘記密碼</RouterLink
-                      >
-                    </div>
-                  </div>
+                <div class="col-12">
+                  
                 </div>
+              </div>
               </form>
+              
             </div>
             <!-- End Quote Form -->
           </div>
@@ -130,6 +144,9 @@ const send = async () => {
       <!-- End Get Started Section -->
     </main>
   </div>
+
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+
+</style>

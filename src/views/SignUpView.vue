@@ -1,3 +1,88 @@
+<script setup>
+import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
+import { ref } from 'vue';
+
+const BASE_URL = import.meta.env.VITE_API_BASEURL;
+const API_URL = `${BASE_URL}/Customers`; 
+
+//讀取資料
+const loadUsers = async()=>{
+         const response = await fetch(API_URL)
+         const datas = await response.json()
+         console.log(datas)
+                  
+}
+loadUsers();
+
+const userData = ref({
+    "psw": "",
+    "useremail": "",
+    "license": "",
+    
+});
+
+const validity = ref({
+    "emailRequired": true,
+    "pswRequired": true,
+    "licenseRequired": true,
+    "pswFormat": true,
+    "emailFormat": true,
+    "licenseFormat": true,
+    "submitted": false,
+});
+
+const emailRule = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const pswRule = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+]{8,}$/;
+const licenseRule = /^[A-Z]{3}\d{4}$/;
+
+const validate = async () => {
+    //validity.value.submitted = true; // 設置提交狀態為真
+    const { useremail, license, psw } = userData.value;
+
+    validity.value.licenseRequired = license.length > 0;
+    validity.value.pswRequired = psw.length > 0;
+    validity.value.emailRequired = useremail.length > 0;
+
+    validity.value.pswFormat = pswRule.test(psw);
+    validity.value.emailFormat = emailRule.test(useremail);
+    validity.value.licenseFormat = licenseRule.test(license);
+
+    validity.value.isValid = validity.value.pswRequired && 
+                             validity.value.emailRequired && 
+                             validity.value.emailFormat && 
+                             validity.value.pswFormat && 
+                             validity.value.licenseRequired && 
+                             validity.value.licenseFormat;
+
+    if (validity.value.isValid) {
+        // const formData = new FormData(document.userData);
+        const data = {
+            UserId: 0,  // 預設值，如果是自動生成的，可以忽略或設為 null
+            Username: "Null",
+            Password: userData.value.psw,
+            Salt: "Null",  // 如果由伺服器生成，可以留空
+            Email: userData.value.useremail,
+            Phone: "Null",  // 如果不需要電話號碼，可以保持空值
+            LicensePlate: userData.value.license
+        };
+        
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'  // 確保發送的是 JSON 格式
+            },
+            body: JSON.stringify(data) 
+        });
+        if (response.ok) {
+            localStorage.setItem("user", JSON.stringify(data));
+            localStorage.setItem("userId", data.userId);
+            alert('註冊成功!!');
+            window.location.href = '/';
+        }
+    }
+};
+</script>
+
 <template>
   <div>
     <main id="main">
@@ -103,85 +188,4 @@
 
 <style lang="css" scoped></style>
 
-<script setup>
-import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
-import { ref } from 'vue';
 
-const BASE_URL = import.meta.env.VITE_API_BASEURL;
-const API_URL = `${BASE_URL}/Customers`; 
-
-//讀取Categories資料
-const loadCategories = async()=>{
-         const response = await fetch(API_URL)
-         const datas = await response.json()
-         console.log(datas)
-                  
-}
-loadCategories();
-
-const userData = ref({
-    "psw": "",
-    "useremail": "",
-    "license": "",
-    
-});
-
-const validity = ref({
-    "emailRequired": true,
-    "pswRequired": true,
-    "licenseRequired": true,
-    "pswFormat": true,
-    "emailFormat": true,
-    "licenseFormat": true,
-    "submitted": false,
-});
-
-const emailRule = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-const pswRule = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+]{8,}$/;
-const licenseRule = /^[A-Z]{3}\d{4}$/;
-
-const validate = async () => {
-    //validity.value.submitted = true; // 設置提交狀態為真
-    const { useremail, license, psw } = userData.value;
-
-    validity.value.licenseRequired = license.length > 0;
-    validity.value.pswRequired = psw.length > 0;
-    validity.value.emailRequired = useremail.length > 0;
-
-    validity.value.pswFormat = pswRule.test(psw);
-    validity.value.emailFormat = emailRule.test(useremail);
-    validity.value.licenseFormat = licenseRule.test(license);
-
-    validity.value.isValid = validity.value.pswRequired && 
-                             validity.value.emailRequired && 
-                             validity.value.emailFormat && 
-                             validity.value.pswFormat && 
-                             validity.value.licenseRequired && 
-                             validity.value.licenseFormat;
-
-    if (validity.value.isValid) {
-        // const formData = new FormData(document.userData);
-        const data = {
-            UserId: 0,  // 預設值，如果是自動生成的，可以忽略或設為 null
-            Username: "Null",
-            Password: userData.value.psw,
-            Salt: "Null",  // 如果由伺服器生成，可以留空
-            Email: userData.value.useremail,
-            Phone: "Null",  // 如果不需要電話號碼，可以保持空值
-            LicensePlate: userData.value.license
-        };
-        
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'  // 確保發送的是 JSON 格式
-            },
-            body: JSON.stringify(data) 
-        });
-        if (response.ok) {
-            alert('註冊成功!!');
-            window.location.href = '/';
-        }
-    }
-};
-</script>
