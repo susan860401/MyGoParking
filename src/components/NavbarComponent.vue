@@ -4,11 +4,11 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 const isLoggedIn = ref(false);
-const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 分鐘
+// const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 分鐘
 let timeout;
 
 const logout = () => {
-  localStorage.removeItem("userId"); // 清除 userId
+  localStorage.removeItem("user"); // 清除 userId
   isLoggedIn.value = false;
   alert("已成功登出");
   router.push("/signIn"); // 導去登入頁面
@@ -19,22 +19,12 @@ const resetTimeout = () => {
   timeout = setTimeout(logout, TIMEOUT_DURATION);
 };
 
-const handleBeforeUnload = (event) => {
-  // 在關閉視窗或重新加載時登出
-  logout();
-  // 可以選擇顯示提示消息，這取決於您的需求
-  // event.returnValue = '您確定要離開此頁面嗎？';
-};
-
 onMounted(() => {
   checkLoginStatus(); // 在元件加載時檢查登入狀態
   // 監聽用戶活動事件
   window.addEventListener("mousemove", resetTimeout);
   window.addEventListener("keypress", resetTimeout);
   resetTimeout(); // 初始化計時器
-
-  // 監聽關閉視窗事件
-  window.addEventListener("beforeunload", handleBeforeUnload);
 });
 
 onBeforeUnmount(() => {
@@ -47,7 +37,7 @@ onBeforeUnmount(() => {
 
 const checkLoginStatus = () => {
   // 假設這個函數會檢查 localStorage 中的 userId 來確定用戶是否已登入
-  const userId = localStorage.getItem("userId");
+  const userId = localStorage.getItem("user");
   isLoggedIn.value = userId !== null;
   if (!isLoggedIn.value) {
     // 如果登入，則導向首頁
@@ -150,6 +140,14 @@ const checkLoginStatus = () => {
                     activeClass="active"
                     :to="{ name: 'coupon' }"
                     >優惠券專區</RouterLink
+                  >
+                </li>
+                <li>
+                  <RouterLink
+                    class="nav-link"
+                    activeClass="active"
+                    :to="{ name: 'MonthlyRent' }"
+                    >月租測試</RouterLink
                   >
                 </li>
               </ul>

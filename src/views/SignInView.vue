@@ -1,6 +1,7 @@
 <script setup>
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
-import { ref } from "vue";
+import router from "@/router";
+import { KeepAlive, ref } from "vue";
 
 const API_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/login`;
 
@@ -20,7 +21,7 @@ const send = async () => {
     console.log(datas);
     localStorage.setItem("user", JSON.stringify(datas));
     alert("登入成功!!");
-    window.location.href = "/";
+    router.push("/");
   } else {
     alert("登入失敗,請重新登入!!");
   }
