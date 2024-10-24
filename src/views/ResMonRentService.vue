@@ -6,6 +6,7 @@ import "vue3-carousel/dist/carousel.css";
 import { useRoute } from "vue-router";
 import { onMounted, ref } from "vue";
 import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel";
+import Swal from "sweetalert2";
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const route = useRoute();
@@ -43,12 +44,60 @@ const getUserCarPlate = async () => {
       console.log(cars.value);
       selectedCarPlate.value =
         cars.value.length > 0 ? cars.value[0].licensePlate : "";
-      console.log(selectedCarPlate.value);
     } else {
       throw new Error("無法取得車輛資料");
     }
   } catch (error) {
     console.error("Error：", error);
+  }
+};
+
+const submitRes = async () => {
+  try {
+    const userId = JSON.parse(localStorage.getItem("user")).user;
+    const payload = {
+      userId,
+      licensePlate: selectedCarPlate.value,
+      resTime: date.value,
+      lotName: lotsInfo.value.lotName,
+    };
+    const res = await fetch(`${BASE_URL}/Reservations/newReservation`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) {
+      const result = await res.json();
+      Swal.fire({
+        title: "Are you sure?",
+        text: "確認是否預約",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "沒錯!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "確認!",
+            text: "預約成功!即將轉跳付款頁面!",
+            icon: "success",
+          });
+        } else {
+          const errorData = res.json();
+          // 預約失敗，顯示錯誤訊息
+          Swal.fire("錯誤", errorData.Message, "error");
+        }
+      });
+    }
+  } catch (error) {
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: error,
+    });
   }
 };
 
@@ -72,7 +121,7 @@ onMounted(async () => {
         </template>
       </BreadcrumbsComponent>
       <section>
-        <div class="container">
+        <div class="container mt-3">
           <div class="row">
             <div class="col-lg-5">
               <div
@@ -101,8 +150,12 @@ onMounted(async () => {
                   <div class="card-body mb-3">
                     <h5 class="card-title">{{ lotsInfo?.lotName }}</h5>
                     <p class="card-text">
-                      <i class="fa-solid fa-map-location-dot me-2"></i
-                      >{{ lotsInfo?.location }}
+                      <a
+                        :href="`https://www.google.com/maps/search/?api=1&query=${lotsInfo?.latitude},${lotsInfo?.longitude}`"
+                        target="_blank"
+                        ><i class="fa-solid fa-map-location-dot me-2"></i
+                      ></a>
+                      {{ lotsInfo?.location }}
                     </p>
                     <p class="card-text">收費標準：{{ lotsInfo?.rateRules }}</p>
                     <p class="card-text">

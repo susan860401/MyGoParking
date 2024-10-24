@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 const isLoggedIn = ref(false);
-// const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 分鐘
+const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 分鐘
 let timeout;
 
 const logout = () => {
@@ -31,7 +31,7 @@ onBeforeUnmount(() => {
   // 清除事件監聽器
   window.removeEventListener("mousemove", resetTimeout);
   window.removeEventListener("keypress", resetTimeout);
-  window.removeEventListener("beforeunload", handleBeforeUnload);
+  //window.removeEventListener("beforeunload", handleBeforeUnload);
   clearTimeout(timeout);
 });
 
@@ -140,14 +140,6 @@ const checkLoginStatus = () => {
                     activeClass="active"
                     :to="{ name: 'coupon' }"
                     >優惠券專區</RouterLink
-                  >
-                </li>
-                <li>
-                  <RouterLink
-                    class="nav-link"
-                    activeClass="active"
-                    :to="{ name: 'MonthlyRent' }"
-                    >月租測試</RouterLink
                   >
                 </li>
               </ul>
