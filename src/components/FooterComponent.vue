@@ -1,4 +1,31 @@
-<script setup></script>
+<script setup>
+import Swal from 'sweetalert2';
+
+const reply = async () => {
+  const { value: text } = await Swal.fire({
+    title: '意見回復',
+    html:
+      '<input id="swal-input1" class="swal2-input mb-3" placeholder="輸入你的名字">' +
+      '<textarea id="swal-input2" class="swal2-input form-control" style="height:300px;"" placeholder="輸入你的意見">',
+    focusConfirm: false,
+    showCancelButton: true,
+    preConfirm: () => {
+      const input1 = document.getElementById('swal-input1').value;
+      const input2 = document.getElementById('swal-input2').value;
+      if (!input1 || !input2) {
+        Swal.showValidationMessage('所有欄位都必須填寫');
+        return null;
+      }
+      return [input1, input2]; // 返回多個輸入值
+    }
+  });
+  if (text) {
+    Swal.fire(text);
+  }
+}
+
+
+</script>
 
 <template>
   <div>
@@ -14,14 +41,14 @@
       <div class="footer-content position-relative">
         <div class="container">
           <div class="row">
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-1"></div>
+            <div class="col-lg-4 col-md-12">
               <div class="footer-info">
                 <h3>MyGO Parking</h3>
                 <p>
-                  A108 Adam Street <br />
-                  NY 535022, USA<br /><br />
-                  <strong>Phone:</strong> +1 5589 55488 55<br />
-                  <strong>Email:</strong> info@example.com<br />
+                  801高雄市前金區中正四路211號8號樓之1<br /><br />
+                  <strong>Phone:</strong> 07 969 9885<br />
+                  <strong>Email:</strong> example@example.com<br />
                 </p>
                 <div class="social-links d-flex mt-3">
                   <a
@@ -49,55 +76,36 @@
             </div>
             <!-- End footer info column-->
 
-            <div class="col-lg-2 col-md-3 footer-links">
-              <h4>Useful Links</h4>
+            <div class="col-lg-2 col-md-4 footer-links">
+              <h4>服務項目</h4>
               <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">About us</a></li>
-                <li><a href="#">Services</a></li>
-                <li><a href="#">Terms of service</a></li>
-                <li><a href="#">Privacy policy</a></li>
+                <li><a href="#">停車場搜尋</a></li>
+                <li><a href="#">預定車位</a></li>
+                <li><a href="#">月租車位</a></li>
               </ul>
             </div>
             <!-- End footer links column-->
 
-            <div class="col-lg-2 col-md-3 footer-links">
-              <h4>Our Services</h4>
+            <div class="col-lg-2 col-md-4 footer-links">
+              <h4>其他功能</h4>
               <ul>
-                <li><a href="#">Web Design</a></li>
-                <li><a href="#">Web Development</a></li>
-                <li><a href="#">Product Management</a></li>
-                <li><a href="#">Marketing</a></li>
-                <li><a href="#">Graphic Design</a></li>
+                <li><a href="#">用戶中心</a></li>
+                <li><a href="#">使用教學</a></li>
               </ul>
             </div>
             <!-- End footer links column-->
 
-            <div class="col-lg-2 col-md-3 footer-links">
-              <h4>Hic solutasetp</h4>
+            <div class="col-lg-2 col-md-4 footer-links">
+              <h4>聯絡我們</h4>
               <ul>
-                <li><a href="#">Molestiae accusamus iure</a></li>
-                <li><a href="#">Excepturi dignissimos</a></li>
-                <li><a href="#">Suscipit distinctio</a></li>
-                <li><a href="#">Dilecta</a></li>
-                <li><a href="#">Sit quas consectetur</a></li>
-              </ul>
-            </div>
-            <!-- End footer links column-->
-
-            <div class="col-lg-2 col-md-3 footer-links">
-              <h4>Nobis illum</h4>
-              <ul>
-                <li><a href="#">Ipsam</a></li>
-                <li><a href="#">Laudantium dolorum</a></li>
-                <li><a href="#">Dinera</a></li>
-                <li><a href="#">Trodelas</a></li>
-                <li><a href="#">Flexo</a></li>
+                <li><a href="#" @click.prevent="reply">意見回復</a></li>
+                <li><a href="#">即時客服</a></li>
               </ul>
             </div>
             <!-- End footer links column-->
           </div>
         </div>
+        <div class="col-lg-1"></div>
       </div>
 
       <div class="footer-legal text-center position-relative">
@@ -115,10 +123,16 @@
             <a href="https://bootstrapmade.com/">BootstrapMade</a> Distributed
             by <a href="https://themewagon.com">ThemeWagon</a>
           </div>
+          <div class="credits">
+            網頁最佳體驗大小:1920x1080px
+          </div>
         </div>
       </div>
     </footer>
     <!-- End Footer -->
+
+    <!-- 意見回復 -->
+
   </div>
 </template>
 
