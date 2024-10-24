@@ -42,8 +42,8 @@ const getUserCarPlate = async () => {
     if (res.ok) {
       cars.value = await res.json();
       console.log(cars.value);
-      selectedCarPlate.value =
-        cars.value.length > 0 ? cars.value[0].licensePlate : "";
+      //selectedCarPlate.value = "";
+      //cars.value.length > 0 ? cars.value[0].licensePlate : "";
     } else {
       throw new Error("無法取得車輛資料");
     }
@@ -53,15 +53,26 @@ const getUserCarPlate = async () => {
 };
 
 const submitRes = async () => {
+  if (
+    !selectedCarPlate.value ||
+    !date.value ||
+    selectedCarPlate.value === "--請選擇車牌--"
+  ) {
+    Swal.fire({
+      icon: "warning",
+      title: "錯誤",
+      text: "請輸入資料後再進行預約",
+    });
+    return;
+  }
+
   const userId = JSON.parse(localStorage.getItem("user")).user;
   const formattedDate = new Date(date.value).toISOString();
-  console.log(formattedDate);
   const payload = {
     resTime: formattedDate,
     lotName: lotsInfo.value.lotName,
     licensePlate: selectedCarPlate.value,
   };
-  console.log(payload);
   let res = await fetch(
     `${BASE_URL}/Reservations/newReservation?userId=${userId}`,
     {
@@ -72,35 +83,36 @@ const submitRes = async () => {
       body: JSON.stringify(payload),
     }
   );
-  console.log(res);
 
-  let result = res;
-  console.log(result);
   try {
+    let fetchRes = await res.json();
+    console.log(fetchRes);
+    if (res.ok) {
+      await getLotsInfo();
+      sessionStorage.setItem("carId", fetchRes.newRes.carId);
+      sessionStorage.setItem("lotId", fetchRes.newRes.lotId);
+      sessionStorage.setItem("resTime", fetchRes.newRes.resTime);
+      sessionStorage.setItem("amount", fetchRes.newRes.amount);
+      date.value = null;
+      Swal.fire({
+        icon: "info",
+        title: "預約成功",
+        text: "訂金 : 新台幣3000元 , 將為您轉跳付款頁面!",
+      });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: fetchRes.message,
+      });
+    }
   } catch (err) {
-    throw new Error("無效的JSON回應：" + err.message);
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: err.Message,
+    });
   }
-  //   if (res.ok) {
-  //     Swal.fire({
-  //       title: "預約成功",
-  //       text: "即將轉跳付款頁面",
-  //       icon: "success",
-  //     });
-  //   } else {
-  //     // 顯示具體的錯誤訊息
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "錯誤",
-  //       text: result.Message || "發生未知錯誤",
-  //     });
-  //   }
-  // } catch (error) {
-  //   Swal.fire({
-  //     icon: "error",
-  //     title: "Oops...",
-  //     text: error,
-  //   });
-  //}
 };
 
 onMounted(async () => {
@@ -125,7 +137,7 @@ onMounted(async () => {
       <section>
         <div class="container mt-3">
           <div class="row">
-            <div class="col-lg-5">
+            <div class="col-lg-6">
               <div
                 class="row"
                 style="border: 1px solid gray; border-radius: 10px"
@@ -161,7 +173,9 @@ onMounted(async () => {
                       ></a>
                       {{ lotsInfo?.location }}
                     </p>
-                    <p class="card-text">收費標準：{{ lotsInfo?.rateRules }}</p>
+                    <p class="card-text">
+                      收費標準：{{ lotsInfo?.rateRules }}預約服務訂金：3000元
+                    </p>
                     <p class="card-text">
                       總車位數：{{ lotsInfo?.smallCarSpace }}
                     </p>
@@ -178,18 +192,34 @@ onMounted(async () => {
                 </div>
               </div>
             </div>
-            <div class="col-lg-7">
-              <div class="">
-                <div class="ticket-form p-5">
-                  <h2 class="text-dark text-uppercase mb-4">預約</h2>
-                  <form method="post">
-                    <div class="row g-4">
-                      <div class="col-12">
-                        <label for="licensePlate">選擇車牌：</label>
+            <div class="col-lg-6">
+              <div class="content pt-0">
+                <!-- Nav pills -->
+                <ul class="nav nav-pills" role="tablist">
+                  <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="pill" href="#Res"
+                      >預約</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#Mon"
+                      >月租</a
+                    >
+                  </li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                  <div id="Res" class="container tab-pane active">
+                    <form>
+                      <div class="form-group">
+                        <label for="exampleFormControlInput1">車牌號碼</label>
                         <select
                           v-model="selectedCarPlate"
-                          class="form-control border-0 py-2"
+                          class="form-control mb-2"
+                          id="exampleFormControlInput1"
                         >
+                          <option value="">--請選擇車牌--</option>
                           <option
                             v-for="(car, index) in cars"
                             :key="index"
@@ -199,24 +229,54 @@ onMounted(async () => {
                           </option>
                         </select>
                       </div>
-                      <div class="col-12">
+                      <div class="form-group">
+                        <label for="exampleInputPassword1">預約時間</label>
                         <!-- 使用 VueDatePicker 並綁定 v-model -->
                         <VueDatePicker
                           v-model="date"
-                          class="form-control border-0"
+                          class="form-control"
+                          id="exampleInputPassword1"
                         />
                       </div>
-                      <div class="col-12">
-                        <button
-                          type="button"
-                          class="btn btn-primary w-100 py-2 px-5"
-                          @click="submitRes"
+                      <button
+                        type="button"
+                        @click="submitRes"
+                        class="btn btn-primary mt-3"
+                      >
+                        送出
+                      </button>
+                    </form>
+                  </div>
+                  <div id="Mon" class="container tab-pane fade">
+                    <form>
+                      <div class="form-group">
+                        <label for="InputName">車牌號碼</label>
+                        <select
+                          v-model="selectedCarPlate"
+                          class="form-control"
+                          id="InputName"
                         >
-                          Book Now
-                        </button>
+                          <option :value="selectedCarPlate">
+                            --請選擇車牌--
+                          </option>
+                          <option
+                            v-for="(car, index) in cars"
+                            :key="index"
+                            :value="car"
+                          >
+                            {{ car }}
+                          </option>
+                        </select>
                       </div>
-                    </div>
-                  </form>
+                      <button
+                        type="button"
+                        class="btn btn-primary mt-3"
+                        @click="GoToMonPay"
+                      >
+                        送出
+                      </button>
+                    </form>
+                  </div>
                 </div>
               </div>
             </div>
@@ -232,8 +292,51 @@ onMounted(async () => {
   position: relative;
   z-index: 9999;
 }
-.ticket-form {
-  background: rgba(137, 177, 189, 0.979);
-  border-radius: 10px;
+label {
+  color: #fff;
+}
+.content {
+  width: 450px;
+  height: auto;
+  margin: 0 auto;
+  padding: 30px;
+}
+.nav-pills {
+  width: 450px;
+}
+.nav-item {
+  width: 50%;
+}
+.nav-pills .nav-link {
+  font-weight: bold;
+  padding-top: 13px;
+  text-align: center;
+  background: #939399;
+  color: #fff;
+  border-radius: 30px;
+  height: 100px;
+}
+.nav-pills .nav-link.active {
+  background: #000;
+  color: #fff;
+}
+.tab-content {
+  position: absolute;
+  width: 450px;
+  height: auto;
+  margin-top: -50px;
+  background: #000;
+  color: #000;
+  border-radius: 30px;
+  z-index: 1000;
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.4);
+  padding: 30px;
+  margin-bottom: 50px;
+}
+.tab-content button {
+  border-radius: 15px;
+  width: 100px;
+  margin: 0 auto;
+  float: right;
 }
 </style>
