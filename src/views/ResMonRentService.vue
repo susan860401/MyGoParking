@@ -3,14 +3,14 @@ import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import "vue3-carousel/dist/carousel.css";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { onMounted, ref } from "vue";
 import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel";
 import Swal from "sweetalert2";
-import router from "@/router";
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const route = useRoute();
+const router = useRouter();
 const lotId = route.query.lotId;
 const lotsInfo = ref(null);
 const date = ref();
@@ -36,7 +36,7 @@ const getLotsInfo = async () => {
 const getUserCarPlate = async () => {
   try {
     const userId = JSON.parse(localStorage.getItem("user")).userId;
-    console.log(userId);
+    //console.log(userId);
     const res = await fetch(
       `${BASE_URL}/Reservations/GetUserCarPlate?userId=${userId}`
     );
@@ -74,14 +74,14 @@ const submitRes = async () => {
   }
 
   const userId = JSON.parse(localStorage.getItem("user")).userId;
-  console.log(userId);
+  //console.log(userId);
   const formattedDate = new Date(date.value).toISOString();
   const payload = {
     startTime: formattedDate,
     lotName: lotsInfo.value.lotName,
     licensePlate: selectedCarPlate.value,
   };
-  console.log(payload);
+  //console.log(payload);
   let res = await fetch(
     `${BASE_URL}/Reservations/newReservation?userId=${userId}`,
     {
@@ -119,7 +119,22 @@ const submitRes = async () => {
   }
 };
 
-const GoToMonPay = async () => {};
+const GoToMonPay = async () => {
+  const selectCar = cars.value.find((car) => car === selectedCarPlate.value);
+  if (selectCar) {
+    sessionStorage.setItem("licensePlate", selectCar);
+    console.log(selectCar);
+    router.push({
+      name: "MonthlyRent",
+    });
+  } else {
+    Swal.fire({
+      icon: "warning",
+      title: "錯誤",
+      text: "請選擇車牌再申請月租!",
+    });
+  }
+};
 
 onMounted(async () => {
   await getLotsInfo();
