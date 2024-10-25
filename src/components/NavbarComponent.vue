@@ -1,17 +1,19 @@
 <script setup>
-import { onMounted, onBeforeUnmount, ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 const isLoggedIn = ref(false);
-// const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 分鐘
+const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 分鐘
 let timeout;
+
 
 const logout = () => {
   localStorage.removeItem("user"); // 清除 userId
-  isLoggedIn.value = false;
+  isLoggedIn === false;
   alert("已成功登出");
-  router.push("/signIn"); // 導去登入頁面
+  console.log(isLoggedIn)
+  router.push("/"); // 導去登入頁面
 };
 
 const resetTimeout = () => {
@@ -22,26 +24,25 @@ const resetTimeout = () => {
 onMounted(() => {
   checkLoginStatus(); // 在元件加載時檢查登入狀態
   // 監聽用戶活動事件
-  window.addEventListener("mousemove", resetTimeout);
-  window.addEventListener("keypress", resetTimeout);
+    window.addEventListener("mousemove", resetTimeout);
+    window.addEventListener("keypress", resetTimeout);
   resetTimeout(); // 初始化計時器
 });
 
-onBeforeUnmount(() => {
-  // 清除事件監聽器
-  window.removeEventListener("mousemove", resetTimeout);
-  window.removeEventListener("keypress", resetTimeout);
-  window.removeEventListener("beforeunload", handleBeforeUnload);
-  clearTimeout(timeout);
-});
+// onBeforeUnmount(() => {
+ 
+//   window.removeEventListener("mousemove", resetTimeout);
+//   window.removeEventListener("keypress", resetTimeout);
+//   clearTimeout(timeout);
+// });
 
 const checkLoginStatus = () => {
-  // 假設這個函數會檢查 localStorage 中的 userId 來確定用戶是否已登入
-  const userId = localStorage.getItem("user");
-  isLoggedIn.value = userId !== null;
-  if (!isLoggedIn.value) {
-    // 如果登入，則導向首頁
-    router.push("/home");
+  // 假設這個函數會檢查 localStorage 中的 user 來確定用戶是否已登入
+  const userId = localStorage.getItem(JSON.stringify("user"));
+  console.log(userId)
+    if ( userId === null){
+    isLoggedIn === false;
+    console.log(isLoggedIn);
   }
 };
 </script>
@@ -152,7 +153,7 @@ const checkLoginStatus = () => {
                 </li>
               </ul>
             </li>
-            <li v-show="isLoggedIn">
+            <li v-show="!isLoggedIn">
               <RouterLink
                 class="nav-link"
                 activeClass="active"
@@ -160,7 +161,7 @@ const checkLoginStatus = () => {
                 >註冊</RouterLink
               >
             </li>
-            <li v-show="isLoggedIn">
+            <li v-show="!isLoggedIn">
               <RouterLink
                 class="nav-link"
                 activeClass="active"

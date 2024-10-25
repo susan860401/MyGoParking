@@ -1,22 +1,61 @@
 <script setup>
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
+import router from "@/router";
 import { ref } from "vue";
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const API_URL = `${BASE_URL}/Customers`;
+const GET_URL = `${BASE_URL}/Customers/login`;
 
 //讀取資料
-const loadUsers = async () => {
-  const response = await fetch(API_URL);
-  const datas = await response.json();
-  console.log(datas);
+// const loadUsers = async () => {
+//   const response = await fetch(API_URL);
+//   const datas = await response.json();
+//   console.log(datas);
+// };
+// loadUsers();
+
+const autoLogin = async () => {
+  const loginData = {
+    Email: userData.value.useremail,
+    Password: userData.value.psw,
+    
+  };
+
+  const response = await fetch(GET_URL, {
+    method: "POST",
+    body: JSON.stringify(loginData),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    
+  });
+ 
+
+  const data = await response.json();
+
+  if (response.ok) {
+    if (data.exit) {
+      // 如果後端回傳 exit = true，代表登入成功
+      localStorage.setItem("userId", data.UserId); // 存儲用戶ID
+      alert(data.message); // 提示成功訊息
+      router.push("/"); // 導向主頁
+    } else {
+      // 登入失敗處理
+      alert(data.message); // 顯示失敗訊息
+    }
+  } else {
+    alert("登入失敗");
+  }
 };
-loadUsers();
+
+
 
 const userData = ref({
   psw: "",
   useremail: "",
   license: "",
+  message:""
 });
 
 const validity = ref({
@@ -67,15 +106,20 @@ const validate = async () => {
 
     const response = await fetch(API_URL, {
       method: "POST",
+      body: JSON.stringify(data),
       headers: {
         "Content-Type": "application/json", // 確保發送的是 JSON 格式
       },
-      body: JSON.stringify(data),
+     
     });
     if (response.ok) {
       localStorage.setItem("user", JSON.stringify(data));
       alert("註冊成功!!");
-      window.location.href = "/";
+      autoLogin();
+      router.push("/");
+    }
+    else{
+      alert("此帳號已註冊!");
     }
   }
 };
