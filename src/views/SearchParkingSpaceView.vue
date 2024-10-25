@@ -149,9 +149,10 @@ const AddMarkerToMap = async () => {
   displayedParkingLots.value.forEach((lot) => {
     const iconClass = lot.validSpace > 0 ? "lotsIcon" : "lotsIcon2"; // 根據可用車位判斷class
     const backgroundColor = lot.validSpace > 0 ? "#4caf50" : "#e72e0d"; // 綠色表示可用，紅色表示不可用
+    const display = lot.resDeposit > 0 ? "" : "none";
     const lotsIcon = L.divIcon({
       className: iconClass,
-      html: `<div style="
+      html: `<div class="text-center"><i class="fa-solid fa-star" style="display:${display};color:#FF00FF;font-size:1.5rem;"></i><div style="
         width: 40px;
         height: 40px;
         border-radius: 50%;
@@ -161,7 +162,7 @@ const AddMarkerToMap = async () => {
         color: white;
         font-weight: bold;
         border: 2px solid white;
-        background-color: ${backgroundColor};">${lot.validSpace}</div>`,
+        background-color: ${backgroundColor};">${lot.validSpace}</div></div>`,
       iconSize: [40, 40],
       iconAnchor: [20, 20],
     });
@@ -174,6 +175,40 @@ const AddMarkerToMap = async () => {
         },
         13
       );
+      marker.on("click", () => {
+        // 滾動到對應的停車場卡片
+        const cardElement = document.querySelector(
+          `[data-lot-id="${lot.lotId}"]`
+        );
+        if (cardElement) {
+          cardElement.scrollIntoView({ behavior: "smooth", block: "center" });
+
+          // 添加 active-card 樣式，並移除其他卡片的樣式
+          const allCards = document.querySelectorAll(".card");
+          allCards.forEach((card) => card.classList.remove("active-card"));
+          cardElement.classList.add("active-card");
+        }
+      });
+      // 為每個 marker 綁定 popup，顯示停車場相關資訊  => 問老師
+      //   const popupContent = `
+      //     <div>
+      //       <h4>${lot.lotName}</h4>
+      //       <p>可用車位: ${lot.validSpace}</p>
+      //       <p>地址: ${lot.location}</p>
+      //       <p>平日費率: ${lot.weekdayRate}元/小時</p>
+      //       <p>假日費率: ${lot.holidayRate}元/小時</p>
+      //     </div>
+      //   `;
+
+      //   const popup = L.popup()
+      //     .setLatLng([lot.latitude, lot.longitude])
+      //     .setContent(popupContent);
+      //   // 解除舊的 popup 綁定
+      //   if (marker.getPopup()) {
+      //     marker.unbindPopup();
+      //   }
+      //   marker.bindPopup(popup).openPopup();
+
       markerClusterGroup.value.addLayer(marker);
       // 將 marker 存入 markerMap，使用 lotId 進行關聯
       markerMap.value.set(lot.lotId, marker);
@@ -240,13 +275,6 @@ onMounted(async () => {
     if (destinationFromHome) {
       await SearchHandler(destinationFromHome); //自動搜尋跟定位
     }
-    // 防止重複綁定 zoomstart 事件，只需要一次即可
-    if (!map.value._zoomEventBound) {
-      map.value.on("zoomstart", () => {
-        map.value.closePopup();
-      });
-      map.value._zoomEventBound = true; // 標記事件已綁定
-    }
   }
 });
 
@@ -309,6 +337,7 @@ onBeforeUnmount(() => {
                             30
                           )"
                           :key="index"
+                          :data-lot-id="lot.lotId"
                           :ref="'parkingLotCard-' + index"
                           class="card mb-4"
                           @mouseover="focusOnMarker(lot.lotId)"
@@ -402,9 +431,9 @@ onBeforeUnmount(() => {
   align-items: center;
   z-index: 9999; /* 確保它位於最上層 */
 }
-/* 添加選中卡片的高亮效果 */
+/* 添加選中卡片的效果 */
 .active-card {
-  border: 2px solid #ff9800; /* 邊框顏色改為橙色 */
-  box-shadow: 0 0 15px rgba(255, 152, 0, 0.8); /* 卡片高亮效果 */
+  border: 2px solid #b3b0ad; /* 邊框顏色改為橙色 */
+  box-shadow: 0 0 15px rgba(85, 83, 80, 0.8); /* 卡片高亮效果 */
 }
 </style>

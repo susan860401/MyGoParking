@@ -35,7 +35,7 @@ const getLotsInfo = async () => {
 
 const getUserCarPlate = async () => {
   try {
-    const userId = JSON.parse(localStorage.getItem("user")).user;
+    const userId = JSON.parse(localStorage.getItem("user")).userId;
     console.log(userId);
     const res = await fetch(
       `${BASE_URL}/Reservations/GetUserCarPlate?userId=${userId}`
@@ -73,13 +73,15 @@ const submitRes = async () => {
     return;
   }
 
-  const userId = JSON.parse(localStorage.getItem("user")).user;
+  const userId = JSON.parse(localStorage.getItem("user")).userId;
+  console.log(userId);
   const formattedDate = new Date(date.value).toISOString();
   const payload = {
-    resTime: formattedDate,
+    startTime: formattedDate,
     lotName: lotsInfo.value.lotName,
     licensePlate: selectedCarPlate.value,
   };
+  console.log(payload);
   let res = await fetch(
     `${BASE_URL}/Reservations/newReservation?userId=${userId}`,
     {
@@ -99,7 +101,6 @@ const submitRes = async () => {
       sessionStorage.setItem("carId", fetchRes.newRes.carId);
       sessionStorage.setItem("lotId", fetchRes.newRes.lotId);
       sessionStorage.setItem("startTime", fetchRes.newRes.resTime);
-      sessionStorage.setItem("amount", fetchRes.newRes.amount);
       date.value = null;
       GotoRes();
     } else {
@@ -117,6 +118,8 @@ const submitRes = async () => {
     });
   }
 };
+
+const GoToMonPay = async () => {};
 
 onMounted(async () => {
   await getLotsInfo();
