@@ -1,7 +1,7 @@
 <script setup>
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
 import router from "@/router";
-import { KeepAlive, ref } from "vue";
+import { ref } from "vue";
 
 const API_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/login`;
 
@@ -18,12 +18,21 @@ const send = async () => {
   });
   if (response.ok) {
     const datas = await response.json(); //取得會員資訊
-    console.log(datas);
     localStorage.setItem("user", JSON.stringify(datas));
-    alert("登入成功!!");
-    router.push("/");
-  } else {
-    alert("登入失敗,請重新登入!!");
+    console.log(datas);
+    if (datas.message === "登入成功")
+    {
+      alert("登入成功!!");
+      router.push("/");
+    }
+    else if(datas.message === "無此帳號")
+    {
+      alert("無此帳號,請重新登入!!");
+    }
+    else
+    {
+      alert("登入失敗,請重新登入!!");
+    }
   }
 };
 </script>
@@ -100,7 +109,7 @@ const send = async () => {
                     <div class="error-message"></div>
                     <div class="sent-message">您已成功登入!</div>
 
-                    <button type="submit">登入</button>
+                    <button type="submit" @click="exitUser">登入</button>
                   </div>
                 </div>
                 <div class="row">
