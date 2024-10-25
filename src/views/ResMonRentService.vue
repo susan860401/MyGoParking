@@ -7,6 +7,7 @@ import { useRoute } from "vue-router";
 import { onMounted, ref } from "vue";
 import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel";
 import Swal from "sweetalert2";
+import router from "@/router";
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const route = useRoute();
@@ -52,6 +53,12 @@ const getUserCarPlate = async () => {
   }
 };
 
+const GotoRes = async () => {
+  router.push({
+    name: "resPayment",
+  });
+};
+
 const submitRes = async () => {
   if (
     !selectedCarPlate.value ||
@@ -91,14 +98,10 @@ const submitRes = async () => {
       await getLotsInfo();
       sessionStorage.setItem("carId", fetchRes.newRes.carId);
       sessionStorage.setItem("lotId", fetchRes.newRes.lotId);
-      sessionStorage.setItem("resTime", fetchRes.newRes.resTime);
+      sessionStorage.setItem("startTime", fetchRes.newRes.resTime);
       sessionStorage.setItem("amount", fetchRes.newRes.amount);
       date.value = null;
-      Swal.fire({
-        icon: "info",
-        title: "預約成功",
-        text: "訂金 : 新台幣3000元 , 將為您轉跳付款頁面!",
-      });
+      GotoRes();
     } else {
       Swal.fire({
         icon: "error",

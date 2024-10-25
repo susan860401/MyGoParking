@@ -17,6 +17,8 @@ import ParkingDetailView from "./views/CustomerCenter/ParkingDetailView.vue";
 import MonthlyConfirmView from "./views/MonthlyConfirmView.vue";
 import ResetPsw from "./views/ResetPsw.vue";
 import ResMonRentService from "./views/ResMonRentService.vue";
+import ResConfirmView from "./views/ResConfirmView.vue";
+import ResPaymentView from "./views/ResPaymentView.vue";
 
 const routes = [
   {
@@ -48,6 +50,16 @@ const routes = [
     path: "/MonthlyConfirm",
     component: MonthlyConfirmView,
     name: "MonthlyConfirm",
+  },
+  {
+    path: "/ResConfirm",
+    component: ResConfirmView,
+    name: "resConfirm",
+  },
+  {
+    path: "/ResPayment",
+    component: ResPaymentView,
+    name: "resPayment",
   },
   {
     path: "/CustomerCenter",
