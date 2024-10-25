@@ -100,7 +100,7 @@ const submitRes = async () => {
       await getLotsInfo();
       sessionStorage.setItem("carId", fetchRes.newRes.carId);
       sessionStorage.setItem("lotId", fetchRes.newRes.lotId);
-      sessionStorage.setItem("startTime", fetchRes.newRes.resTime);
+      sessionStorage.setItem("startTime", fetchRes.newRes.startTime);
       date.value = null;
       GotoRes();
     } else {
