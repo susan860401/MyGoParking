@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 const isLoggedIn = ref(false);
-// const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 分鐘
+const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 分鐘
 let timeout;
 
 const logout = () => {
