@@ -1,9 +1,11 @@
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 const API_URL = "https://localhost:7077/api";
 const reservations = ref([]); //傳回的預訂資料放此
 const search = ref("");
+const router = useRouter();
 
 const loadReservations = async () => {
   const response = await fetch(`${API_URL}/Reservations?userId=1`);
@@ -23,6 +25,17 @@ const filterByLotName = async () => {
     reservations.value = datas;
     console.log(reservations.value);
   }
+};
+
+//點擊前往預訂 導航到其停車場的預定頁面
+const toRes = (res) => {
+  router.push({
+    name: "resmon", // 目標路由的名稱
+    query: {
+      lotId: res.lotId, // 傳遞選中的停車場 ID
+      lotName: res.lotName, // 傳遞選中的停車場名稱
+    },
+  });
 };
 
 loadReservations();
@@ -143,7 +156,11 @@ loadReservations();
                           >
                         </p>
                         <div style="text-align: right">
-                          <button type="button" class="btn btn-light">
+                          <button
+                            @click="toRes(res)"
+                            type="button"
+                            class="btn btn-light"
+                          >
                             <i class="fa-regular fa-calendar"></i> 重新預訂
                           </button>
                         </div>
