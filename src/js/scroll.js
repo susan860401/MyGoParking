@@ -2,8 +2,9 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MotionPathPlugin } from "gsap/all";
 
-export function scrollanimation() {
-  LoadSVG();
+export async function scrollanimation() {
+  await LoadSVG();
+  
   gsap.registerPlugin(ScrollTrigger);
   gsap.registerPlugin(MotionPathPlugin);
 
@@ -18,7 +19,7 @@ export function scrollanimation() {
   //     }
   // });
   //
-  gsap.to(".view-point", { backgroundColor: "#87CEEB" });
+  // gsap.to(".view-point", { backgroundColor: "#87CEEB" });
   // gsap.to(".main_stars",{opacity:"0"});
   ScrollTrigger.create({
     trigger: ".panel_search",
@@ -83,6 +84,7 @@ export function scrollanimation() {
         opacity: 1,
         ease:'power1.out',
       });
+
       gsap.set("#car_container", {
         backgroundImage: "url('src/images/road.png')",
       });
@@ -96,34 +98,31 @@ export function scrollanimation() {
       });
 
       //天空背景顏色
-      let color;
+      let color,mountainColor;
       let color_progress = progress * 1.1;
       if (color_progress <= 0.3) {
         // 保持 skyblue 顏色
         color = "#87CEEB"; // skyblue
+        //山的顏色
+        mountainColor = "#3EAE57"; // 綠色
       } else if (color_progress > 0.3 && color_progress <= 0.35) {
         // 從 skyblue 到淡橙色過渡
-        color = gsap.utils.interpolate(
-          "#87CEEB",
-          "#FFEF99",
-          (color_progress - 0.3) * 20
-        ); // 淡黃色過渡
+        color = gsap.utils.interpolate("#87CEEB", "#FFEF99",(color_progress - 0.3) * 20); // 淡黃色過渡
+        mountainColor = gsap.utils.interpolate("#3EAE57", "#6B8E23", (color_progress - 0.3) * 20); // 深綠色
       } else if (color_progress > 0.35 && color_progress <= 0.4) {
         // 從淡橙色到 #FF8600 過渡
-        color = gsap.utils.interpolate(
-          "#FFEF99",
-          "#FF8600",
-          (color_progress - 0.35) * 10
-        );
+        color = gsap.utils.interpolate("#FFEF99", "#FF8600", (color_progress - 0.35) * 10 );
+        mountainColor = gsap.utils.interpolate("#6B8E23", "#3B5A1B", (color_progress - 0.35) * 10); // 更深的綠色
       } else if (color_progress > 0.4) {
         // 從橙色到黑色過渡
-        color = gsap.utils.interpolate(
-          "#FF8600",
-          "#000",
-          (color_progress - 0.4) * 10
-        );
-      }
+        color = gsap.utils.interpolate( "#FF8600", "#000", (color_progress - 0.4) * 10 );
+        mountainColor = "#121C08";
+      } 
+
+
+
       gsap.to(".view-point", { backgroundColor: color });
+      gsap.to(".mountain path[fill='#3EAE57']", { fill: mountainColor});
     },
     onLeave: () => {
       gsap.set(".main_stars", { duration: 0.5, opacity: "0" });
@@ -367,9 +366,9 @@ export function killAnimation() {
 
 
 
-//載入SVG的BUG
-function LoadSVG() {
-  fetch("src/images/car.svg")
+//載入SVG的Car
+async function LoadSVG() {
+  await fetch("src/images/car.svg")
     .then((response) => {
       return response.text();
     })
@@ -378,7 +377,7 @@ function LoadSVG() {
       document.getElementById("car_body").innerHTML = svg;
     });
 
-  fetch("src/images/stars.svg")
+  await fetch("src/images/stars.svg")
     .then((response) => {
       return response.text();
     })
@@ -408,5 +407,12 @@ function LoadSVG() {
         });
       });
       // console.log(stars);
+    });
+
+    await fetch("src/images/background.svg")
+    .then((response) => { return response.text()})
+    .then((svg) => {
+      // console.log(svg)
+      document.getElementById("background").innerHTML = svg;
     });
 }

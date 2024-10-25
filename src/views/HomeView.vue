@@ -1,5 +1,5 @@
 <script setup>
-import { nextTick, onBeforeMount, onBeforeUnmount, onMounted, onUpdated } from "vue";
+import { nextTick, onBeforeUnmount, onMounted, onUpdated } from "vue";
 import { scrollanimation, killAnimation } from "@/js/scroll";
 import SearchInputComponent from "@/components/SearchInputComponent.vue";
 import { ref } from "vue";
@@ -7,6 +7,7 @@ import { onBeforeRouteLeave, useRouter } from "vue-router";
 
 const router = useRouter();
 const searchQuery = ref("");
+const isLoading = ref(true);
 
 const SearchHandler = (searchQuery) => {
   if (searchQuery) {
@@ -17,28 +18,49 @@ const SearchHandler = (searchQuery) => {
   }
 };
 
-onMounted(() => {
+
+
+onMounted(async() => {
   try {
-    scrollanimation();
+    await scrollanimation();
+    await new Promise(resolve => setTimeout(resolve, 300)); // 模擬加載
+    await nextTick();
   } catch (error) {
     console.error("Error during mounted:", error);
+  } finally{
+    isLoading.value = false;
   }
 });
+
 
 onBeforeUnmount(()=>{
   killAnimation();
 });
 
 onBeforeRouteLeave(()=>{
+  isLoading.value = true
   window.scrollTo(0,0);
   nextTick();
 });
 
+window.addEventListener('resize',() => {
+  window.location.reload();
+})
+
 </script>
 
 <template>
+  <div v-if="isLoading" class="loading d-flex justify-content-center">
+    <div class="loader">
+      <div class="loader-text">Loading...</div>
+      <div class="loader-bar"></div>
+    </div>
+  </div>
   <div class="view-container">
     <section class="view-point">
+      <div class="background" id="background">
+        <!-- <img src="@/images/background.svg" alt=""> -->
+      </div>
       <div class="phone" id="phone1">
         <img v-once src="@/images/phone.svg" alt="" />
         <div class="function">
@@ -100,17 +122,17 @@ onBeforeRouteLeave(()=>{
         <div class="building" style="--position: 3">
           <img v-once src="@/images/cityscape.svg" alt="" />
         </div>
-        <div class="building" style="--position: 4">
-          <img v-once src="@/images/apartment_small.svg" alt="" />
-        </div>
         <div class="building" style="--position: 5">
           <img v-once src="@/images/convenience_store.svg" alt="" />
         </div>
-        <div class="building" style="--position: 6">
-          <img v-once src="@/images/apartment_rent.svg" alt="" />
+        <div class="building" style="--position: 4">
+          <img v-once src="@/images/apartment_small.svg" alt="" />
         </div>
         <div class="building" style="--position: 7">
           <img v-once src="@/images/residential_area.svg" alt="" />
+        </div>
+        <div class="building" style="--position: 6">
+          <img v-once src="@/images/apartment_rent.svg" alt="" />
         </div>
       </div>
       <div class="question">
@@ -152,6 +174,64 @@ onBeforeRouteLeave(()=>{
 </template>
 
 <style lang="css" scoped>
+.loading{
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  background-color: skyblue;
+  opacity: 1;
+  z-index: 9999;
+}
+.loader {
+  /* background-color: blue; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.loader-text {
+  font-size: 24px;
+  color: rgb(0, 0, 0);
+  margin-bottom: 20px;
+  align-self: center;
+}
+
+.loader-bar {
+  width: 30%;
+  height: 10px;
+  border-radius: 5px;
+  background-color: rgb(0, 0, 0);
+  animation: loader-bar-animation 2s ease-in-out infinite;
+}
+
+@keyframes loader-bar-animation {
+  0% {
+    /* transform: translateX(-100%) rotate(270deg); */
+    transform: translateX(-100%);
+  }
+
+  50% {
+    /* transform: translateX(100%) rotate(-90deg); */
+    transform: translateX(100%);
+  }
+
+  100% {
+    /* transform: translateX(-100%) rotate(270deg); */
+    transform: translateX(-100%);
+  }
+}
+
+
+/* 背景 */
+.background{
+  position: absolute;
+  bottom: 15vmin;
+  right: 0;
+  z-index: 1;
+  width: 100vw;
+}
+
 /* 手機 */
 .phone {
   /* pointer-events: auto; */
@@ -237,6 +317,7 @@ onBeforeRouteLeave(()=>{
   width: 185vh;
   display: flex;
   justify-content: space-between;
+  z-index: -1;
 }
 .sun * {
   height: 20vmin;
@@ -290,6 +371,7 @@ onBeforeRouteLeave(()=>{
   width: 100vmax;
   top: 5vmin;
   position: absolute;
+  z-index: -10;
 }
 #cloud_big1 {
   top: 10vmin;
@@ -314,6 +396,7 @@ onBeforeRouteLeave(()=>{
   align-items: flex-end;
   flex-wrap: nowrap;
   padding: 0;
+  z-index: 10;
 }
 .building {
   position: relative;
@@ -331,7 +414,8 @@ onBeforeRouteLeave(()=>{
   height: 100vh;
   display: flex;
   justify-items: center;
-  justify-content: center;  
+  justify-content: center;
+  background-color: #87CEEB;
 }
 
 .title {
@@ -367,15 +451,16 @@ onBeforeRouteLeave(()=>{
   height: 100vh;
   font-size: 300px;
   z-index: -1;
+  background-color: transparent
 }
 
-.panel_search {
+/* .panel_search {
   background-color: green;
 }
 
 .panel_reserve {
   background-color: gray;
-}
+} */
 
 .panel_test {
   height: 100vh;
@@ -497,6 +582,7 @@ onBeforeRouteLeave(()=>{
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 10;
 }
 
 .question img {
