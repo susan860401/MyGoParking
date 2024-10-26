@@ -44,6 +44,8 @@ import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
                 >
                 <RouterLink activeClass="active" :to="{ name: 'coupon' }"
                   >優惠券專區</RouterLink
+                ><RouterLink activeClass="active" :to="{ name: 'test' }"
+                  >test</RouterLink
                 >
               </div>
             </div>

@@ -96,7 +96,7 @@ loadLicensePlates();
 
 <template>
   <div>
-    <div class="container p-3 bg-light">
+    <div id="outside" class="container p-3 bg-light">
       <h4 class="mb-3">車牌設定</h4>
       <div class="mb-2">
         <p>
@@ -165,6 +165,9 @@ loadLicensePlates();
 </template>
 
 <style lang="css" scoped>
+#outside {
+  box-shadow: -5px 0px 10px lightgrey;
+}
 /* CSS */
 /* 新增按鈕樣式 */
 .button-55 {

@@ -20,6 +20,7 @@ import ResMonRentService from "./views/ResMonRentService.vue";
 import ResConfirmView from "./views/ResConfirmView.vue";
 import ResPaymentView from "./views/ResPaymentView.vue";
 import MonthlyRentalView from "./views/CustomerCenter/MonthlyRentalView.vue";
+import Test from "./views/CustomerCenter/test.vue";
 
 const routes = [
   {
@@ -101,6 +102,11 @@ const routes = [
         path: "coupon",
         component: CouponView,
         name: "coupon",
+      },
+      {
+        path: "test",
+        component: Test,
+        name: "test",
       },
 
       // 其他子路由...
