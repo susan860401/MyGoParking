@@ -24,6 +24,7 @@ const getLotsInfo = async () => {
     );
     if (res.ok) {
       let data = await res.json();
+      console.log(data);
       lotsInfo.value = data;
     } else {
       throw new Error("無法取得停車場資料");
@@ -56,6 +57,7 @@ const getUserCarPlate = async () => {
 const GotoRes = async () => {
   router.push({
     name: "resPayment",
+    query: lotId,
   });
 };
 
@@ -121,17 +123,61 @@ const submitRes = async () => {
 
 const GoToMonPay = async () => {
   const selectCar = cars.value.find((car) => car === selectedCarPlate.value);
-  if (selectCar) {
-    sessionStorage.setItem("licensePlate", selectCar);
-    console.log(selectCar);
-    router.push({
-      name: "MonthlyRent",
-    });
-  } else {
+  if (!selectCar) {
     Swal.fire({
       icon: "warning",
       title: "錯誤",
       text: "請選擇車牌再申請月租!",
+    });
+    return;
+  }
+  try {
+    const res = await fetch(
+      `${BASE_URL}/MonRental/CheckMonRentalSpace?lotId=${lotId}`
+    );
+    const data = await res.json();
+    console.log(data);
+    if (!res.ok) {
+      throw new Error(data.message || "檢查月租車位狀態時發生錯誤");
+    }
+    if (data.message === "月租車位可用" && data.success === true) {
+      sessionStorage.setItem("licensePlate", selectCar);
+      sessionStorage.setItem("lotId", lotId);
+      router.push({
+        name: "MonthlyRent",
+        query: lotId,
+      });
+    } else if (
+      data.message === "月租車位已滿, 您可以填寫申請表單等待抽籤" &&
+      data.success === false
+    ) {
+      //沒空位跳去填寫表單
+      Swal.fire({
+        icon: "info",
+        title: "月租車位已滿",
+        text: "月租車位已滿, 您可以填寫申請表單等待抽籤",
+        showCancelButton: true,
+        confirmButtonText: "去申請排隊",
+        cancelButtonText: "取消",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push({
+            name: "monRentApply",
+          });
+        }
+      });
+    } else {
+      Swal.fire({
+        icon: "warning",
+        title: "注意!",
+        text: "該停車場不支援月租服務",
+      });
+    }
+  } catch (error) {
+    Swal.fire({
+      icon: "error",
+      title: "錯誤",
+      text: error.message || "檢查月租車位狀態時發生錯誤",
     });
   }
 };
@@ -184,7 +230,17 @@ onMounted(async () => {
                 <div class="col-lg-12">
                   <div class="card-body mb-3">
                     <h5 class="card-title mb-2" style="font-weight: 700">
-                      {{ lotsInfo?.lotName }}
+                      {{ lotsInfo?.lotName
+                      }}<span
+                        style="color: #ff00ff"
+                        v-show="lotsInfo?.resDeposit > 0"
+                        ><i class="fa-solid fa-star"></i
+                      ></span>
+                      <span
+                        style="color: #d9b300"
+                        v-show="lotsInfo?.monRentalRate > 0"
+                        ><i class="fa-solid fa-circle"></i
+                      ></span>
                     </h5>
                     <p class="card-text">
                       <a
@@ -194,8 +250,12 @@ onMounted(async () => {
                       ></a>
                       {{ lotsInfo?.location }}
                     </p>
+                    <p class="card-text">收費標準：{{ lotsInfo?.rateRules }}</p>
                     <p class="card-text">
-                      收費標準：{{ lotsInfo?.rateRules }}預約服務訂金：3000元
+                      預約服務訂金:{{ lotsInfo?.resDeposit }}元
+                    </p>
+                    <p class="card-text">
+                      月租費: {{ lotsInfo?.monRentalRate }}元/月
                     </p>
                     <p class="card-text">
                       總車位數：{{ lotsInfo?.smallCarSpace }}

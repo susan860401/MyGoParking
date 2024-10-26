@@ -19,6 +19,7 @@ import ResetPsw from "./views/ResetPsw.vue";
 import ResMonRentService from "./views/ResMonRentService.vue";
 import ResConfirmView from "./views/ResConfirmView.vue";
 import ResPaymentView from "./views/ResPaymentView.vue";
+import MonApplyView from "./views/MonApplyView.vue";
 
 const routes = [
   {
@@ -45,6 +46,11 @@ const routes = [
     path: "/MonthlyRent",
     component: MonthlyRentView,
     name: "MonthlyRent",
+  },
+  {
+    path: "/MonRentalApply",
+    component: MonApplyView,
+    name: "monRentApply",
   },
   {
     path: "/MonthlyConfirm",

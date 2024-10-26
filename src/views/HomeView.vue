@@ -18,35 +18,31 @@ const SearchHandler = (searchQuery) => {
   }
 };
 
-
-
-onMounted(async() => {
+onMounted(async () => {
   try {
     await scrollanimation();
-    await new Promise(resolve => setTimeout(resolve, 300)); // 模擬加載
+    await new Promise((resolve) => setTimeout(resolve, 300)); // 模擬加載
     await nextTick();
   } catch (error) {
     console.error("Error during mounted:", error);
-  } finally{
+  } finally {
     isLoading.value = false;
   }
 });
 
-
-onBeforeUnmount(()=>{
+onBeforeUnmount(() => {
   killAnimation();
 });
 
-onBeforeRouteLeave(()=>{
-  isLoading.value = true
-  window.scrollTo(0,0);
+onBeforeRouteLeave(() => {
+  isLoading.value = true;
+  window.scrollTo(0, 0);
   nextTick();
 });
 
-window.addEventListener('resize',() => {
-  window.location.reload();
-})
-
+// window.addEventListener('resize',() => {
+//   window.location.reload();
+// })
 </script>
 
 <template>
@@ -174,7 +170,7 @@ window.addEventListener('resize',() => {
 </template>
 
 <style lang="css" scoped>
-.loading{
+.loading {
   width: 100vw;
   height: 100vh;
   position: fixed;
@@ -222,9 +218,8 @@ window.addEventListener('resize',() => {
   }
 }
 
-
 /* 背景 */
-.background{
+.background {
   position: absolute;
   bottom: 15vmin;
   right: 0;
@@ -415,7 +410,7 @@ window.addEventListener('resize',() => {
   display: flex;
   justify-items: center;
   justify-content: center;
-  background-color: #87CEEB;
+  background-color: #87ceeb;
 }
 
 .title {
@@ -451,7 +446,7 @@ window.addEventListener('resize',() => {
   height: 100vh;
   font-size: 300px;
   z-index: -1;
-  background-color: transparent
+  background-color: transparent;
 }
 
 /* .panel_search {

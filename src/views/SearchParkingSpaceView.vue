@@ -98,21 +98,21 @@ const SearchHandler = async (searchQuery) => {
 
 // 載入停車場
 const loadParkingLots = async () => {
-  if (!map.value) {
-    console.error("地圖尚未初始化");
-    return;
-  }
   try {
     const res = await fetch(`${BASE_URL}/ParkingLot/GetParkingLots`);
     if (!res.ok) {
       throw new Error("Server無法獲取停車場數據");
     }
     const data = await res.json();
+    //console.log(data);
     data.forEach((lot) => {
       lot.isETC = lot.etcSpace > 0;
+      lot.monRentalRate = lot.monRate > 0;
+      lot.deposit = lot.resDeposit > 0;
     });
     parkingLots.value = data;
-    AddMarkerToMap();
+    updateDisplayLots(22.6273, 120.3014); // 高雄的經緯度
+    //AddMarkerToMap();
   } catch (error) {
     console.error("加載停車場數據時出現錯誤：", error);
     Swal.fire({
@@ -131,7 +131,7 @@ const updateDisplayLots = (lat, lon) => {
       return { ...lot, distance };
     })
     .sort((a, b) => a.distance - b.distance);
-  AddMarkerToMap();
+  //AddMarkerToMap();
 };
 //停車場加上marker
 const AddMarkerToMap = async () => {
@@ -145,7 +145,7 @@ const AddMarkerToMap = async () => {
   markerMap.value.clear(); // 每次都清空舊的 markerMap
 
   // 模擬延遲 2 秒鐘
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   displayedParkingLots.value.forEach((lot) => {
     const iconClass = lot.validSpace > 0 ? "lotsIcon" : "lotsIcon2"; // 根據可用車位判斷class
     const backgroundColor = lot.validSpace > 0 ? "#4caf50" : "#e72e0d"; // 綠色表示可用，紅色表示不可用
@@ -257,6 +257,7 @@ watch(
     }
   }
 );
+watch(displayedParkingLots, AddMarkerToMap);
 
 // 掛載時檢查有沒有來自首頁的字串
 onMounted(async () => {
@@ -270,7 +271,7 @@ onMounted(async () => {
     // 初始化 LayerGroup
     markerGroup.value = L.layerGroup().addTo(map.value); // 停車場標記
     searchMarkerGroup.value = L.layerGroup().addTo(map.value); // 搜尋標記
-    loadParkingLots();
+    await loadParkingLots();
     const destinationFromHome = route.query.searchQuery; //查詢home傳來的參數
     if (destinationFromHome) {
       await SearchHandler(destinationFromHome); //自動搜尋跟定位
@@ -344,8 +345,18 @@ onBeforeUnmount(() => {
                           @click="ResMon(lot)"
                         >
                           <div class="card-body">
-                            <h3 class="card-title d-flex">
-                              {{ lot.lotName }}
+                            <div class="d-flex justify-content-between">
+                              <h3 class="card-title d-flex">
+                                {{ lot.lotName }}
+                                <span style="color: #ff00ff" v-if="lot.deposit"
+                                  ><i class="fa-solid fa-star"></i
+                                ></span>
+                                <span
+                                  style="color: #d9b300"
+                                  v-if="lot.monRentalRate"
+                                  ><i class="fa-solid fa-circle"></i
+                                ></span>
+                              </h3>
                               <div
                                 class="d-flex text-center"
                                 style="width: 80px; height: 25px"
@@ -355,7 +366,7 @@ onBeforeUnmount(() => {
                                   >{{ lot.distance.toFixed(2) }}km</span
                                 >
                               </div>
-                            </h3>
+                            </div>
                             <p style="font-weight: 700">
                               剩餘車位：<span style="color: chocolate">{{
                                 lot.validSpace
@@ -385,6 +396,18 @@ onBeforeUnmount(() => {
           </div>
           <div class="col-md-8">
             <div id="map"></div>
+            <div class="mt-2 d-flex">
+              <p>
+                <span style="color: #ff00ff"
+                  ><i class="fa-solid fa-star"></i></span
+                >: 該停車場支援預約服務。
+              </p>
+              <p>
+                <span style="color: #d9b300"
+                  ><i class="fa-solid fa-circle"></i></span
+                >: 該停車場支援月租服務。
+              </p>
+            </div>
           </div>
         </div>
       </section>
