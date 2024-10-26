@@ -229,7 +229,7 @@ async function requestPayment() {
                 <h2 class="text-center mb-3">選擇您的月租停車方案</h2>
                 <p class="text-center text-muted">彈性付款方案，滿足您的停車需求</p>
 
-                <ul class="nav justify-content-evenly mb-4" id="planTabs">
+                <ul class="nav justify-content-evenly mb-4">
                     <li class="nav-item" style="width: 23%;" v-for="(plan, key) in planData" :key="key">
                         <div class="plan-option" :class="{ active: selectedPlanKey === key }" @click="selectPlan(key)">
                             {{ plan.label }}
@@ -238,7 +238,7 @@ async function requestPayment() {
                 </ul>
 
                 <div class="tab-content">
-                    <div class="tab-pane show active" id="planContent">
+                    <div class="tab-pane show active">
                         <div class="text-center p-5 bg-white rounded shadow">
                             <h1>{{ selectedPlan.averagePerMonth }}/月</h1>
                             <p>總付款{{ selectedPlan.price }}元</p>
