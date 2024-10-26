@@ -2,10 +2,13 @@
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
 import router from "@/router";
 import { ref } from "vue";
+import { useAuthStore } from "@/stores/authStore"; // 引入 store
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const API_URL = `${BASE_URL}/Customers`;
 const GET_URL = `${BASE_URL}/Customers/login`;
+const authStore = useAuthStore();
+
 
 //讀取資料
 // const loadUsers = async () => {
@@ -36,8 +39,9 @@ const autoLogin = async () => {
 
   if (response.ok) {
     if (data.exit) {
-      // 如果後端回傳 exit = true，代表登入成功
-      localStorage.setItem("userId", data.UserId); // 存儲用戶ID
+      // 成功登入時更新 Pinia 狀態
+      localStorage.setItem("user", JSON.stringify(data)); // 儲存用戶資訊
+      authStore.login(); // 更新登入狀態
       alert(data.message); // 提示成功訊息
       router.push("/"); // 導向主頁
     } else {
@@ -115,7 +119,7 @@ const validate = async () => {
     if (response.ok) {
       localStorage.setItem("user", JSON.stringify(data));
       alert("註冊成功!!");
-      autoLogin();
+      await autoLogin(); // 註冊成功後自動登入
       router.push("/");
     }
     else{

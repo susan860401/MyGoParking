@@ -1,19 +1,22 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authStore"; // 引入 store
 
 const router = useRouter();
-const isLoggedIn = ref(false);
+const authStore = useAuthStore();
 const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 分鐘
 let timeout;
 
+
+//pinia
 const logout = () => {
-  localStorage.removeItem("user"); // 清除 userId
-  isLoggedIn === false;
-  alert("已成功登出");
-  console.log(isLoggedIn);
-  router.push("/"); // 導去登入頁面
+  authStore.logout();
+  alert("已登出")
+  router.push("/"); // 導向登入頁面
 };
+
+
 
 const resetTimeout = () => {
   clearTimeout(timeout);
@@ -21,29 +24,12 @@ const resetTimeout = () => {
 };
 
 onMounted(() => {
-  checkLoginStatus(); // 在元件加載時檢查登入狀態
+  authStore.checkLoginStatus(); // 初始化時檢查登入狀態
   // 監聽用戶活動事件
   window.addEventListener("mousemove", resetTimeout);
   window.addEventListener("keypress", resetTimeout);
   resetTimeout(); // 初始化計時器
 });
-
-// onBeforeUnmount(() => {
-
-//   window.removeEventListener("mousemove", resetTimeout);
-//   window.removeEventListener("keypress", resetTimeout);
-//   clearTimeout(timeout);
-// });
-
-const checkLoginStatus = () => {
-  // 假設這個函數會檢查 localStorage 中的 user 來確定用戶是否已登入
-  const userId = localStorage.getItem(JSON.stringify("user"));
-  console.log(userId);
-  if (userId === null) {
-    isLoggedIn === false;
-    console.log(isLoggedIn);
-  }
-};
 </script>
 
 <template>
@@ -98,7 +84,7 @@ const checkLoginStatus = () => {
               >
             </li>
             <!-- 用戶中心選單 -->
-            <li v-show="!isLoggedIn" class="dropdown">
+            <li v-if="authStore.isLogin" class="dropdown">
               <RouterLink
                 class="nav-link"
                 activeClass="active"
@@ -144,7 +130,7 @@ const checkLoginStatus = () => {
                 </li>
               </ul>
             </li>
-            <li v-show="!isLoggedIn">
+            <li v-if="!authStore.isLogin">
               <RouterLink
                 class="nav-link"
                 activeClass="active"
@@ -152,7 +138,7 @@ const checkLoginStatus = () => {
                 >註冊</RouterLink
               >
             </li>
-            <li v-show="!isLoggedIn">
+            <li v-if="!authStore.isLogin">
               <RouterLink
                 class="nav-link"
                 activeClass="active"
@@ -160,7 +146,7 @@ const checkLoginStatus = () => {
                 >登入</RouterLink
               >
             </li>
-            <li v-show="!isLoggedIn">
+            <li v-if="authStore.isLogin">
               <button class="btn btn-light" @click="logout">登出</button>
             </li>
           </ul>
