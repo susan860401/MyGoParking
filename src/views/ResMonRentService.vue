@@ -7,6 +7,7 @@ import { useRoute, useRouter } from "vue-router";
 import { onMounted, ref } from "vue";
 import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel";
 import Swal from "sweetalert2";
+import { getUserCarPlate } from "@/js/com";
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const route = useRoute();
@@ -28,26 +29,6 @@ const getLotsInfo = async () => {
       lotsInfo.value = data;
     } else {
       throw new Error("無法取得停車場資料");
-    }
-  } catch (error) {
-    console.error("Error：", error);
-  }
-};
-
-const getUserCarPlate = async () => {
-  try {
-    const userId = JSON.parse(localStorage.getItem("user")).userId;
-    //console.log(userId);
-    const res = await fetch(
-      `${BASE_URL}/Reservations/GetUserCarPlate?userId=${userId}`
-    );
-    if (res.ok) {
-      cars.value = await res.json();
-      //console.log(cars.value);
-      //selectedCarPlate.value = "";
-      //cars.value.length > 0 ? cars.value[0].licensePlate : "";
-    } else {
-      throw new Error("無法取得車輛資料");
     }
   } catch (error) {
     console.error("Error：", error);
@@ -140,6 +121,9 @@ const submitRes = async () => {
 };
 
 const GoToMonPay = async () => {
+  if (!lotsInfo.value) {
+    await getLotsInfo(); // 確保此時已經獲取了 lotId 和 lotName
+  }
   const selectCar = cars.value.find((car) => car === selectedCarPlate.value);
   if (!selectCar) {
     Swal.fire({
@@ -163,7 +147,10 @@ const GoToMonPay = async () => {
       sessionStorage.setItem("lotId", lotId);
       router.push({
         name: "MonthlyRent",
-        query: lotId,
+        query: {
+          lotId: lotsInfo.value.lotId,
+          lotName: lotsInfo.value.lotName,
+        },
       });
     } else if (
       data.message === "月租車位已滿, 您可以填寫申請表單等待抽籤" &&
@@ -181,6 +168,10 @@ const GoToMonPay = async () => {
         if (result.isConfirmed) {
           router.push({
             name: "monRentApply",
+            query: {
+              lotId: lotsInfo.value.lotId,
+              lotName: lotsInfo.value.lotName,
+            },
           });
         }
       });
@@ -202,13 +193,19 @@ const GoToMonPay = async () => {
 
 onMounted(async () => {
   await getLotsInfo();
-  await getUserCarPlate();
+  await getUserCarPlate(cars);
 });
 </script>
 
 <template>
   <main id="main">
-    <BreadcrumbsComponent backgroundImage="/03.jpg">
+    <BreadcrumbsComponent
+      backgroundImage="/03.jpg"
+      :breadcrumbs="[
+        { name: 'Home', link: '/' },
+        { name: 'GoParkingMap', link: '/search' },
+      ]"
+    >
       <template #title>
         <!-- 插入到 title 插槽 -->
         <h2>Reservation & MonthlyRental</h2>
@@ -278,6 +275,9 @@ onMounted(async () => {
                     總車位數：{{ lotsInfo?.smallCarSpace }}
                   </p>
                   <p class="card-text">電動車位數：{{ lotsInfo?.etcSpace }}</p>
+                  <p class="card-text">
+                    月租剩餘車位: {{ lotsInfo?.monRentalSpace }}
+                  </p>
                   <p class="card-text">電話：{{ lotsInfo?.tel }}</p>
                   <p class="card-text">
                     <small class="text-muted"

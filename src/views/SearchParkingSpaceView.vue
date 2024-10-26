@@ -54,6 +54,7 @@ const SearchHandler = async (searchQuery) => {
     return;
   }
   if (searchQuery) {
+    sessionStorage.setItem("searchQuery", searchQuery);
     const res = await fetch(`${API_URL}${encodeURIComponent(searchQuery)}`);
     if (!res.ok) {
       throw new Error("Server無法獲取數據");
@@ -295,7 +296,10 @@ onBeforeUnmount(() => {
   <div>
     <main id="main">
       <!-- 麵包屑 -->
-      <BreadcrumbsComponent backgroundImage="/homePage.jpg">
+      <BreadcrumbsComponent
+        backgroundImage="/homePage.jpg"
+        :breadcrumbs="[{ name: 'home', link: '/' }]"
+      >
         <template #title>
           <!-- 插入到 title 插槽 -->
           <h2>Search Parking</h2>
