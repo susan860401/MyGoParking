@@ -3,7 +3,7 @@
   import { useAuthStore } from "@/stores/authStore"; // 引入 pinia store
 
   const authStore = useAuthStore(); 
-  const GET_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/info`;
+  //const GET_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/info`;
   const PUT_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/id`;
 
   // Pinia store 
@@ -48,11 +48,11 @@
     if (isEditing.value) {
       const storedUser = localStorage.getItem("user");
       const parsedUser = JSON.parse(storedUser);
-      const userId = parsedUser.userId;
-      const PUT_TURL = `${PUT_URL}${userId}`;
+      // const userId = parsedUser.userId;
+      // const PUT_TURL = `${PUT_URL}${userId}`;
 
       try {
-        const response = await fetch(PUT_TURL, {
+        const response = await fetch(PUT_URL, {
           method: "PUT",
           body: JSON.stringify(authStore.user),
           headers: { "Content-Type": "application/json" },
@@ -61,7 +61,6 @@
         if (!response.ok) {
           throw new Error("更新失敗");
         }
-
         authStore.updateUser(authStore.user); // 更新 Pinia store
         alert("用戶資料已成功更新");
       } catch (error) {
