@@ -19,6 +19,7 @@ import ResetPsw from "./views/ResetPsw.vue";
 import ResMonRentService from "./views/ResMonRentService.vue";
 import ResConfirmView from "./views/ResConfirmView.vue";
 import ResPaymentView from "./views/ResPaymentView.vue";
+import MonthlyRentalView from "./views/CustomerCenter/MonthlyRentalView.vue";
 
 const routes = [
   {
@@ -90,6 +91,11 @@ const routes = [
       {
         path: "parking-record/:id", //動態路由
         component: ParkingDetailView,
+      },
+      {
+        path: "monthlyRental",
+        component: MonthlyRentalView,
+        name: "monthlyRental",
       },
       {
         path: "coupon",
