@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
 const API_URL = "https://localhost:7077/api";
@@ -8,7 +8,11 @@ const search = ref("");
 const router = useRouter();
 const completedRes = ref([]); //已完成的訂單
 const ongoingRes = ref([]); //還在進行的訂單
-const isAllStatus = ref(true);
+const isAllStatus = ref(true); //用來判斷如果是顯示全部的情況(才會顯示現正進行中區塊)
+const countAll = ref(0);
+const countComplete = ref(0);
+const countCancel = ref(0);
+const countOverdue = ref(0);
 
 const loadReservations = async () => {
   const response = await fetch(`${API_URL}/Reservations?userId=1`);
@@ -17,6 +21,12 @@ const loadReservations = async () => {
   //已完成的訂單
   completedRes.value = reservations.value.filter((res) => res.isFinish);
   ongoingRes.value = reservations.value.filter((res) => !res.isFinish);
+  countAll.value = reservations.value.length;
+  countComplete.value = reservations.value.filter(
+    (res) => res.isFinish && !res.isCanceled & !res.isOverdue
+  ).length;
+  countCancel.value = reservations.value.filter((res) => res.isCanceled).length;
+  countOverdue.value = reservations.value.filter((res) => res.isOverdue).length;
 };
 
 const filterByStatus = async (filter) => {
@@ -45,7 +55,6 @@ const filterByLotName = async () => {
     );
     const datas = await response.json();
     reservations.value = datas;
-    console.log(reservations.value);
   }
 };
 
@@ -78,7 +87,9 @@ const cancelRes = async (id) => {
   }
 };
 
-loadReservations();
+onMounted(() => {
+  loadReservations();
+});
 </script>
 
 <template>
@@ -86,17 +97,21 @@ loadReservations();
     <!-- ======= Features Section ======= -->
 
     <div id="outside" class="container" data-aos="fade-up">
-      <!-- 測試導覽列 -->
       <ul id="nav" class="d-flex justify-content-around">
-        <li @click="filterByStatus('all')" class="text-center">全部</li>
+        <li @click="filterByStatus('all')" class="text-center">
+          全部 <small style="color: gray">({{ countAll }})</small>
+        </li>
         <li @click="filterByStatus('isCompleted')" class="text-center">
           已完成
+          <small style="color: gray">({{ countComplete }})</small>
         </li>
         <li @click="filterByStatus('isCanceled')" class="text-center">
           已取消
+          <small style="color: gray">({{ countCancel }})</small>
         </li>
         <li @click="filterByStatus('isOverDue')" class="text-center">
           逾時紀錄
+          <small style="color: gray">({{ countOverdue }})</small>
         </li>
       </ul>
 
