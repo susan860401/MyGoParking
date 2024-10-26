@@ -4,62 +4,73 @@ import BreadcrumbsComponent from '@/components/BreadcrumbsComponent.vue';
 import axios from 'axios';
 
 // 初始化資料
-const amount = ref(0); // 方案金額
-const planLabel = ref(''); // 方案名稱
+const amount = ref(0);
+const planLabel = ref('');
 const paymentStatus = ref('等待確認...');
+const isDisabled = ref(true);
+const buttonClass = ref('btn-secondary');
 
-// API 基本路徑
-const baseLoginPayUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay/`;
+// API 路徑
+const baseApiUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay`;
 
-
-// 從 sessionStorage 讀取金額與方案資料
+// 取得 sessionStorage 中的付款資料
 onMounted(() => {
     const storedInfo = JSON.parse(sessionStorage.getItem('paymentInfo'));
 
     if (storedInfo) {
         amount.value = storedInfo.amount;
         planLabel.value = storedInfo.planLabel;
-
     } else {
         alert('無法讀取方案資料，請重新選擇方案。');
-        window.location.href = '/'; // 導回首頁或選擇頁
+        window.location.href = '/';
     }
+
+    setTimeout(() => {
+        isDisabled.value = false;
+        buttonClass.value = 'btn-warning';
+    }, 5000);
 });
 
+// 確認付款
 async function confirmPayment() {
     try {
+        isDisabled.value = true;
+        paymentStatus.value = '確認中...';
+
         const params = new URLSearchParams(window.location.search);
-        const orderId = params.get('orderId'); // 從 URL 取得 orderId
+        const orderId = params.get('orderId');
         const transactionId = params.get('transactionId');
         const payment = { amount: amount.value, currency: 'TWD' };
-        const url = `${baseLoginPayUrl}Confirm?transactionId=${transactionId}&orderId=${orderId}`;
 
-        const check = await axios.post(url, payment, {
+        const confirmUrl = `${baseApiUrl}/Confirm?transactionId=${transactionId}&orderId=${orderId}`;
+
+        const check = await axios.post(confirmUrl, payment, {
             headers: { 'Content-Type': 'application/json' },
         });
 
-        // 發送 POST 請求，將 orderId 傳遞給後端
         if (check.data.returnCode === '0000') {
             alert('付款確認成功');
             paymentStatus.value = '交易狀態: 成功';
-            const response = await axios.post(`${baseLoginPayUrl}UpdatePaymentStatus`, { orderId: orderId }, {
-                headers: { 'Content-Type': 'application/json' },
-            });
+
+            // 更新付款狀態
+            const response = await axios.post(`${baseApiUrl}/UpdatePaymentStatus`,
+                { orderId }, { headers: { 'Content-Type': 'application/json' } });
+
             console.log('確認成功:', response.data);
         } else if (check.data.returnCode === '1172') {
             alert('重複付款');
-            paymentStatus.value = '交易狀態: 已經有重複訂單';
-            console.log('確認成功:', response.data);
+            paymentStatus.value = '交易狀態: 已有重複訂單';
+        } else {
+            paymentStatus.value = `交易狀態: ${check.data.message}`;
         }
-        setTimeout(() => {
-            window.location.href = '/';
-        }, 5000); // 5 秒延遲 (5000 毫秒)
+
+        setTimeout(() => window.location.href = '/', 5000);
     } catch (error) {
         console.error('交易確認失敗:', error);
         paymentStatus.value = '交易狀態: 失敗，請稍後再試';
-        setTimeout(() => {
-            window.location.href = '/';
-        }, 5000); // 5 秒延遲 (5000 毫秒)
+        setTimeout(() => window.location.href = '/', 5000);
+    } finally {
+        isDisabled.value = false;
     }
 }
 </script>
@@ -88,7 +99,8 @@ async function confirmPayment() {
                     readonly />
             </div>
             <div class="text-center">
-                <button class="btn btn-primary btn-lg w-100 mt-3" @click.prevent="confirmPayment">
+                <button class="btn btn-lg mt-3" :class="[buttonClass]" @click.prevent="confirmPayment"
+                    :disabled="isDisabled">
                     確認支付
                 </button>
             </div>
