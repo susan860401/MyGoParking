@@ -19,6 +19,7 @@ import ResetPsw from "./views/ResetPsw.vue";
 import ResMonRentService from "./views/ResMonRentService.vue";
 import ResConfirmView from "./views/ResConfirmView.vue";
 import ResPaymentView from "./views/ResPaymentView.vue";
+import TestView from "./views/TestView.vue";
 
 const routes = [
   {
@@ -60,6 +61,11 @@ const routes = [
     path: "/ResPayment",
     component: ResPaymentView,
     name: "resPayment",
+  },
+  {
+    path: "/TestView",
+    component: TestView,
+    name: "TestView",
   },
   {
     path: "/CustomerCenter",
