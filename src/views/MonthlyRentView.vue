@@ -125,7 +125,7 @@ const selectPlan = (planKey) => {
 };
 
 // API 基本路徑
-const baseLoginPayUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay/`;
+const baseUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay/`;
 
 //驗證方案與金錢
 async function validatePlan() {
@@ -136,7 +136,7 @@ async function validatePlan() {
     };
 
     try {
-        const response = await axios.post(`${baseLoginPayUrl}Validate`, payload, {
+        const response = await axios.post(`${baseUrl}Validate`, payload, {
             headers: { 'Content-Type': 'application/json' },
         });
         console.log('驗證結果:', response.data);
@@ -193,13 +193,15 @@ async function requestPayment() {
         ],
         redirectUrls: {
             confirmUrl: `${window.location.origin}/MonthlyConfirm`,  // 確認頁面
-            cancelUrl: `${baseLoginPayUrl}Cancel`,  // 取消頁面
+            cancelUrl: `${baseUrl}Cancel`,  // 取消頁面
         },
         options: null,  // 可選：額外選項
     };
-
+    // 使用 console.log 檢查 payment 的內容
+    console.log('準備發送的 payment 物件:', JSON.stringify(payment, null, 2));
+    alert('前往支付頁面:');
     try {
-        const response = await axios.post(`${baseLoginPayUrl}Create`, payment, {
+        const response = await axios.post(`${baseUrl}Create`, payment, {
             headers: { 'Content-Type': 'application/json' },
         });
 
