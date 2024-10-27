@@ -4,6 +4,7 @@ import { scrollanimation, killAnimation } from "@/js/scroll";
 import SearchInputComponent from "@/components/SearchInputComponent.vue";
 import { ref } from "vue";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
+import { subscribeUserToPush } from "../../public/js/userToPush";
 
 const router = useRouter();
 const searchQuery = ref("");
@@ -28,6 +29,13 @@ onMounted(async () => {
   } finally {
     isLoading.value = false;
   }
+  Notification.requestPermission().then((permission) => {
+    if (permission == "granted") {
+      subscribeUserToPush();
+    } else {
+      console.warn("拒絕");
+    }
+  });
 });
 
 onBeforeUnmount(() => {

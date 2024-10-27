@@ -1,32 +1,32 @@
-  <script setup>
-  import { ref, onMounted } from "vue";
+<script setup>
+import { ref, onMounted } from "vue";
 
-  const GET_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/info`;
-  const PUT_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/id`;
+const GET_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/info`;
+const PUT_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/id`;
 
-  const user = ref({
-    username: "",
-    phone: "",
-    email: "",
-    licensePlate: "",
-    password: "",
-  });
+const user = ref({
+  username: "",
+  phone: "",
+  email: "",
+  licensePlate: "",
+  password: "",
+});
 
-  //讀取
-  const Info = async () => {
+//讀取
+const Info = async () => {
   try {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem("user");
     const parsedUser = JSON.parse(storedUser); //將string字串(storedUser)轉成物件
-    const userId = parsedUser.user;         
-    const GET_TURL = `${GET_URL}${userId}`
+    const userId = parsedUser.user;
+    const GET_TURL = `${GET_URL}${userId}`;
     console.log(GET_TURL);
-    
+
     const response = await fetch(GET_TURL);
     const data = await response.json();
     user.value = data;
-    console.log(data)
+    console.log(data);
     if (!response.ok) {
-      throw new Error('Failed to fetch user info');
+      throw new Error("Failed to fetch user info");
     }
   } catch (error) {
     console.error("Error fetching user info:", error);
@@ -64,8 +64,6 @@ const toggleEdit = async () => {
   isEditing.value = !isEditing.value;
 };
 
-
-
 // const toggleEdit = async () => {
 //   try {
 //     const response = await fetch(PUT_URL, {
@@ -83,44 +81,60 @@ const toggleEdit = async () => {
 //   }
 // };
 
-  // 從 localStorage 中取出資料
-  // const loadUserFromLocalStorage = () => {
-  //   const storedUser = localStorage.getItem('user'); // 假設 'user' 是儲存用戶資料的 key
-  //   console.log(storedUser);
-  //   console.log(user.email);
-  //   if (storedUser) {
-  //     // 將 JSON 字串解析為物件，並賦值給 user
-  //     user.value = JSON.parse(storedUser);
-  //     console.log(user);
-  //   }
-  // };
+// 從 localStorage 中取出資料
+// const loadUserFromLocalStorage = () => {
+//   const storedUser = localStorage.getItem('user'); // 假設 'user' 是儲存用戶資料的 key
+//   console.log(storedUser);
+//   console.log(user.email);
+//   if (storedUser) {
+//     // 將 JSON 字串解析為物件，並賦值給 user
+//     user.value = JSON.parse(storedUser);
+//     console.log(user);
+//   }
+// };
 
-  // 當組件加載時載入用戶資料
-  onMounted(() => {
-    Info();
-  });
+// 當組件加載時載入用戶資料
+onMounted(() => {
+  Info();
+});
+</script>
 
-  </script>
-
-  <template>
-    <div class="">
-      <h2>用戶基本資訊</h2>
-      <hr>
-      <div class="card" style="width: 53rem;">
+<template>
+  <div class="">
+    <h2>用戶基本資訊</h2>
+    <hr />
+    <div class="card" style="width: 53rem">
       <div class="card-body">
         <h5 class="card-title">Welcome</h5>
         <ul v-if="user">
-          <li>姓名 <span v-if="!isEditing.valueOf">{{user.username}}</span><input v-if="isEditing" v-model="user.username" /></li>
-          
-          <li>電話 <span v-if="!isEditing.valueOf">{{user.phone}}</span> <input v-if="isEditing" v-model="user.phone" /></li>
-          <li>Email信箱 <span v-if="!isEditing.valueOf">{{user.email}}</span> <input v-if="isEditing" v-model="user.email" /></li>
-          <li>車牌 <span v-if="!isEditing.valueOf">{{user.licensePlate}}</span> <input v-if="isEditing" v-model="user.licensePlate" /></li>
-          <li>密碼 <span v-if="!isEditing.valueOf">{{user.password}}</span> <input v-if="isEditing" v-model="user.password" /></li>
-        </ul>     
-            <a href="#" class="btn btn-dark" @click="toggleEdit">{{ isEditing ? '保存' : '修改' }}</a>
+          <li>
+            姓名 <span v-if="!isEditing.valueOf">{{ user.username }}</span
+            ><input v-if="isEditing" v-model="user.username" />
+          </li>
+
+          <li>
+            電話 <span v-if="!isEditing.valueOf">{{ user.phone }}</span>
+            <input v-if="isEditing" v-model="user.phone" />
+          </li>
+          <li>
+            Email信箱 <span v-if="!isEditing.valueOf">{{ user.email }}</span>
+            <input v-if="isEditing" v-model="user.email" />
+          </li>
+          <li>
+            車牌 <span v-if="!isEditing.valueOf">{{ user.licensePlate }}</span>
+            <input v-if="isEditing" v-model="user.licensePlate" />
+          </li>
+          <li>
+            密碼 <span v-if="!isEditing.valueOf">{{ user.password }}</span>
+            <input v-if="isEditing" v-model="user.password" />
+          </li>
+        </ul>
+        <a href="#" class="btn btn-dark" @click="toggleEdit">{{
+          isEditing ? "保存" : "修改"
+        }}</a>
       </div>
     </div>
-    </div>
-  </template>
+  </div>
+</template>
 
-  <style lang="css" scoped></style>
+<style lang="css" scoped></style>

@@ -20,19 +20,51 @@ const send = async () => {
     const datas = await response.json(); //取得會員資訊
     localStorage.setItem("user", JSON.stringify(datas));
     console.log(datas);
-    if (datas.message === "登入成功")
-    {
+    if (datas.message === "登入成功") {
       alert("登入成功!!");
       router.push("/");
-    }
-    else if(datas.message === "無此帳號")
-    {
+    } else if (datas.message === "無此帳號") {
       alert("無此帳號,請重新登入!!");
-    }
-    else
-    {
+    } else {
       alert("登入失敗,請重新登入!!");
     }
+  }
+};
+const testSendNotification = async () => {
+  try {
+    const res = await fetch("https://localhost:7077/api/Notification/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        Title: "測試通知標題",
+        Message: "這是測試通知內容",
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      console.log("通知發送成功");
+      // 使用 Notification API 顯示推播通知
+      if (Notification.permission === "granted") {
+        new Notification(data.title, {
+          body: data.body,
+          icon: "/logo.png", // 請確認此路徑是否正確
+        });
+      } else if (Notification.permission !== "denied") {
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+          new Notification(data.title, {
+            body: data.body,
+            icon: "/logo.png",
+          });
+        }
+      }
+    } else {
+      console.error("通知發送失敗", response.statusText);
+    }
+  } catch (error) {
+    console.error("發送通知時出錯", error);
   }
 };
 </script>
@@ -135,6 +167,7 @@ const send = async () => {
             </div>
             <!-- End Quote Form -->
           </div>
+          <button @click="testSendNotification">測試推播通知</button>
         </div>
       </section>
       <!-- End Get Started Section -->
