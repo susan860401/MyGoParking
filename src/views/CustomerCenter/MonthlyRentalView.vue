@@ -102,8 +102,7 @@ loadMonthlyRental();
           >
             <div class="accordion-body">
               <div class="row">
-                <div class="col-md-8"></div>
-                <div class="col-md-4">
+                <div class="col-md-5">
                   <img
                     class="rounded img-fluid"
                     :src="`https://maps.googleapis.com/maps/api/staticmap?center=${currentRental[0].latitude},${currentRental[0].longitude}&zoom=18&size=600x300&markers=color:red%7Clabel:P%7C${currentRental[0].latitude},${currentRental[0].longitude}&key=AIzaSyALBHIW2HQWkmhCK-VXqGIoTVttRvMTtXo`"
@@ -111,16 +110,17 @@ loadMonthlyRental();
                     style="width: 100%; height: 100%"
                   />
                 </div>
+                <div class="col-md-7"></div>
               </div>
             </div>
           </div>
         </div>
-        <div
-          v-for="(current, index) in currentRental"
-          v-if="index !== 0"
-          class="accordion-item"
-        >
-          <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+        <div v-for="(current, index) in currentRental" class="accordion-item">
+          <h2
+            v-if="index !== 0"
+            class="accordion-header"
+            id="panelsStayOpen-headingTwo"
+          >
             <button
               class="accordion-button collapsed"
               type="button"
@@ -138,6 +138,7 @@ loadMonthlyRental();
             </button>
           </h2>
           <div
+            v-if="index !== 0"
             id="panelsStayOpen-collapseTwo"
             class="accordion-collapse collapse"
             aria-labelledby="panelsStayOpen-headingTwo"
@@ -155,7 +156,6 @@ loadMonthlyRental();
           </div>
         </div>
       </div>
-      <div v-if="current in currentRental"></div>
     </div>
   </div>
 </template>
