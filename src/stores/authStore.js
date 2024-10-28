@@ -4,11 +4,13 @@ export const useAuthStore = defineStore("auth", {
   state: () => ({
     isLogin: false, // 初始登錄狀態
     user: {
-      userId: null,
+      userId: 0,
       username: "",
-      phone: "",
+      password: "",
+      salt: "",
       email: "",
-      licensePlate: "",
+      phone: "",
+      licensePlate: ""
     },
   }),
   actions: {
@@ -31,12 +33,13 @@ export const useAuthStore = defineStore("auth", {
     // 更新用戶資料的方法
     updateUser(data) {
       this.user = { ...this.user, ...data }; // 更新用戶資料
+      console.log(this.user);
       localStorage.setItem("user", JSON.stringify(this.user)); // 更新本地存儲中的用戶資料
       localStorage.setItem("info", JSON.stringify(this.user)); 
     },
     persist: {
       enabled: true,
-      storage: sessionStorage, // 使用sessionStorage來存儲資料
+      storage: localStorage, // 使用localStorage來存儲資料
     },
   }
 });
