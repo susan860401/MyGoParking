@@ -110,7 +110,22 @@ loadMonthlyRental();
                     style="width: 100%; height: 100%"
                   />
                 </div>
-                <div class="col-md-7"></div>
+                <div class="col-md-7">
+                  <p>
+                    <strong>合約期間</strong>
+                    {{ formatDate(currentRental[0].startDate) }} 至
+                    {{ formatDate(currentRental[0].endDate) }}
+                  </p>
+                  <p>
+                    <strong>車牌號碼</strong>
+                    {{ currentRental[0].licensePlate }}
+                  </p>
+                  <p>
+                    <strong>停車場地址</strong>
+                    {{ currentRental[0].district }}
+                    {{ currentRental[0].location }}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -186,5 +201,17 @@ loadMonthlyRental();
 #noDataImg {
   width: 80%;
   height: 250px;
+}
+
+.accordion-button {
+  background: linear-gradient(to left, #dfe9f3 0%, white 100%);
+  background-color: transparent;
+}
+
+strong {
+  /* background-color: rgb(247, 238, 238); */
+  border: 1px solid lightgray;
+  border-radius: 10px;
+  padding: 5px;
 }
 </style>
