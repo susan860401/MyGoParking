@@ -145,6 +145,7 @@ const GoToMonPay = async () => {
     if (data.message === "月租車位可用" && data.success === true) {
       sessionStorage.setItem("licensePlate", selectCar);
       sessionStorage.setItem("lotId", lotId);
+      sessionStorage.setItem("amount", lotsInfo?.value.monRentalRate);
       router.push({
         name: "MonthlyRent",
         query: {
