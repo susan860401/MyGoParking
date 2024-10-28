@@ -58,9 +58,12 @@ const submitRes = async () => {
 
   const userId = JSON.parse(localStorage.getItem("user")).userId;
   //console.log(userId);
-  const formattedDate = new Date(date.value).toISOString();
+  const formattedDate = new Date(date.value);
+  const utcFormattedDate = new Date(
+    formattedDate.getTime() - formattedDate.getTimezoneOffset() * 60000
+  ).toISOString();
   const payload = {
-    startTime: formattedDate,
+    startTime: utcFormattedDate,
     lotName: lotsInfo.value.lotName,
     licensePlate: selectedCarPlate.value,
   };
@@ -107,6 +110,7 @@ const submitRes = async () => {
       await getLotsInfo();
       sessionStorage.setItem("carId", fetchRes.newRes.carId);
       sessionStorage.setItem("lotId", fetchRes.newRes.lotId);
+      sessionStorage.setItem("resDeposit", lotsInfo?.value.resDeposit);
       sessionStorage.setItem("startTime", fetchRes.newRes.startTime);
       date.value = null;
       GotoRes();
@@ -124,6 +128,10 @@ const GoToMonPay = async () => {
   if (!lotsInfo.value) {
     await getLotsInfo(); // 確保此時已經獲取了 lotId 和 lotName
   }
+  const formattedDate = new Date(date.value);
+  const utcFormattedDate = new Date(
+    formattedDate.getTime() - formattedDate.getTimezoneOffset() * 60000
+  ).toISOString();
   const selectCar = cars.value.find(
     (car) => car.licensePlate === selectedCarPlate.value
   );
@@ -140,7 +148,7 @@ const GoToMonPay = async () => {
   }
   try {
     const res = await fetch(
-      `${BASE_URL}/MonRental/CheckMonRentalSpace?lotId=${lotId}`
+      `${BASE_URL}/MonthlyRentals/CheckMonRentalSpace?lotId=${lotId}`
     );
     const data = await res.json();
     console.log(data);
@@ -150,6 +158,7 @@ const GoToMonPay = async () => {
     if (data.message === "月租車位可用" && data.success === true) {
       sessionStorage.setItem("carId", selectCar.carId);
       sessionStorage.setItem("lotId", lotId);
+      sessionStorage.setItem("startTime", utcFormattedDate);
       sessionStorage.setItem("amount", lotsInfo?.value.monRentalRate);
       router.push({
         name: "MonthlyRent",
@@ -367,6 +376,15 @@ onMounted(async () => {
                           {{ car.licensePlate }}
                         </option>
                       </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputPassword1">預約時間</label>
+                      <!-- 使用 VueDatePicker 並綁定 v-model -->
+                      <VueDatePicker
+                        v-model="date"
+                        class="form-control"
+                        id="exampleInputPassword1"
+                      />
                     </div>
                     <button
                       type="button"

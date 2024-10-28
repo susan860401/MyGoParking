@@ -20,20 +20,19 @@ self.addEventListener("push", function (event) {
     return;
   }
   console.log("Push event received");
-  //console.log(data.title);
-  // if (event.data) {
-  //   try {
-  //     data = event.data.json(); // 嘗試解析 JSON 格式的資料
-  //   } catch (e) {
-  //     console.error("無效的 JSON 格式", e);
-  //   }
-  // }
-  const data = event.data?.text() ?? {};
-  const title = data.title || "Something Has Happened";
-  const message =
-    data.message || "Here's something you might want to check out.";
+  let data = {
+    title: "Something Has Happened",
+    message: "Here's something you might want to check out.",
+  };
+  if (event.data) {
+    try {
+      data = event.data.json(); // 嘗試解析 JSON 格式的資料
+    } catch (e) {
+      console.error("無效的 JSON 格式", e);
+    }
+  }
   const options = {
-    body: message, // 通知的主要內容
+    body: data.message, // 通知的主要內容
     icon: "/logo.png", // 通知圖標，可按需替換路徑
     actions: [
       {
@@ -48,7 +47,7 @@ self.addEventListener("push", function (event) {
   };
 
   // 顯示通知
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil(self.registration.showNotification(data.title, options));
 });
 // 處理通知點擊 (notificationclick) 事件
 self.addEventListener("notificationclick", function (event) {

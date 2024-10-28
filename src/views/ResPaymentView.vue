@@ -5,7 +5,7 @@ import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
 const baseUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay/`;
 const MylotId = ref(0);
 const MycarId = ref(0);
-const MyAmount = ref(3000);
+const MyAmount = ref(0);
 const startTime = ref();
 const lotInfo = reactive({
   lotName: "",
@@ -32,6 +32,9 @@ onMounted(async () => {
 
     MylotId.value = Number(sessionStorage.getItem("lotId")) || 0;
     console.log("l=" + MylotId.value);
+
+    MyAmount.value = Number(sessionStorage.getItem("resDeposit")) || 0;
+    console.log("D=" + MyAmount.value);
 
     startTime.value = sessionStorage.getItem("startTime");
     console.log("取得的 startTime:", startTime.value);
@@ -62,7 +65,7 @@ async function requestPayment() {
   sessionStorage.setItem("paymentInfo", JSON.stringify(RespaymentInfo));
 
   const payment = {
-    amount: 3000, // 總金額
+    amount: MyAmount.value, // 總金額
     currency: "TWD", // 貨幣類型
     orderId: Date.now().toString(), // 訂單 ID
     carId: MycarId.value,
@@ -72,7 +75,7 @@ async function requestPayment() {
     packages: [
       {
         id: `pkg_${Date.now()}_${Math.floor(Math.random() * 10000)}`, // 包裹 ID
-        amount: 3000, // 包裹金額
+        amount: MyAmount.value, // 包裹金額
         name: lotInfo.lotName, // 停車名稱
         products: [
           {
@@ -144,7 +147,7 @@ async function requestPayment() {
                   <p><strong>停車場類型：</strong>{{ lotInfo.lotType }}</p>
                   <p><strong>剩餘車位：</strong>{{ lotInfo.lotValid }}</p>
                   <p><strong>聯絡電話：</strong>{{ lotInfo.lotTel }}</p>
-                  <p><strong>預約訂金:</strong> 3000元</p>
+                  <p><strong>預約訂金:</strong> {{ MyAmount }}</p>
                 </div>
               </div>
             </div>
