@@ -7,7 +7,12 @@ export const getUserCarPlate = async (cars) => {
       `https://localhost:7077/api/Reservations/GetUserCarPlate?userId=${userId}`
     );
     if (res.ok) {
-      cars.value = await res.json();
+      const data = await res.json();
+      cars.value = data.carId.map((id, index) => ({
+        carId: id,
+        licensePlate: data.userCarPlate[index],
+      }));
+      console.log(cars.value);
     } else {
       throw new Error("無法取得車輛資料");
     }

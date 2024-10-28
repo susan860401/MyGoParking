@@ -64,7 +64,7 @@ const submitRes = async () => {
     lotName: lotsInfo.value.lotName,
     licensePlate: selectedCarPlate.value,
   };
-  //console.log(payload);
+  console.log(payload);
   let res = await fetch(
     `${BASE_URL}/Reservations/newReservation?userId=${userId}`,
     {
@@ -124,8 +124,13 @@ const GoToMonPay = async () => {
   if (!lotsInfo.value) {
     await getLotsInfo(); // 確保此時已經獲取了 lotId 和 lotName
   }
-  const selectCar = cars.value.find((car) => car === selectedCarPlate.value);
-  if (!selectCar) {
+  const selectCar = cars.value.find(
+    (car) => car.licensePlate === selectedCarPlate.value
+  );
+  console.log(selectCar);
+  console.log(selectedCarPlate.value);
+  console.log(cars.value); //抓不到
+  if (!selectedCarPlate.value) {
     Swal.fire({
       icon: "warning",
       title: "錯誤",
@@ -143,7 +148,7 @@ const GoToMonPay = async () => {
       throw new Error(data.message || "檢查月租車位狀態時發生錯誤");
     }
     if (data.message === "月租車位可用" && data.success === true) {
-      sessionStorage.setItem("licensePlate", selectCar);
+      sessionStorage.setItem("carId", selectCar.carId);
       sessionStorage.setItem("lotId", lotId);
       sessionStorage.setItem("amount", lotsInfo?.value.monRentalRate);
       router.push({
@@ -318,9 +323,9 @@ onMounted(async () => {
                         <option
                           v-for="(car, index) in cars"
                           :key="index"
-                          :value="car"
+                          :value="car.licensePlate"
                         >
-                          {{ car }}
+                          {{ car.licensePlate }}
                         </option>
                       </select>
                     </div>
@@ -357,9 +362,9 @@ onMounted(async () => {
                         <option
                           v-for="(car, index) in cars"
                           :key="index"
-                          :value="car"
+                          :value="car.licensePlate"
                         >
-                          {{ car }}
+                          {{ car.licensePlate }}
                         </option>
                       </select>
                     </div>
