@@ -22,6 +22,7 @@ import ResPaymentView from "./views/ResPaymentView.vue";
 import MonthlyRentalView from "./views/CustomerCenter/MonthlyRentalView.vue";
 import Test from "./views/CustomerCenter/test.vue";
 import MonApplyView from "./views/MonApplyView.vue";
+import TestView from "./views/TestView.vue";
 
 const routes = [
   {
@@ -68,6 +69,11 @@ const routes = [
     path: "/ResPayment",
     component: ResPaymentView,
     name: "resPayment",
+  },
+  {
+    path: "/TestView",
+    component: TestView,
+    name: "TestView",
   },
   {
     path: "/CustomerCenter",

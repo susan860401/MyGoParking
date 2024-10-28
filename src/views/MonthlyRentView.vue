@@ -1,47 +1,110 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, reactive } from 'vue';
 import BreadcrumbsComponent from '@/components/BreadcrumbsComponent.vue';
 import axios from 'axios';
 
-// 方案資料
-const planData = {
+
+const MycarId = ref(0);
+const MylotId = ref(0);
+const MyAmount = ref(0);
+
+
+// 宣告方案資料，使用 reactive 包裹
+const planData = reactive({
     oneMonth: {
         id: "oneMonth",
         label: '1個月方案',
-        money: '3500/月',
-        price: '3500',
+        price: 0,
+        averagePerMonth: 0,
         description: '適合短期停車需求，彈性靈活，無需長期綁約。',
         features: ['無綁約，可隨時取消', '方便的自動續約功能', '支援多種付款方式'],
-        savings: '',
     },
     threeMonths: {
         id: "threeMonths",
         label: '3個月方案',
-        money: '3400/月',
-        price: '10200',
+        price: 0,
+        averagePerMonth: 0,
         description: '享有優惠價格，適合中期停車需求。',
         features: ['比單月更划算', '推薦方案，特別優惠', '可提前續約，保障車位'],
-        savings: '比1個月方案每月省100元',
     },
     sixMonths: {
         id: "sixMonths",
         label: '6個月方案',
-        money: '3200/月',
-        price: '19200',
+        price: 0,
+        averagePerMonth: 0,
         description: '適合長期停車需求，節省更多費用。',
         features: ['半年合約，享有長期優惠', '固定車位保障', '免費升級停車服務'],
-        savings: '比1個月方案每月省300元',
     },
     twelveMonths: {
         id: "twelveMonths",
         label: '12個月方案',
-        money: '3000/月',
-        price: '36000',
+        price: 0,
+        averagePerMonth: 0,
         description: '最划算的年度合約方案，省下更多。',
         features: ['年度最低價格', '專屬客戶服務', '參加會員活動資格'],
-        savings: '比1個月方案每月省500元',
     },
+});
+
+// 折扣對應表
+const discountMap = {
+    1: 1,
+    3: 0.9,
+    6: 0.85,
+    12: 0.8,
 };
+
+// 計算價格的函數
+function calculatePrice(months, baseAmount) {
+    const discount = discountMap[months] || 1;
+    const total = baseAmount * months * discount;
+    const averagePerMonth = total / months; // 計算每月平均費用
+    console.log(`計算: ${baseAmount} * ${months} * ${discount} = ${total}, 每月平均: ${averagePerMonth}`);
+    return { total, averagePerMonth };
+}
+
+// 在 onMounted 中初始化資料
+onMounted(() => {
+    MycarId.value = Number(sessionStorage.getItem("carId")) || 0;
+    console.log("c=" + MycarId.value);
+
+    MylotId.value = Number(sessionStorage.getItem("lotId")) || 0;
+    console.log("l=" + MylotId.value);
+
+    MyAmount.value = Number(sessionStorage.getItem("amount")) || 0;
+    console.log("A=" + MyAmount.value);
+
+    // 確保 MyAmount.value 取得的是數字
+    if (MyAmount.value === 0) {
+        console.error('amount 無法正確取得，請檢查 sessionStorage 的內容。');
+        return;
+    }
+
+    // 動態計算每個方案的價格和平均每月費用
+    const oneMonth = calculatePrice(1, MyAmount.value);
+    planData.oneMonth.price = oneMonth.total;
+    planData.oneMonth.averagePerMonth = oneMonth.averagePerMonth;
+
+    const threeMonths = calculatePrice(3, MyAmount.value);
+    planData.threeMonths.price = threeMonths.total;
+    planData.threeMonths.averagePerMonth = threeMonths.averagePerMonth;
+
+    const sixMonths = calculatePrice(6, MyAmount.value);
+    planData.sixMonths.price = sixMonths.total;
+    planData.sixMonths.averagePerMonth = sixMonths.averagePerMonth;
+
+    const twelveMonths = calculatePrice(12, MyAmount.value);
+    planData.twelveMonths.price = twelveMonths.total;
+    planData.twelveMonths.averagePerMonth = twelveMonths.averagePerMonth;
+
+    console.log("方案資料:", planData);
+
+    if (MycarId.value > 0 || MylotId.value > 0) {
+        alert('車子與停車場已讀取成功');
+    } else {
+        alert('無法讀取方案資料，請重新選擇方案。');
+    }
+});
+//-------------------------------------------------------
 
 // 設定選中的方案
 const selectedPlanKey = ref('twelveMonths');
@@ -62,16 +125,18 @@ const selectPlan = (planKey) => {
 };
 
 // API 基本路徑
-const baseLoginPayUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay/`;
+const baseUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay/`;
 
+//驗證方案與金錢
 async function validatePlan() {
     const payload = {
+        lotId: MylotId.value,
         planId: selectedPlan.value.id,
         amount: parseInt(selectedPlan.value.price, 10),
     };
 
     try {
-        const response = await axios.post(`${baseLoginPayUrl}Validate`, payload, {
+        const response = await axios.post(`${baseUrl}Validate`, payload, {
             headers: { 'Content-Type': 'application/json' },
         });
         console.log('驗證結果:', response.data);
@@ -95,6 +160,8 @@ async function requestPayment() {
     const paymentInfo = {
         amount: amount,  // 金額
         planLabel: selectedPlan.value.label,  // 方案名稱
+        car: MycarId.value,
+        lot: MylotId.value
     };
 
     // 儲存金額與方案資訊於 sessionStorage
@@ -107,6 +174,8 @@ async function requestPayment() {
         currency: "TWD",  // 貨幣類型
         orderId: Date.now().toString(),  // 訂單 ID
         planId: selectedPlan.value.id,  // 方案 ID
+        carId: MycarId.value,
+        lotId: MylotId.value,
         packages: [
             {
                 id: `pkg_${Date.now()}_${Math.floor(Math.random() * 10000)}`,  // 包裹 ID
@@ -124,13 +193,15 @@ async function requestPayment() {
         ],
         redirectUrls: {
             confirmUrl: `${window.location.origin}/MonthlyConfirm`,  // 確認頁面
-            cancelUrl: `${baseLoginPayUrl}Cancel`,  // 取消頁面
+            cancelUrl: `${baseUrl}Cancel`,  // 取消頁面
         },
         options: null,  // 可選：額外選項
     };
-
+    // 使用 console.log 檢查 payment 的內容
+    console.log('準備發送的 payment 物件:', JSON.stringify(payment, null, 2));
+    alert('前往支付頁面:');
     try {
-        const response = await axios.post(`${baseLoginPayUrl}Create`, payment, {
+        const response = await axios.post(`${baseUrl}Create`, payment, {
             headers: { 'Content-Type': 'application/json' },
         });
 
@@ -160,7 +231,7 @@ async function requestPayment() {
                 <h2 class="text-center mb-3">選擇您的月租停車方案</h2>
                 <p class="text-center text-muted">彈性付款方案，滿足您的停車需求</p>
 
-                <ul class="nav justify-content-evenly mb-4" id="planTabs">
+                <ul class="nav justify-content-evenly mb-4">
                     <li class="nav-item" style="width: 23%;" v-for="(plan, key) in planData" :key="key">
                         <div class="plan-option" :class="{ active: selectedPlanKey === key }" @click="selectPlan(key)">
                             {{ plan.label }}
@@ -169,9 +240,9 @@ async function requestPayment() {
                 </ul>
 
                 <div class="tab-content">
-                    <div class="tab-pane show active" id="planContent">
+                    <div class="tab-pane show active">
                         <div class="text-center p-5 bg-white rounded shadow">
-                            <h1>{{ selectedPlan.money }}</h1>
+                            <h1>{{ selectedPlan.averagePerMonth }}/月</h1>
                             <p>總付款{{ selectedPlan.price }}元</p>
                             <p class="text-muted">{{ selectedPlan.description }}</p>
                             <ul class="list-unstyled">

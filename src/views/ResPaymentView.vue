@@ -1,135 +1,100 @@
 <script setup>
-import { ref, computed } from "vue";
-import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
+import { reactive, ref, computed, onMounted } from "vue";
 import axios from "axios";
+import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
+const baseUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay/`;
+const MylotId = ref(0);
+const MycarId = ref(0);
+const MyAmount = ref(3000);
+const startTime = ref();
+const lotInfo = reactive({
+  lotName: "",
+  lotType: "",
+  lotLocation: "",
+  lotValid: 0,
+  lotWeek: 0,
+  lotTel: "",
+  lotLatitude: "",
+  lotLongitude: "",
+  errorMessage: "",
+});
 
-// 方案資料
-const planData = {
-  oneMonth: {
-    id: "oneMonth",
-    label: "1個月方案",
-    money: "3500/月",
-    price: "3500",
-    description: "適合短期停車需求，彈性靈活，無需長期綁約。",
-    features: ["無綁約，可隨時取消", "方便的自動續約功能", "支援多種付款方式"],
-    savings: "",
-  },
-  threeMonths: {
-    id: "threeMonths",
-    label: "3個月方案",
-    money: "3400/月",
-    price: "10200",
-    description: "享有優惠價格，適合中期停車需求。",
-    features: ["比單月更划算", "推薦方案，特別優惠", "可提前續約，保障車位"],
-    savings: "比1個月方案每月省100元",
-  },
-  sixMonths: {
-    id: "sixMonths",
-    label: "6個月方案",
-    money: "3200/月",
-    price: "19200",
-    description: "適合長期停車需求，節省更多費用。",
-    features: ["半年合約，享有長期優惠", "固定車位保障", "免費升級停車服務"],
-    savings: "比1個月方案每月省300元",
-  },
-  twelveMonths: {
-    id: "twelveMonths",
-    label: "12個月方案",
-    money: "3000/月",
-    price: "36000",
-    description: "最划算的年度合約方案，省下更多。",
-    features: ["年度最低價格", "專屬客戶服務", "參加會員活動資格"],
-    savings: "比1個月方案每月省500元",
-  },
-};
-
-// 設定選中的方案
-const selectedPlanKey = ref("twelveMonths");
-const selectedPlan = ref(planData[selectedPlanKey.value]);
-
-const savingsMessage = computed(() =>
-  selectedPlan.value.savings ? `此方案 ${selectedPlan.value.savings}` : ""
+// 動態計算地圖 URL
+const mapUrl = computed(
+  () =>
+    `https://maps.googleapis.com/maps/api/staticmap?center=${lotInfo.lotLatitude},${lotInfo.lotLongitude}&zoom=18&size=600x300&markers=color:red%7Clabel:P%7C${lotInfo.lotLatitude},${lotInfo.lotLongitude}&key=AIzaSyALBHIW2HQWkmhCK-VXqGIoTVttRvMTtXo`
 );
 
-const selectPlan = (planKey) => {
-  if (planData[planKey]) {
-    selectedPlan.value = planData[planKey];
-    selectedPlanKey.value = planKey;
-    console.log("已選擇方案:", selectedPlan.value);
-  } else {
-    console.error("無效的方案 Key:", planKey);
-  }
-};
-
-// API 基本路徑
-const baseLoginPayUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay/`;
-
-async function validatePlan() {
-  const payload = {
-    planId: selectedPlan.value.id,
-    amount: parseInt(selectedPlan.value.price, 10),
-  };
-
+onMounted(async () => {
   try {
-    const response = await axios.post(`${baseLoginPayUrl}Validate`, payload, {
-      headers: { "Content-Type": "application/json" },
+    MycarId.value = Number(sessionStorage.getItem("carId")) || 0;
+    console.log("c=" + MycarId.value);
+
+    MylotId.value = Number(sessionStorage.getItem("lotId")) || 0;
+    console.log("l=" + MylotId.value);
+
+    startTime.value = sessionStorage.getItem("startTime");
+    console.log("取得的 startTime:", startTime.value);
+
+    if (MylotId.value === 0) {
+      lotInfo.errorMessage = "LotId 無效";
+      return;
+    }
+    const response = await axios.post(`${baseUrl}ListenLotId`, {
+      LotId: MylotId.value,
     });
-    console.log("驗證結果:", response.data);
-    alert("方案驗證成功。");
-    return response.data.isValid;
+    Object.assign(lotInfo, response.data);
   } catch (error) {
-    console.error(
-      "方案驗證失敗:",
-      error.response?.data?.message || error.message
-    );
-    alert("方案驗證失敗，請確認後再試。");
-    return false;
+    lotInfo.errorMessage = error.response?.data.message || "取得資料時發生錯誤";
   }
-}
+});
 
 // 建立交易請求
 async function requestPayment() {
-  const isValid = await validatePlan();
-  if (!isValid) return; // 若驗證失敗，中止支付流程
-
-  const amount = parseInt(selectedPlan.value.price, 10); // 取得選擇方案的金額
-  const paymentInfo = {
-    amount: amount, // 金額
-    planLabel: selectedPlan.value.label, // 方案名稱
+  const RespaymentInfo = {
+    amount: MyAmount.value,
+    lot: lotInfo.lotName,
+    car: MycarId.value,
+    startTime: startTime.value,
   };
 
   // 儲存金額與方案資訊於 sessionStorage
-  sessionStorage.setItem("paymentInfo", JSON.stringify(paymentInfo));
+  sessionStorage.setItem("paymentInfo", JSON.stringify(RespaymentInfo));
 
   const payment = {
-    amount: amount, // 總金額
+    amount: 3000, // 總金額
     currency: "TWD", // 貨幣類型
     orderId: Date.now().toString(), // 訂單 ID
-    planId: selectedPlan.value.id, // 方案 ID
+    carId: MycarId.value,
+    lotId: MylotId.value,
+    planId: "預約",
+    startTime: startTime.value,
     packages: [
       {
         id: `pkg_${Date.now()}_${Math.floor(Math.random() * 10000)}`, // 包裹 ID
-        amount: parseInt(selectedPlan.value.price, 10), // 包裹金額
-        name: selectedPlan.value.label, // 包裹名稱
+        amount: 3000, // 包裹金額
+        name: lotInfo.lotName, // 停車名稱
         products: [
           {
-            name: selectedPlan.value.label, // 產品名稱
+            name: `${lotInfo.lotName}預約`, // 產品名稱
             quantity: 1, // 數量
-            price: parseInt(selectedPlan.value.price, 10), // 單價
+            price: MyAmount.value, // 單價
           },
         ],
         userFee: 0, // 可選：使用者費用
       },
     ],
     redirectUrls: {
-      confirmUrl: `${window.location.origin}/MonthlyConfirm`, // 確認頁面
-      cancelUrl: `${baseLoginPayUrl}Cancel`, // 取消頁面
+      confirmUrl: `${window.location.origin}/ResConfirm`, // 確認頁面
+      cancelUrl: `${baseUrl}Cancel`, // 取消頁面
     },
     options: null, // 可選：額外選項
   };
+  // 使用 console.log 檢查 payment 的內容
+  console.log("準備發送的 payment 物件:", JSON.stringify(payment, null, 2));
 
   try {
-    const response = await axios.post(`${baseLoginPayUrl}Create`, payment, {
+    const response = await axios.post(`${baseUrl}CreateDay`, payment, {
       headers: { "Content-Type": "application/json" },
     });
 
@@ -149,116 +114,51 @@ async function requestPayment() {
     <main id="main">
       <BreadcrumbsComponent>
         <template #title>
-          <h2>月租付款</h2>
+          <h2>預約付款</h2>
         </template>
-        <template #page>月租付款</template>
+        <template #page>預約付款</template>
       </BreadcrumbsComponent>
 
       <div class="container py-5">
-        <h2 class="text-center mb-3">選擇您的月租停車方案</h2>
-        <p class="text-center text-muted">彈性付款方案，滿足您的停車需求</p>
-
-        <ul class="nav justify-content-evenly mb-4" id="planTabs">
-          <li
-            class="nav-item"
-            style="width: 23%"
-            v-for="(plan, key) in planData"
-            :key="key"
-          >
-            <div
-              class="plan-option"
-              :class="{ active: selectedPlanKey === key }"
-              @click="selectPlan(key)"
-            >
-              {{ plan.label }}
-            </div>
-          </li>
-        </ul>
+        <h2 class="text-center mb-3">請確認您的預約停車場</h2>
+        <p class="text-center text-muted">為了您的權益，請閱讀使用規則</p>
 
         <div class="tab-content">
-          <div class="tab-pane show active" id="planContent">
-            <div class="text-center p-5 bg-white rounded shadow">
-              <h1>{{ selectedPlan.money }}</h1>
-              <p>總付款{{ selectedPlan.price }}元</p>
-              <p class="text-muted">{{ selectedPlan.description }}</p>
-              <ul class="list-unstyled">
-                <li
-                  v-for="feature in selectedPlan.features"
-                  :key="feature"
-                  class="feature-item"
-                >
-                  {{ feature }}
-                </li>
-              </ul>
-              <p v-if="savingsMessage" class="text-success mt-3">
-                {{ savingsMessage }}
-              </p>
+          <div class="tab-pane show active">
+            <div class="text-left p-4 bg-white rounded shadow">
+              <div class="row">
+                <div class="col-md-5 p-3 img-container">
+                  <img
+                    :src="mapUrl"
+                    alt="Map of {{ lotInfo.lotName }}"
+                    class="rounded img-fluid"
+                    style="width: 100%; height: 100%"
+                  />
+                </div>
+                <div class="col-md-7 p-3 mt-2">
+                  <h1>{{ lotInfo.lotName }}</h1>
+                  <p><strong>停車地址：</strong>{{ lotInfo.lotLocation }}</p>
+                  <p>
+                    <strong>停車費用：</strong>{{ lotInfo.lotWeek }} 元/小時
+                  </p>
+                  <p><strong>停車場類型：</strong>{{ lotInfo.lotType }}</p>
+                  <p><strong>剩餘車位：</strong>{{ lotInfo.lotValid }}</p>
+                  <p><strong>聯絡電話：</strong>{{ lotInfo.lotTel }}</p>
+                  <p><strong>預約訂金:</strong> 3000元</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         <div class="text-center mt-4">
-          <button class="btn btn-warning btn-lg" @click="requestPayment()">
+          <button class="btn btn-warning btn-lg" @click="requestPayment">
             立即付款
           </button>
         </div>
       </div>
     </main>
-    <div id="paymentFormContainer"></div>
   </div>
 </template>
 
-<style lang="css" scoped>
-.plan-option {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 15px;
-  border: 2px solid #ddd;
-  border-radius: 12px;
-  transition: all 0.3s ease-in-out;
-  cursor: pointer;
-  position: relative;
-}
-
-.plan-option::before {
-  content: "○";
-  font-size: 20px;
-  color: #ddd;
-  margin-right: 10px;
-  transition: color 0.3s;
-}
-
-.plan-option.active::before {
-  content: "✔" !important;
-  color: #007bff !important;
-}
-
-.plan-option.active {
-  border-color: #007bff !important;
-  background: #e7f1ff !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
-}
-
-.tab-content h1 {
-  font-size: 3rem;
-}
-
-.feature-item {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.feature-item::before {
-  content: "✔";
-  color: #28a745;
-  margin-right: 8px;
-  font-size: 18px;
-}
-
-.btn-lg:hover {
-  background-color: #ffc107;
-}
-</style>
+<style scoped></style>
