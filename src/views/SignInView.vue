@@ -2,8 +2,10 @@
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
 import router from "@/router";
 import { ref } from "vue";
+import { useAuthStore } from "@/stores/authStore"; // 引入 store
 
 const API_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/login`;
+const authStore = useAuthStore();
 
 const user = ref({
   email: "",
@@ -17,10 +19,12 @@ const send = async () => {
     headers: { "Content-Type": "application/json" },
   });
   if (response.ok) {
-    const datas = await response.json(); //取得會員資訊
-    localStorage.setItem("user", JSON.stringify(datas));
+    const datas = await response.json(); // 取得會員資訊
     console.log(datas);
     if (datas.message === "登入成功") {
+      // 成功登入時，儲存資料並更新 Pinia 狀態
+      localStorage.setItem("user", JSON.stringify(datas));
+      authStore.login(); // 更新登入狀態
       alert("登入成功!!");
       router.push("/");
     } else if (datas.message === "無此帳號") {
