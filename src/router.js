@@ -19,6 +19,8 @@ import ResetPsw from "./views/ResetPsw.vue";
 import ResMonRentService from "./views/ResMonRentService.vue";
 import ResConfirmView from "./views/ResConfirmView.vue";
 import ResPaymentView from "./views/ResPaymentView.vue";
+import MonthlyRentalView from "./views/CustomerCenter/MonthlyRentalView.vue";
+import Test from "./views/CustomerCenter/test.vue";
 import MonApplyView from "./views/MonApplyView.vue";
 
 const routes = [
@@ -98,9 +100,19 @@ const routes = [
         component: ParkingDetailView,
       },
       {
+        path: "monthlyRental",
+        component: MonthlyRentalView,
+        name: "monthlyRental",
+      },
+      {
         path: "coupon",
         component: CouponView,
         name: "coupon",
+      },
+      {
+        path: "test",
+        component: Test,
+        name: "test",
       },
 
       // 其他子路由...
