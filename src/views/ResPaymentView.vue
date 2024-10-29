@@ -5,7 +5,7 @@ import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
 const baseUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay/`;
 const MylotId = ref(0);
 const MycarId = ref(0);
-const MyAmount = ref(3000);
+const MyAmount = ref(0);
 const startTime = ref();
 const lotInfo = reactive({
   lotName: "",
@@ -17,6 +17,7 @@ const lotInfo = reactive({
   lotLatitude: "",
   lotLongitude: "",
   errorMessage: "",
+  lotResDeposit: 0
 });
 
 // 動態計算地圖 URL
@@ -72,7 +73,7 @@ async function requestPayment() {
     packages: [
       {
         id: `pkg_${Date.now()}_${Math.floor(Math.random() * 10000)}`, // 包裹 ID
-        amount: 3000, // 包裹金額
+        amount: lotInfo.lotResDeposit, // 包裹金額
         name: lotInfo.lotName, // 停車名稱
         products: [
           {
@@ -128,12 +129,8 @@ async function requestPayment() {
             <div class="text-left p-4 bg-white rounded shadow">
               <div class="row">
                 <div class="col-md-5 p-3 img-container">
-                  <img
-                    :src="mapUrl"
-                    alt="Map of {{ lotInfo.lotName }}"
-                    class="rounded img-fluid"
-                    style="width: 100%; height: 100%"
-                  />
+                  <img :src="mapUrl" alt="Map of {{ lotInfo.lotName }}" class="rounded img-fluid"
+                    style="width: 100%; height: 100%" />
                 </div>
                 <div class="col-md-7 p-3 mt-2">
                   <h1>{{ lotInfo.lotName }}</h1>
@@ -144,7 +141,7 @@ async function requestPayment() {
                   <p><strong>停車場類型：</strong>{{ lotInfo.lotType }}</p>
                   <p><strong>剩餘車位：</strong>{{ lotInfo.lotValid }}</p>
                   <p><strong>聯絡電話：</strong>{{ lotInfo.lotTel }}</p>
-                  <p><strong>預約訂金:</strong> 3000元</p>
+                  <p><strong>預約訂金:</strong> {{ lotInfo.lotResDeposit }}</p>
                 </div>
               </div>
             </div>
