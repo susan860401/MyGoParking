@@ -31,13 +31,35 @@ export const useAuthStore = defineStore("auth", {
       const user = localStorage.getItem("user");
       this.isLogin = !!user; // 如果有用戶資料，設置為 true
     },
-    
     // 更新用戶資料的方法
     updateUser(data) {
       this.user = { ...this.user, ...data }; // 更新用戶資料
       console.log(this.user);
       localStorage.setItem("user", JSON.stringify(this.user)); // 更新本地存儲中的用戶資料
       localStorage.setItem("info", JSON.stringify(this.user)); 
+    },
+    async updateMemberInfo(name, phone) {
+      try {
+        const response = await fetch(`${BASE_URL}/Customers/info`, {
+          method: 'PUT',
+          body: JSON.stringify({ 
+            Name: name, 
+            Phone: phone 
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (response.ok) {
+          const result = await response.json();
+          alert('會員資料已更新');
+          this.addCoupons();
+        } else {
+          throw new Error('會員資料更新失敗');
+        }
+      } catch (error) {
+        alert(error.message);
+      }
     },
     setEmail(email) {
       this.email = email;
