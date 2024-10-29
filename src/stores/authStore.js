@@ -3,6 +3,8 @@ import { defineStore } from "pinia";
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     isLogin: false, // 初始登錄狀態
+    email: '',
+    token: '',
     user: {
       userId: 0,
       username: "",
@@ -36,6 +38,16 @@ export const useAuthStore = defineStore("auth", {
       console.log(this.user);
       localStorage.setItem("user", JSON.stringify(this.user)); // 更新本地存儲中的用戶資料
       localStorage.setItem("info", JSON.stringify(this.user)); 
+    },
+    setEmail(email) {
+      this.email = email;
+    },
+    setToken(token) {
+      this.token = token;
+    },
+    clear() {
+      this.email = '';
+      this.token = '';
     },
     persist: {
       enabled: true,

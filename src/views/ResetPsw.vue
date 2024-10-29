@@ -2,16 +2,20 @@
     import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
     import { useRoute } from 'vue-router';
     import { ref } from "vue";
+    import { useAuthStore } from '@/stores/authStore';
 
     const API_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/reset`;
 
-    const removeReadonly = (fieldId) => {
-    document.getElementById(fieldId).removeAttribute('readonly');
-    };
+    const authStore = useAuthStore();
+    const email = ref('');
 
-    const user = ref({
-        email: ''
-    });
+    // const removeReadonly = (fieldId) => {
+    // document.getElementById(fieldId).removeAttribute('readonly');
+    // };
+
+    // const user = ref({
+    //     email: ''
+    // });
 
     // 使用 `useRoute` 獲取路由參數中的 token
     const route = useRoute();
@@ -56,7 +60,7 @@
         <template #title>
           <h2>Reset Password</h2>
         </template>
-        <template #page> 重設密碼 </template>
+        <template #page> 忘記密碼 </template>
       </BreadcrumbsComponent>
 
       <!-- ======= Get Started Section ======= -->
@@ -105,7 +109,7 @@
                     @focus="removeReadonly('emailField')"
                     />
                   </div>
-
+<!-- 
                   <div class="col-md-12">
                     <input
                       type="password"
@@ -119,7 +123,7 @@
                       readonly
                     @focus="removeReadonly('pswField')"
                     />
-                  </div>
+                  </div> -->
 
                   <div class="col-md-12 text-center">
                     <div class="loading">Loading</div>
