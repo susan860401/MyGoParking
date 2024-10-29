@@ -23,12 +23,18 @@ app.mount("#app");
 
 //serviceWorker
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker
-    .register("/service-worker.js")
-    .then((registration) => {
+  window.addEventListener("load", async () => {
+    try {
+      const registration = await navigator.serviceWorker.register(
+        "/service-worker.js"
+      );
       console.log("Service Worker registered with scope:", registration.scope);
-    })
-    .catch((error) => {
+
+      // 確保 service worker 已經準備好
+      const swRegistration = await navigator.serviceWorker.ready;
+      console.log("Service Worker is ready:", swRegistration);
+    } catch (error) {
       console.error("Service Worker registration failed:", error);
-    });
+    }
+  });
 }

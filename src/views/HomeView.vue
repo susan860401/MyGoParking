@@ -4,7 +4,7 @@ import { scrollanimation, killAnimation } from "@/js/scroll";
 import SearchInputComponent from "@/components/SearchInputComponent.vue";
 import { ref } from "vue";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
-import { subscribeUserToPush } from "../../public/js/userToPush";
+import { subscribeUserToPush } from "../js/userToPush";
 
 const router = useRouter();
 const searchQuery = ref("");
