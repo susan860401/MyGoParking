@@ -56,7 +56,7 @@ export async function subscribeUserToPush() {
     // 將訂閱資料傳送到後端
     await fetch("https://localhost:7077/api/Notification/subscribe", {
       method: "POST",
-      body: JSON.stringify(pushSubscription),
+      body: JSON.stringify(pushSubscription.toJSON()),
       headers: {
         "Content-Type": "application/json",
       },
