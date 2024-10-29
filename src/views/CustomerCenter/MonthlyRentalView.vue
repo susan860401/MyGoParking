@@ -58,9 +58,9 @@ const getRentalStatus = (endDate) => {
   const today = new Date();
   const end = new Date(endDate);
   if (end > today) {
-    return "進行中";
+    return "Active";
   } else {
-    return "已到期";
+    return "Expired";
   }
 };
 
@@ -389,7 +389,7 @@ loadMonthlyRental();
           <template #default="scope">
             <div
               :class="
-                getRentalStatus(scope.row.endDate) == '進行中'
+                getRentalStatus(scope.row.endDate) == 'Active'
                   ? 'ongoing'
                   : 'expired'
               "
@@ -452,12 +452,14 @@ strong {
 }
 
 .ongoing {
-  background-color: #c9fbc5;
+  background-color: #b5cfa0;
+  color: white;
   border-radius: 10px;
 }
 
 .expired {
-  background-color: rgb(250, 217, 217);
+  border: 1px solid lightgray;
   border-radius: 10px;
+  background-color: aliceblue;
 }
 </style>
