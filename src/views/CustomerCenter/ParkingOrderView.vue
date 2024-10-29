@@ -15,7 +15,7 @@ const countCancel = ref(0);
 const countOverdue = ref(0);
 
 const loadReservations = async () => {
-  const response = await fetch(`${API_URL}/Reservations?userId=2`);
+  const response = await fetch(`${API_URL}/Reservations?userId=1`);
   const datas = await response.json();
   reservations.value = datas;
   //已完成的訂單

@@ -5,9 +5,11 @@ import { useRouter } from "vue-router";
 
 const API_URL = "https://localhost:7077/api";
 const parkingRecords = ref([]);
+//用來判斷視窗大小決定顯示欄位
 const isPhoneSize = ref(false);
-const isSmallScreen = ref(false); //用來判斷視窗大小決定顯示欄位
+const isSmallScreen = ref(false);
 const isMiddleScreen = ref(false);
+
 const router = useRouter();
 
 const loadParkingRecords = async () => {
@@ -21,6 +23,16 @@ const checkScreenSize = () => {
   isPhoneSize.value = window.innerWidth < 450;
   isSmallScreen.value = window.innerWidth >= 450 && window.innerWidth < 768;
   isMiddleScreen.value = window.innerWidth >= 768 && window.innerWidth < 1200;
+};
+
+const formatTime = (time) => {
+  const date = new Date(time);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const hour = date.getHours().toString().padStart(2, "0");
+  const minute = date.getMinutes().toString().padStart(2, "0");
+  return `${year}-${month}-${day}   ${hour}:${minute}`;
 };
 
 //跳轉到詳細資訊
@@ -59,11 +71,12 @@ onMounted(() => {
         <el-table-column
           prop="lotName"
           label="停車場名稱"
-          width="150"
+          :width="isPhoneSize ? 120 : 150"
           :sortable="true"
           show-overflow-tooltip
           header-cell-class-name="custom-header"
         ></el-table-column>
+
         <el-table-column
           v-if="!isPhoneSize"
           prop="licensePlate"
@@ -72,23 +85,31 @@ onMounted(() => {
           :sortable="true"
         ></el-table-column>
         <el-table-column
-          v-if="!isSmallScreen & !isPhoneSize"
-          prop="entryTime"
+          v-if="!isSmallScreen && !isPhoneSize"
           label="入場時間"
-          width="180"
+          width="150"
           :sortable="true"
-        ></el-table-column>
+          ><template #default="scope">
+            <div>
+              {{ formatTime(scope.row.entryTime) }}
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column
           v-if="!isMiddleScreen && !isSmallScreen && !isPhoneSize"
-          prop="exitTime"
           label="離場時間"
-          width="180"
+          width="150"
           :sortable="true"
-        ></el-table-column>
+          ><template #default="scope">
+            <div>
+              {{ formatTime(scope.row.exitTime) }}
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column
           prop="totalMins"
-          label="停車時間(分)"
-          width="130"
+          label="時長(分)"
+          width="100"
           :sortable="true"
         ></el-table-column>
         <el-table-column

@@ -1,10 +1,15 @@
 <script setup>
+import { scrollbarProps } from "element-plus";
 import { ref } from "vue";
 
 const API_URL = "https://localhost:7077/api";
-const activeButton = ref("current"); //目前在哪個頁面(當前合約還是歷史)
+const activePage = ref("current"); //目前在哪個頁面(當前合約還是歷史)
 const monthlyRentals = ref([]);
 const currentRental = ref([]);
+//用來判斷視窗大小決定顯示欄位
+const isPhoneSize = ref(false);
+const isSmallScreen = ref(false);
+const isMiddleScreen = ref(false);
 
 const loadMonthlyRental = async () => {
   const response = await fetch(`${API_URL}/MonthlyRentals?userId=1`);
@@ -16,22 +21,54 @@ const loadMonthlyRental = async () => {
   });
   console.log(currentRental.value.length);
 };
-
+//載入當前合約
 const loadCurrent = async () => {
-  activeButton.value = "current";
+  activePage.value = "current";
   console.log("current");
 };
-
+//載入歷史合約
 const loadHistory = async () => {
-  activeButton.value = "history";
+  activePage.value = "history";
   console.log("history");
 };
-
+//格式化日期
 const formatDate = (date) => {
   const convertDate = new Date(date);
-  return `${convertDate.getFullYear()}-${
-    convertDate.getMonth() + 1
-  }-${convertDate.getDate()}`;
+  return `${convertDate.getFullYear()}-${(convertDate.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}-${convertDate.getDate().toString().padStart(2, "0")}`;
+};
+//回推月租方案
+const getRentalPlan = (amount, rentalFee) => {
+  if (amount == rentalFee) {
+    return 1;
+  } else if (amount == rentalFee * 3 * 0.9) {
+    return 3;
+  } else if (amount == rentalFee * 6 * 0.85) {
+    return 6;
+  } else if (amount == rentalFee * 12 * 0.8) {
+    return 12;
+  }
+  return 0; // 沒有匹配到則返回0
+};
+//存放月租方案適用優惠
+const Rentalplan = { 1: "", 3: "9折優惠", 6: "85折優惠", 12: "8折優惠" };
+
+const getRentalStatus = (endDate) => {
+  const today = new Date();
+  const end = new Date(endDate);
+  if (end > today) {
+    return "Active";
+  } else {
+    return "Expired";
+  }
+};
+
+//辨識視窗大小(依照視窗大小調整看到的表格欄位)
+const checkScreenSize = () => {
+  isPhoneSize.value = window.innerWidth < 450;
+  isSmallScreen.value = window.innerWidth >= 450 && window.innerWidth < 768;
+  isMiddleScreen.value = window.innerWidth >= 768 && window.innerWidth < 1200;
 };
 
 loadMonthlyRental();
@@ -45,14 +82,14 @@ loadMonthlyRental();
           <button
             class="list me-2"
             @click="loadCurrent"
-            :class="{ active: activeButton == 'current' }"
+            :class="{ active: activePage == 'current' }"
           >
             <i class="fa-solid fa-paste"></i> 當前合約
           </button>
           <button
             class="list"
             @click="loadHistory"
-            :class="{ active: activeButton == 'history' }"
+            :class="{ active: activePage == 'history' }"
           >
             <i class="fa-solid fa-clock-rotate-left"></i> 歷史合約
           </button>
@@ -71,7 +108,11 @@ loadMonthlyRental();
 
       <!-- <img id="noDataImg" src="/src/assets/images/Nodatas.webp" alt="No Data" /> -->
 
-      <div class="accordion mt-2" id="accordionPanelsStayOpenExample">
+      <div
+        v-if="activePage == 'current'"
+        class="accordion mt-2"
+        id="accordionPanelsStayOpenExample"
+      >
         <!-- 至少要顯示一個 -->
         <div class="accordion-item">
           <h2
@@ -95,6 +136,7 @@ loadMonthlyRental();
               >
             </button>
           </h2>
+
           <div
             id="panelsStayOpen-collapseOne"
             class="accordion-collapse collapse show"
@@ -102,7 +144,7 @@ loadMonthlyRental();
           >
             <div class="accordion-body">
               <div class="row">
-                <div class="col-md-5">
+                <div class="col-md-6 mb-2">
                   <img
                     class="rounded img-fluid"
                     :src="`https://maps.googleapis.com/maps/api/staticmap?center=${currentRental[0].latitude},${currentRental[0].longitude}&zoom=18&size=600x300&markers=color:red%7Clabel:P%7C${currentRental[0].latitude},${currentRental[0].longitude}&key=AIzaSyALBHIW2HQWkmhCK-VXqGIoTVttRvMTtXo`"
@@ -110,12 +152,59 @@ loadMonthlyRental();
                     style="width: 100%; height: 100%"
                   />
                 </div>
-                <div class="col-md-7">
+                <div class="col-md-6">
+                  <div>
+                    <p class="fw-bold mb-1" style="font-size: 20px">月租方案</p>
+                    <div
+                      class="fw-bold"
+                      style="
+                        font-size: 20px;
+                        background-color: aliceblue;
+                        padding: 5px;
+                      "
+                    >
+                      {{
+                        getRentalPlan(
+                          currentRental[0].amount,
+                          currentRental[0].monRentalRate
+                        )
+                      }}個月方案
+                      <span
+                        style="font-size: 16px"
+                        v-if="
+                          getRentalPlan(
+                            currentRental[0].amount,
+                            currentRental[0].monRentalRate
+                          ) !== 1
+                        "
+                        >({{
+                          Rentalplan[
+                            getRentalPlan(
+                              currentRental[0].amount,
+                              currentRental[0].monRentalRate
+                            )
+                          ]
+                        }})</span
+                      >
+                      <p>
+                        合約總額 {{ currentRental[0].amount }} (NT$
+                        {{
+                          currentRental[0].amount /
+                          getRentalPlan(
+                            currentRental[0].amount,
+                            currentRental[0].monRentalRate
+                          )
+                        }}/月)
+                      </p>
+                    </div>
+                  </div>
+                  <hr />
                   <p>
                     <strong>合約期間</strong>
                     {{ formatDate(currentRental[0].startDate) }} 至
                     {{ formatDate(currentRental[0].endDate) }}
                   </p>
+
                   <p>
                     <strong>車牌號碼</strong>
                     {{ currentRental[0].licensePlate }}
@@ -125,6 +214,7 @@ loadMonthlyRental();
                     {{ currentRental[0].district }}
                     {{ currentRental[0].location }}
                   </p>
+                  <!-- 價格方案 -->
                 </div>
               </div>
             </div>
@@ -134,15 +224,15 @@ loadMonthlyRental();
           <h2
             v-if="index !== 0"
             class="accordion-header"
-            id="panelsStayOpen-headingTwo"
+            :id="'panelsStayOpen-headingindex' + index"
           >
             <button
               class="accordion-button collapsed"
               type="button"
               data-bs-toggle="collapse"
-              data-bs-target="#panelsStayOpen-collapseTwo"
+              :data-bs-target="'#panelsStayOpen-collapse' + index"
               aria-expanded="false"
-              aria-controls="panelsStayOpen-collapseTwo"
+              :aria-controls="'panelsStayOpen-collapse' + index"
             >
               #{{ current.renId }}
               {{ current.lotName }}
@@ -154,23 +244,168 @@ loadMonthlyRental();
           </h2>
           <div
             v-if="index !== 0"
-            id="panelsStayOpen-collapseTwo"
+            :id="'panelsStayOpen-collapse' + index"
             class="accordion-collapse collapse"
-            aria-labelledby="panelsStayOpen-headingTwo"
+            :aria-labelledby="'panelsStayOpen-heading' + index"
           >
             <div class="accordion-body">
-              <strong>This is the second item's accordion body.</strong> It is
-              hidden by default, until the collapse plugin adds the appropriate
-              classes that we use to style each element. These classes control
-              the overall appearance, as well as the showing and hiding via CSS
-              transitions. You can modify any of this with custom CSS or
-              overriding our default variables. It's also worth noting that just
-              about any HTML can go within the <code>.accordion-body</code>,
-              though the transition does limit overflow.
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <img
+                    class="rounded img-fluid"
+                    :src="`https://maps.googleapis.com/maps/api/staticmap?center=${current.latitude},${current.longitude}&zoom=18&size=600x300&markers=color:red%7Clabel:P%7C${current.latitude},${current.longitude}&key=AIzaSyALBHIW2HQWkmhCK-VXqGIoTVttRvMTtXo`"
+                    alt="Map of {{ current.lotName }}"
+                    style="width: 100%; height: 100%"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <div>
+                    <p class="fw-bold mb-1" style="font-size: 20px">月租方案</p>
+                    <div
+                      class="fw-bold"
+                      style="
+                        font-size: 20px;
+                        background-color: aliceblue;
+                        padding: 5px;
+                      "
+                    >
+                      {{
+                        getRentalPlan(current.amount, current.monRentalRate)
+                      }}個月方案
+                      <span
+                        style="font-size: 16px"
+                        v-if="
+                          getRentalPlan(
+                            current.amount,
+                            current.monRentalRate
+                          ) !== 1
+                        "
+                        >({{
+                          Rentalplan[
+                            getRentalPlan(current.amount, current.monRentalRate)
+                          ]
+                        }})</span
+                      >
+                      <p>
+                        合約總額 {{ current.amount }} (NT$
+                        {{
+                          current.amount /
+                          getRentalPlan(current.amount, current.monRentalRate)
+                        }}/月)
+                      </p>
+                    </div>
+                  </div>
+                  <hr />
+                  <p>
+                    <strong>合約期間</strong>
+                    {{ formatDate(current.startDate) }} 至
+                    {{ formatDate(current.endDate) }}
+                  </p>
+
+                  <p>
+                    <strong>車牌號碼</strong>
+                    {{ current.licensePlate }}
+                  </p>
+                  <p>
+                    <strong>停車場地址</strong>
+                    {{ current.district }}
+                    {{ current.location }}
+                  </p>
+                  <!-- 價格方案 -->
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- 表格區 選擇歷史合約才會載入-->
+      <!-- 屬性說明:show-overflow-tooltip-欄位超出寬度會顯示提示 -->
+      <el-table
+        class="mt-2"
+        v-else-if="activePage == 'history'"
+        :data="monthlyRentals"
+        style="width: 100%"
+        height="400"
+      >
+        <el-table-column
+          prop="lotName"
+          label="停車場名稱"
+          :width="isPhoneSize ? 120 : 150"
+          :sortable="true"
+          show-overflow-tooltip
+          header-cell-class-name="custom-header"
+        ></el-table-column>
+
+        <el-table-column
+          v-if="!isPhoneSize"
+          prop="licensePlate"
+          label="車牌號碼"
+          width="105"
+          :sortable="true"
+        ></el-table-column>
+        <el-table-column
+          v-if="!isSmallScreen && !isPhoneSize"
+          label="合約期間"
+          width="200"
+          :sortable="true"
+          ><template #default="scope">
+            <div>
+              {{ formatDate(scope.row.startDate) }} 至
+              {{ formatDate(scope.row.endDate) }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="方案名稱" width="120" :sortable="true">
+          <template #default="scope">
+            <div>
+              {{ getRentalPlan(scope.row.amount, scope.row.monRentalRate) }}
+              個月方案
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="月租費" width="100" :sortable="true"
+          ><template #default="scope">
+            <div>
+              {{
+                scope.row.amount /
+                getRentalPlan(scope.row.amount, scope.row.monRentalRate)
+              }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="amount"
+          label="總額"
+          width="80"
+          :sortable="true"
+        ></el-table-column>
+        <el-table-column
+          label="狀態"
+          width="80"
+          :sortable="true"
+          align="center"
+        >
+          <template #default="scope">
+            <div
+              :class="
+                getRentalStatus(scope.row.endDate) == 'Active'
+                  ? 'ongoing'
+                  : 'expired'
+              "
+            >
+              {{ getRentalStatus(scope.row.endDate) }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="amount" label="" width="60">
+          <template #default="scope">
+            <div @click="" class="seeDetail">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
@@ -198,6 +433,7 @@ loadMonthlyRental();
   box-shadow: 3px 3px 10px lightgray;
 }
 
+/* 暫時未用 */
 #noDataImg {
   width: 80%;
   height: 250px;
@@ -213,5 +449,17 @@ strong {
   border: 1px solid lightgray;
   border-radius: 10px;
   padding: 5px;
+}
+
+.ongoing {
+  background-color: #b5cfa0;
+  color: white;
+  border-radius: 10px;
+}
+
+.expired {
+  border: 1px solid lightgray;
+  border-radius: 10px;
+  background-color: aliceblue;
 }
 </style>
