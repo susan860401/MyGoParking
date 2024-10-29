@@ -5,7 +5,7 @@ import { ref } from "vue";
 import { useAuthStore } from "@/stores/authStore"; // 引入 store
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
-const API_URL = `${BASE_URL}/Customers`;
+const API_URL = `${BASE_URL}/Customers/sign`;
 const GET_URL = `${BASE_URL}/Customers/login`;
 const authStore = useAuthStore();
 
@@ -19,10 +19,13 @@ const authStore = useAuthStore();
 // loadUsers();
 
 const autoLogin = async () => {
+  const getting = localStorage.getItem("user")
+  const user = JSON.parse(getting);
+  const email = user.Email;
+  const password = user.Password;
   const loginData = {
-    Email: userData.value.useremail,
-    Password: userData.value.psw,
-    
+    Email: email,
+    Password: password
   };
 
   const response = await fetch(GET_URL, {
@@ -31,13 +34,11 @@ const autoLogin = async () => {
     headers: {
       "Content-Type": "application/json",
     },
-    
-  });
- 
 
-  const data = await response.json();
+  });
 
   if (response.ok) {
+    const data = await response.json();
     if (data.exit) {
       // 成功登入時更新 Pinia 狀態
       localStorage.setItem("user", JSON.stringify(data)); // 儲存用戶資訊
@@ -59,7 +60,7 @@ const userData = ref({
   psw: "",
   useremail: "",
   license: "",
-  message:""
+  message: ""
 });
 
 const validity = ref({
@@ -77,6 +78,7 @@ const pswRule = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+]{8,}$/;
 const licenseRule = /^[A-Z]{3}\d{4}$/;
 
 const validate = async () => {
+  console.log("GOOOO");
   //validity.value.submitted = true; // 設置提交狀態為真
   const { useremail, license, psw } = userData.value;
 
@@ -97,6 +99,7 @@ const validate = async () => {
     validity.value.licenseFormat;
 
   if (validity.value.isValid) {
+    console.log("OKKKKKK");
     // const formData = new FormData(document.userData);
     const data = {
       UserId: 0, // 預設值，如果是自動生成的，可以忽略或設為 null
@@ -107,22 +110,22 @@ const validate = async () => {
       Phone: "Null", // 如果不需要電話號碼，可以保持空值
       LicensePlate: userData.value.license,
     };
-
+    console.log(data);
     const response = await fetch(API_URL, {
       method: "POST",
       body: JSON.stringify(data),
       headers: {
         "Content-Type": "application/json", // 確保發送的是 JSON 格式
       },
-     
+
     });
     if (response.ok) {
+      const result = await response.json();
       localStorage.setItem("user", JSON.stringify(data));
-      alert("註冊成功!!");
+      alert(result.message);
       await autoLogin(); // 註冊成功後自動登入
-      router.push("/");
     }
-    else{
+    else {
       alert("此帳號已註冊!");
     }
   }
@@ -164,67 +167,31 @@ const validate = async () => {
             <div class="col-lg-5" data-aos="fade">
               <h3>註冊</h3>
               <p>請輸入信箱及密碼</p>
-              <form
-                name="userData"
-                id="registerForm"
-                novalidate
-                @submit.prevent="validate"
-                class="php-email-form"
-              >
+              <form name="userData" id="registerForm" novalidate @submit.prevent="validate" class="php-email-form">
                 <div class="row gy-3">
                   <div class="col-md-12 input-group">
-                    <input
-                      type="email"
-                      class="form-control"
-                      name="useremail"
-                      v-model.trim="userData.useremail"
-                      placeholder="請輸入Email帳號"
-                      id="email"
-                      required
-                    />
+                    <input type="email" class="form-control" name="useremail" v-model.trim="userData.useremail"
+                      placeholder="請輸入Email帳號" id="email" required />
                   </div>
-                  <small
-                    v-if="!validity.emailRequired || !validity.emailFormat"
-                    class="text-danger"
-                    >請輸入正確電子郵件格式</small
-                  ><br />
+                  <small v-if="!validity.emailRequired || !validity.emailFormat"
+                    class="text-danger">請輸入正確電子郵件格式</small><br />
                   <div class="col-md-12 input-group">
-                    <input
-                      type="text"
-                      class="form-control"
-                      name="license"
-                      v-model.trim="userData.license"
-                      placeholder="請輸入車牌號碼"
-                      required
-                    />
+                    <input type="text" class="form-control" name="license" v-model.trim="userData.license"
+                      placeholder="請輸入車牌號碼" required />
                   </div>
-                  <small
-                    v-if="
-                      validity.submitted &&
-                      (!validity.licenseRequired || !validity.licenseFormat)
-                    "
-                    class="text-danger"
-                    >請輸入正確車牌號碼格式<br />(英文三碼 數字四碼)例:
-                    ABC123</small
-                  >
+                  <small v-if="
+                    validity.submitted &&
+                    (!validity.licenseRequired || !validity.licenseFormat)
+                  " class="text-danger">請輸入正確車牌號碼格式<br />(英文三碼 數字四碼)例:
+                    ABC123</small>
 
                   <div class="col-md-12 input-group">
-                    <input
-                      type="password"
-                      class="form-control"
-                      name="psw"
-                      v-model.trim="userData.psw"
-                      placeholder="請輸入密碼"
-                      required
-                    />
-                    <small
-                      v-if="
-                        validity.submitted &&
-                        (!validity.pswRequired || !validity.pswFormat)
-                      "
-                      class="text-danger"
-                      >請輸入正確密碼格式</small
-                    >
+                    <input type="password" class="form-control" name="psw" v-model.trim="userData.psw"
+                      placeholder="請輸入密碼" required />
+                    <small v-if="
+                      validity.submitted &&
+                      (!validity.pswRequired || !validity.pswFormat)
+                    " class="text-danger">請輸入正確密碼格式</small>
                   </div>
 
                   <div class="col-md-12 text-center">
@@ -243,6 +210,10 @@ const validate = async () => {
       </section>
       <!-- End Get Started Section -->
     </main>
+    <!-- Vertically centered modal -->
+    <!-- <div class="modal-dialog modal-dialog-centered"> -->
+    <!-- 感謝註冊會員! 到用戶中心填寫詳細資料即可獲取3張優惠券~ -->
+    <!-- </div> -->
   </div>
 </template>
 
