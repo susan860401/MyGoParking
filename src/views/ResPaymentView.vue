@@ -17,6 +17,7 @@ const lotInfo = reactive({
   lotLatitude: "",
   lotLongitude: "",
   errorMessage: "",
+  lotResDeposit: 0,
 });
 
 // 動態計算地圖 URL
@@ -76,6 +77,7 @@ async function requestPayment() {
       {
         id: `pkg_${Date.now()}_${Math.floor(Math.random() * 10000)}`, // 包裹 ID
         amount: MyAmount.value, // 包裹金額
+        amount: lotInfo.lotResDeposit, // 包裹金額
         name: lotInfo.lotName, // 停車名稱
         products: [
           {
@@ -147,7 +149,7 @@ async function requestPayment() {
                   <p><strong>停車場類型：</strong>{{ lotInfo.lotType }}</p>
                   <p><strong>剩餘車位：</strong>{{ lotInfo.lotValid }}</p>
                   <p><strong>聯絡電話：</strong>{{ lotInfo.lotTel }}</p>
-                  <p><strong>預約訂金:</strong> {{ MyAmount }}</p>
+                  <p><strong>預約訂金:</strong> {{ lotInfo.lotResDeposit }}</p>
                 </div>
               </div>
             </div>
