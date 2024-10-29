@@ -7,8 +7,8 @@ const baseUrl = `${import.meta.env.VITE_API_BASEURL}`;
 
 const reply = async () => {
   try {
-    const user = localStorage.getItem("user");
-    const userId = user.userId
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userId = user.userId;
     if (userId === null || userId === ""){
       await Swal.fire({
         title:'請先登入系統',
@@ -86,7 +86,7 @@ const reply = async () => {
           })
           if(response.ok){
             const data = await response.json();
-            console.log(data)
+            // console.log(data)
               if(data.status === "success"){
                 Swal.fire({
                 title:"感謝您的意見回覆",
