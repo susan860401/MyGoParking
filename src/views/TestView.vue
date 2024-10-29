@@ -1,3 +1,80 @@
+<script setup>
+import { onMounted, ref } from 'vue';
+import axios from 'axios';
+import BreadcrumbsComponent from '@/components/BreadcrumbsComponent.vue';
+
+const baseUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay/`;
+
+// 響應式變數
+const licensePlate = ref(''); // 選中的車牌號碼
+const selectedCoupon = ref(0); // 選中的優惠券
+const Mycoupons = ref([]);// 儲存 API 回傳的優惠劵資料
+const plates = ref([]); // 儲存 API 回傳的車牌資料
+const MyuserId = ref(0); // 使用者 ID
+
+// 從 localStorage 取得使用者資料
+const userData = localStorage.getItem('user');
+
+// 調用 API 獲取車輛資料
+const fetchCarInfo = async () => {
+    try {
+        const response = await axios.post(`${baseUrl}ListenUserId`, {
+            userId: MyuserId.value,
+        });
+        const cars = response.data.cars;
+
+        if (cars && cars.length > 0) {
+            plates.value = cars.map(car => ({
+                carid: car.carId,
+                carName: car.licensePlate
+            }));
+            licensePlate.value = plates.value[0]; // 預設選第一個車牌
+            console.log('取得的車牌資料:', plates.value);
+        } else {
+            console.log('找不到車輛資料');
+        }
+
+        const coupons = response.data.coupons;
+        if (coupons && coupons.length > 0) {
+            Mycoupons.value = coupons.map(coup => ({
+                id: coup.couponId,
+                amount: coup.amount
+            }));
+            selectedCoupon.value = Mycoupons.value[0];
+            console.log('取得的優惠資料:', Mycoupons.value);
+        } else {
+            console.log('找不到優惠資料');
+        }
+    } catch (error) {
+        console.error('調用 API 時發生錯誤:', error);
+        alert('你未有停車');
+    }
+};
+
+// 在 Vue 組件掛載時調用 API
+onMounted(async () => {
+    try {
+        if (userData) {
+            const user = JSON.parse(userData);
+            MyuserId.value = user.userId;
+            console.log('我的 UserID:', MyuserId.value);
+
+            await fetchCarInfo(); // 調用 API 獲取資料
+        } else {
+            console.log('找不到使用者資料');
+        }
+    } catch (error) {
+        console.error('解析使用者資料時發生錯誤:', error);
+    }
+});
+
+// 表單提交處理
+const submitForm = () => {
+    console.log('提交的車牌號碼ID:', licensePlate.value.carid);
+    console.log('選擇的優惠券ID:', selectedCoupon.value.id);
+};
+</script>
+
 <template>
     <div>
         <main id="main">
@@ -18,25 +95,25 @@
                                 </div>
                                 <div class="card-body p-5">
                                     <form @submit.prevent="submitForm">
-                                        <!-- 車牌號碼輸入 -->
                                         <div class="mb-4">
                                             <label for="plate" class="form-label fs-5">車牌號碼：</label>
-                                            <input type="text" id="plate" class="form-control form-control-lg"
-                                                placeholder="請輸入您的車牌號碼" v-model="plateNumber" required />
-                                        </div>
-
-                                        <!-- 優惠券選擇 -->
-                                        <div class="mb-4">
-                                            <label for="coupon" class="form-label fs-5">選擇優惠券：</label>
-                                            <select class="form-select form-select-lg" id="coupon"
-                                                v-model="selectedCoupon" required>
-                                                <option v-for="coupon in coupons" :key="coupon.id" :value="coupon.code">
-                                                    {{ coupon.name }}
+                                            <select class="form-select form-select-lg" id="plate" v-model="licensePlate"
+                                                required>
+                                                <option v-for="plate in plates" :key="plate" :value="plate">
+                                                    {{ plate.carName }}
                                                 </option>
                                             </select>
                                         </div>
 
-                                        <!-- 提交按鈕 -->
+                                        <div class="mb-4">
+                                            <label for="coupon" class="form-label fs-5">選擇優惠券：</label>
+                                            <select class="form-select form-select-lg" id="coupon"
+                                                v-model="selectedCoupon" required>
+                                                <option v-for="coupon in Mycoupons" :key="coupon" :value="coupon">
+                                                    折價 : {{ coupon.amount }} 元
+                                                </option>
+                                            </select>
+                                        </div>
                                         <div class="d-grid gap-2">
                                             <button type="submit" class="btn btn-warning">提交</button>
                                         </div>
@@ -51,30 +128,7 @@
     </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import BreadcrumbsComponent from '@/components/BreadcrumbsComponent.vue';
-
-// 響應式變數
-const plateNumber = ref('');
-const selectedCoupon = ref('');
-const coupons = ref([
-    { id: 1, name: '10% 折扣', code: 'DISCOUNT10' },
-    { id: 2, name: '20% 折扣', code: 'DISCOUNT20' },
-    { id: 3, name: '免費停車 1 小時', code: 'FREE1HR' },
-]);
-
-// 提交表單
-const submitForm = () => {
-    console.log('車牌號碼:', plateNumber.value);
-    console.log('選擇的優惠券:', selectedCoupon.value);
-
-    alert(`已提交：車牌號碼 - ${plateNumber.value}，優惠券 - ${selectedCoupon.value}`);
-};
-</script>
-
 <style scoped>
-/* 讓頁面背景為透明或純白 */
 .form-wrapper {
     min-height: 100vh;
     display: flex;
@@ -83,7 +137,6 @@ const submitForm = () => {
     padding: 20px;
 }
 
-/* 卡片設計 */
 .card {
     border-radius: 16px;
     overflow: hidden;
@@ -91,14 +144,12 @@ const submitForm = () => {
     background-color: white;
 }
 
-/* 漸層標題背景 */
 .bg-gradient-primary {
     background: linear-gradient(45deg, #6d6c1dbb, #fa9119);
     font-weight: bold;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-/* 表單輸入框 */
 .form-control-lg,
 .form-select-lg {
     border-radius: 12px;
