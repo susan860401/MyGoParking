@@ -23,6 +23,7 @@ import MonthlyRentalView from "./views/CustomerCenter/MonthlyRentalView.vue";
 import Test from "./views/CustomerCenter/test.vue";
 import MonApplyView from "./views/MonApplyView.vue";
 import TestView from "./views/TestView.vue";
+import TestConfirmView from "./views/TestConfirmView.vue";
 
 const routes = [
   {
@@ -74,6 +75,10 @@ const routes = [
     path: "/TestView",
     component: TestView,
     name: "TestView",
+  }, {
+    path: "/TestConfirmView",
+    component: TestConfirmView,
+    name: "TestConfirmView",
   },
   {
     path: "/CustomerCenter",

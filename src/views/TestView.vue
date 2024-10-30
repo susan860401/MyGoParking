@@ -14,6 +14,8 @@ const errorMessage = ref(''); // 儲存錯誤訊息
 const durationHours = ref(0); // 儲存停車時數
 const plateAmount = ref(0); // 儲存停車費用
 const entryTime = ref(''); // 儲存從 API 回傳的進場時間
+const MylotName = ref('');
+const MylotId = ref(0);
 
 // 計算總金額 (plateAmount - selectedCoupon 的折扣金額)
 const totalAmount = computed(() => {
@@ -38,7 +40,7 @@ const checkCouponsByLicensePlate = async () => {
             return;
         }
 
-        const response = await axios.post(`${baseUrl}testddd`, {
+        const response = await axios.post(`${baseUrl}FindMyParking`, {
             licensePlate: licensePlate.value,
         });
 
@@ -47,6 +49,8 @@ const checkCouponsByLicensePlate = async () => {
         plateAmount.value = response.data.plateAmount;
         entryTime.value = response.data.entryTime; // 從 API 回傳時間並儲存
         MycarId.value = response.data.carId;
+        MylotName.value = response.data.lotName;
+        MylotId.value = response.data.lotId;
 
         step.value = 2;
         errorMessage.value = ''; // 清除錯誤訊息
@@ -59,25 +63,131 @@ const checkCouponsByLicensePlate = async () => {
     }
 };
 
-const submitForm = () => {
-    if (!licensePlate.value) {
-        alert('請填寫車牌號碼');
-        return;
-    }
-    console.log('車子的ID: ' + MycarId.value);
-    if (selectedCoupon.value && selectedCoupon.value.couponId !== null) {
-        console.log('選擇的優惠券ID: ', selectedCoupon.value.couponId);
-    } else {
-        console.log('未使用優惠券');
+// const submitForm = () => {
+//     if (!licensePlate.value) {
+//         alert('請填寫車牌號碼');
+//         return;
+//     }
+//     console.log('停車場的ID: ' + MylotId.value);
+//     console.log('車子的ID: ' + MycarId.value);
+//     if (selectedCoupon.value && selectedCoupon.value.couponId !== null) {
+//         console.log('選擇的優惠券ID: ', selectedCoupon.value.couponId);
+//     } else {
+//         console.log('未使用優惠券');
+//     }
+
+//     // 重置狀態
+//     licensePlate.value = '';
+//     selectedCoupon.value = null;
+//     Mycoupons.value = [];
+//     step.value = 1;
+//     errorMessage.value = '';
+// };
+async function validatePlan() {
+    // 安全取得資料
+    const couponId = selectedCoupon.value ? selectedCoupon.value.couponId : null;
+    const lotId = MylotId.value;
+    const carId = MycarId.value;
+    const amount = totalAmount.value;
+
+    // 確認所有必要的欄位都有值
+    if (!lotId || !carId || !amount) {
+        alert('缺少必要的資訊，請檢查資料是否完整。');
+        return false;
     }
 
+    const payload = {
+        lotId: lotId,
+        carId: carId,
+        amount: amount,
+        couponsId: couponId,
+    };
+
+    console.log('發送的 payload:', payload); // 調試用，檢查 payload 是否正確
+
+    try {
+        const response = await axios.post(`${baseUrl}ValidateDay`, payload, {
+            headers: { 'Content-Type': 'application/json' },
+        });
+        console.log('驗證結果:', response.data);
+        alert('方案驗證成功。');
+        return response.data.isValid;
+    } catch (error) {
+        console.error('方案驗證失敗:', error.response?.data?.message || error.message);
+        alert('方案驗證失敗，請確認後再試。');
+        return false;
+    }
+}
+
+// 建立交易請求
+// 建立交易請求
+async function requestPayment() {
+    const isValid = await validatePlan();
+    if (!isValid) return; // 若驗證失敗，中止支付流程
+
+    const couponId = selectedCoupon.value ? selectedCoupon.value.couponId : null;
+    const couponAmount = selectedCoupon.value ? selectedCoupon.value.couponAmount : null;
+    const MyInfo = {
+        amount: totalAmount.value,  // 金額
+        car: MycarId.value,
+        lot: MylotId.value,
+        couponsId: couponId,
+        lotName: MylotName.value,
+        componsAmount: couponAmount
+    };
+
+    // 儲存金額與方案資訊於 sessionStorage
+    sessionStorage.setItem('MyInfo', JSON.stringify(MyInfo))
+
+    const payment = {
+        amount: totalAmount.value,  // 總金額
+        currency: 'TWD',  // 貨幣類型
+        orderId: Date.now().toString(),  // 訂單 ID
+        carId: MycarId.value,
+        lotId: MylotId.value,
+        packages: [
+            {
+                id: `pkg_${Date.now()}_${Math.floor(Math.random() * 10000)}`,  // 包裹 ID
+                amount: totalAmount.value,  // 包裹金額
+                name: `${MylotName.value}繳費`,  // 包裹名稱
+                products: [
+                    {
+                        name: `${MylotName.value}繳費`,  // 產品名稱
+                        quantity: 1,  // 數量
+                        price: totalAmount.value,  // 單價
+                    },
+                ],
+            },
+        ],
+        redirectUrls: {
+            confirmUrl: `${window.location.origin}/TestConfirmView`,  // 確認頁面
+            cancelUrl: `${baseUrl}Cancel`,  // 取消頁面
+        },
+    };
+
+    console.log('準備發送的 payment 物件:', JSON.stringify(payment, null, 2));
+    alert('前往支付頁面:');
+    try {
+        const response = await axios.post(`${baseUrl}CreateRes`, payment, {
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        const paymentUrl = response.data.info.paymentUrl.web;
+        console.log('前往支付頁面:', paymentUrl);
+
+        window.location.href = paymentUrl;
+
+    } catch (error) {
+        console.error('交易失敗:', error.response?.data?.message || error.message);
+        alert('交易失敗，請稍後再試。');
+    }
     // 重置狀態
-    licensePlate.value = '';
-    selectedCoupon.value = null;
-    Mycoupons.value = [];
-    step.value = 1;
-    errorMessage.value = '';
-};
+    // licensePlate.value = '';
+    // selectedCoupon.value = null;
+    // Mycoupons.value = [];
+    // step.value = 1;
+    // errorMessage.value = '';
+}
 </script>
 
 <template>
@@ -96,13 +206,12 @@ const submitForm = () => {
                         <div class="col-md-8 col-lg-6">
                             <div class="card shadow-lg">
                                 <div class="card-header bg-gradient-primary text-white text-center py-4">
-                                    <h2 class="mb-0">輸入車牌及檢查優惠券</h2>
+                                    <h2 class="mb-0"> {{ step === 2 ? MylotName : '請輸入車牌查詢' }}</h2>
                                 </div>
                                 <div class="card-body p-5">
                                     <div v-if="errorMessage" class="alert alert-danger" role="alert">
                                         {{ errorMessage }}
                                     </div>
-
                                     <div class="mb-4">
                                         <label for="plate" class="form-label fs-5">車牌號碼：</label>
                                         <input type="text" id="plate" class="form-control form-control-lg"
@@ -135,7 +244,7 @@ const submitForm = () => {
 
                                     <div class="d-grid gap-2">
                                         <button type="button" class="btn btn-warning" :disabled="!isFormValid"
-                                            @click="step === 1 ? checkCouponsByLicensePlate() : submitForm()">
+                                            @click="step === 1 ? checkCouponsByLicensePlate() : requestPayment()">
                                             {{ step === 1 ? '下一步' : '送出' }}
                                         </button>
                                     </div>
