@@ -12,6 +12,15 @@ import "@/assets/theme.js";
 
 import NavbarComponent from "./components/NavbarComponent.vue";
 import FooterComponent from "./components/FooterComponent.vue";
+import { onBeforeUnmount, onMounted } from "vue";
+import { checkReminder } from "./js/com";
+let intervalId;
+onMounted(async () => {
+  intervalId = setInterval(checkReminder, 1 * 60 * 1000);
+});
+onBeforeUnmount(() => {
+  if (intervalId) clearInterval(intervalId);
+});
 </script>
 
 <template>

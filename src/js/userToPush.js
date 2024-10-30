@@ -44,7 +44,7 @@ export async function subscribeUserToPush() {
     return;
   }
   const vapidPublicKey =
-    "BPNfAqoFJJkgXQq8ebZP7gUR_rwk5c7LUB8Q3YpC1hPOhn7YTCfE39HAu4sQMZAIk12qHPTMBHAstcRqOjx4H3U";
+    "BEOC-kXHgoTOx9oB89JAGbgZxr2w_IXEc_G4_0PACRCJOFtfx4hoT0hxslv1aGGmCSbrzpV-NSexuMjYuCyoMAM";
 
   try {
     // Subscribe the user to push notifications
