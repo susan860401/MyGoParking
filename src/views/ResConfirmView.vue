@@ -2,13 +2,14 @@
 import { ref, onMounted } from "vue";
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
 import axios from "axios";
-
+import dayjs from 'dayjs';
 // 初始化資料
 const amount = ref(0);
 const lotName = ref("");
 const paymentStatus = ref("等待確認...");
 const isDisabled = ref(true);
 const buttonClass = ref("btn-secondary");
+const startTime = ref('');
 
 // API 路徑
 const baseApiUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay`;
@@ -20,6 +21,7 @@ onMounted(() => {
   if (storedInfo) {
     amount.value = storedInfo.amount;
     lotName.value = storedInfo.lot;
+    startTime.value = dayjs(storedInfo.startTime).format('YYYY-MM-DD HH:mm');
   } else {
     alert("無法讀取方案資料，請重新選擇方案。");
     window.location.href = "/";
@@ -92,41 +94,18 @@ async function confirmPayment() {
       </div>
       <div class="form-group mb-4">
         <label for="amount" class="form-label">預約訂金</label>
-        <input
-          type="text"
-          id="amount"
-          class="form-control form-control-lg"
-          :value="`${amount} TWD`"
-          readonly
-        />
+        <input type="text" id="amount" class="form-control form-control-lg" :value="`${amount} TWD`" readonly />
       </div>
       <div class="form-group mb-4">
         <label for="paymentStatus" class="form-label">交易狀態</label>
-        <input
-          type="text"
-          id="paymentStatus"
-          class="form-control form-control-lg"
-          :value="paymentStatus"
-          readonly
-        />
+        <input type="text" id="paymentStatus" class="form-control form-control-lg" :value="paymentStatus" readonly />
       </div>
       <div class="form-group mb-4">
         <label for="paymentStatus" class="form-label">入場時間</label>
-        <input
-          type="text"
-          id="paymentStatus"
-          class="form-control form-control-lg"
-          readonly
-          value="2024/06/15"
-        />
+        <input type="text" id="paymentStatus" class="form-control form-control-lg" readonly :value="startTime" />
       </div>
       <div class="text-center">
-        <button
-          class="btn btn-lg mt-3"
-          :class="[buttonClass]"
-          @click.prevent="confirmPayment"
-          :disabled="isDisabled"
-        >
+        <button class="btn btn-lg mt-3" :class="[buttonClass]" @click.prevent="confirmPayment" :disabled="isDisabled">
           確認支付
         </button>
       </div>
