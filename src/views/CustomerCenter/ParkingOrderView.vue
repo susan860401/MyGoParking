@@ -29,6 +29,7 @@ const loadReservations = async () => {
   countOverdue.value = reservations.value.filter((res) => res.isOverdue).length;
 };
 
+//切換觀看不同狀態的預訂紀錄
 const filterByStatus = async (filter) => {
   if (filter == "all") {
     isAllStatus.value = true;
@@ -57,6 +58,16 @@ const filterByLotName = async () => {
     reservations.value = datas;
   }
 };
+//格式化時間
+const formatTime = (time) => {
+  const date = new Date(time);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const hour = date.getHours().toString().padStart(2, "0");
+  const minute = date.getMinutes().toString().padStart(2, "0");
+  return `${year}-${month}-${day}   ${hour}:${minute}`;
+};
 
 //點擊前往預訂 導航到其停車場的預定頁面
 const toRes = (res) => {
@@ -69,6 +80,7 @@ const toRes = (res) => {
   });
 };
 
+//取消預訂
 const cancelRes = async (id) => {
   try {
     const response = await fetch(`${API_URL}/Reservations/${id}`, {
@@ -177,11 +189,11 @@ onMounted(() => {
                   </p>
                   <h5 class="card-title">{{ ongoing.lotName }}</h5>
 
-                  <p>預訂時間：{{ ongoing.resTime }}</p>
-                  <p>預計入場時間：{{ ongoing.startTime }}</p>
+                  <p>預訂時間：{{ formatTime(ongoing.resTime) }}</p>
+                  <p>預計入場時間：{{ formatTime(ongoing.startTime) }}</p>
                   <p v-if="ongoing.paymentStatus" class="text-success">
                     <i class="fa-regular fa-clock"></i>
-                    最遲於 {{ ongoing.validUntil }} 入場
+                    最遲於 {{ formatTime(ongoing.validUntil) }} 入場
                   </p>
                   <p v-else-if="!ongoing.paymentStatus" class="text-danger">
                     <i class="fa-solid fa-circle-exclamation"></i>
@@ -226,8 +238,8 @@ onMounted(() => {
                   </p>
                   <h5 class="card-title">{{ complete.lotName }}</h5>
 
-                  <p>預訂時間：{{ complete.resTime }}</p>
-                  <p>預計入場時間：{{ complete.startTime }}</p>
+                  <p>預訂時間：{{ formatTime(complete.resTime) }}</p>
+                  <p>預計入場時間：{{ formatTime(complete.startTime) }}</p>
                   <small
                     v-if="
                       complete.isFinish &&
