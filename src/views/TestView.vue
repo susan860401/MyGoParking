@@ -1,77 +1,72 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { ref, computed } from 'vue';
 import axios from 'axios';
 import BreadcrumbsComponent from '@/components/BreadcrumbsComponent.vue';
 
 const baseUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay/`;
 
-// 響應式變數
-const licensePlate = ref(''); // 選中的車牌號碼
-const selectedCoupon = ref(0); // 選中的優惠券
-const Mycoupons = ref([]);// 儲存 API 回傳的優惠劵資料
-const plates = ref([]); // 儲存 API 回傳的車牌資料
-const MyuserId = ref(0); // 使用者 ID
+const licensePlate = ref('');
+const selectedCoupon = ref(null);
+const Mycoupons = ref([]);
+const step = ref(1);
+const errorMessage = ref(''); // 儲存錯誤訊息
 
-// 從 localStorage 取得使用者資料
-const userData = localStorage.getItem('user');
+const licensePlatePattern = /^[A-Z]{3}\d{4}$/;
 
-// 調用 API 獲取車輛資料
-const fetchCarInfo = async () => {
+const isFormValid = computed(() => licensePlatePattern.test(licensePlate.value.trim()));
+
+const onLicensePlateInput = (event) => {
+    const value = event.target.value.toUpperCase();
+    licensePlate.value = value.replace(/[^A-Z0-9]/g, '');
+};
+
+const checkCouponsByLicensePlate = async () => {
     try {
-        const response = await axios.post(`${baseUrl}ListenUserId`, {
-            userId: MyuserId.value,
+        if (licensePlate.value.trim() === '') {
+            alert('請輸入車牌號碼');
+            return;
+        }
+
+        console.log(licensePlate.value);
+
+        const response = await axios.post(`${baseUrl}testddd`, {
+            licensePlate: licensePlate.value,
         });
-        const cars = response.data.cars;
 
-        if (cars && cars.length > 0) {
-            plates.value = cars.map(car => ({
-                carid: car.carId,
-                carName: car.licensePlate
-            }));
-            licensePlate.value = plates.value[0]; // 預設選第一個車牌
-            console.log('取得的車牌資料:', plates.value);
-        } else {
-            console.log('找不到車輛資料');
-        }
+        Mycoupons.value = response.data.couponIds || [];
+        console.log('優惠券資料:', Mycoupons.value);
 
-        const coupons = response.data.coupons;
-        if (coupons && coupons.length > 0) {
-            Mycoupons.value = coupons.map(coup => ({
-                id: coup.couponId,
-                amount: coup.amount
-            }));
-            selectedCoupon.value = Mycoupons.value[0];
-            console.log('取得的優惠資料:', Mycoupons.value);
-        } else {
-            console.log('找不到優惠資料');
-        }
+        step.value = 2;
+        errorMessage.value = ''; // 請求成功時清除錯誤訊息
     } catch (error) {
-        console.error('調用 API 時發生錯誤:', error);
-        alert('你未有停車');
+        console.error('發生錯誤:', error);
+        if (error.response && error.response.status === 404) {
+            errorMessage.value = error.response.data.message; // 儲存錯誤訊息
+        } else {
+            errorMessage.value = '系統錯誤，請稍後再試';
+        }
     }
 };
 
-// 在 Vue 組件掛載時調用 API
-onMounted(async () => {
-    try {
-        if (userData) {
-            const user = JSON.parse(userData);
-            MyuserId.value = user.userId;
-            console.log('我的 UserID:', MyuserId.value);
-
-            await fetchCarInfo(); // 調用 API 獲取資料
-        } else {
-            console.log('找不到使用者資料');
-        }
-    } catch (error) {
-        console.error('解析使用者資料時發生錯誤:', error);
-    }
-});
-
-// 表單提交處理
 const submitForm = () => {
-    console.log('提交的車牌號碼ID:', licensePlate.value.carid);
-    console.log('選擇的優惠券ID:', selectedCoupon.value.id);
+    if (!licensePlate.value) {
+        alert('請填寫車牌號碼');
+        return;
+    }
+
+    console.log('提交的車牌號碼:', licensePlate.value);
+
+    if (selectedCoupon.value && selectedCoupon.value.couponId !== null) {
+        console.log('選擇的優惠券ID:', selectedCoupon.value.couponId);
+    } else {
+        console.log('未使用優惠券');
+    }
+
+    licensePlate.value = '';
+    selectedCoupon.value = null;
+    Mycoupons.value = [];
+    step.value = 1;
+    errorMessage.value = ''; // 重置錯誤訊息
 };
 </script>
 
@@ -80,9 +75,9 @@ const submitForm = () => {
         <main id="main">
             <BreadcrumbsComponent>
                 <template #title>
-                    <h2>預約付款</h2>
+                    <h2>繳費</h2>
                 </template>
-                <template #page>預約付款</template>
+                <template #page>繳費</template>
             </BreadcrumbsComponent>
 
             <div class="form-wrapper">
@@ -91,33 +86,36 @@ const submitForm = () => {
                         <div class="col-md-8 col-lg-6">
                             <div class="card shadow-lg">
                                 <div class="card-header bg-gradient-primary text-white text-center py-4">
-                                    <h2 class="mb-0">車牌號碼及優惠券選擇</h2>
+                                    <h2 class="mb-0">輸入車牌及檢查優惠券</h2>
                                 </div>
                                 <div class="card-body p-5">
-                                    <form @submit.prevent="submitForm">
-                                        <div class="mb-4">
-                                            <label for="plate" class="form-label fs-5">車牌號碼：</label>
-                                            <select class="form-select form-select-lg" id="plate" v-model="licensePlate"
-                                                required>
-                                                <option v-for="plate in plates" :key="plate" :value="plate">
-                                                    {{ plate.carName }}
-                                                </option>
-                                            </select>
-                                        </div>
+                                    <div v-if="errorMessage" class="alert alert-danger" role="alert">
+                                        {{ errorMessage }}
+                                    </div>
 
-                                        <div class="mb-4">
-                                            <label for="coupon" class="form-label fs-5">選擇優惠券：</label>
-                                            <select class="form-select form-select-lg" id="coupon"
-                                                v-model="selectedCoupon" required>
-                                                <option v-for="coupon in Mycoupons" :key="coupon" :value="coupon">
-                                                    折價 : {{ coupon.amount }} 元
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <div class="d-grid gap-2">
-                                            <button type="submit" class="btn btn-warning">提交</button>
-                                        </div>
-                                    </form>
+                                    <div class="mb-4">
+                                        <label for="plate" class="form-label fs-5">車牌號碼：</label>
+                                        <input type="text" id="plate" class="form-control form-control-lg"
+                                            v-model="licensePlate" @input="onLicensePlateInput"
+                                            placeholder="請輸入車牌號碼 (格式：ABC1234)" required />
+                                    </div>
+
+                                    <div class="mb-4" v-if="step === 2">
+                                        <label for="coupon" class="form-label fs-5">選擇優惠券：</label>
+                                        <select class="form-select form-select-lg" id="coupon" v-model="selectedCoupon">
+                                            <option :value="null">不使用優惠券</option>
+                                            <option v-for="coupon in Mycoupons" :key="coupon.couponId" :value="coupon">
+                                                折價: {{ coupon.amount }} 元，到期日: {{ coupon.endTime }}
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="d-grid gap-2">
+                                        <button type="button" class="btn btn-warning" :disabled="!isFormValid"
+                                            @click="step === 1 ? checkCouponsByLicensePlate() : submitForm()">
+                                            {{ step === 1 ? '下一步' : '送出' }}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
