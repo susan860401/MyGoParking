@@ -6,10 +6,21 @@ import BreadcrumbsComponent from '@/components/BreadcrumbsComponent.vue';
 const baseUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay/`;
 
 const licensePlate = ref('');
-const selectedCoupon = ref(null);
+const selectedCoupon = ref(null); // 優惠券的初始值設為 null
 const Mycoupons = ref([]);
 const step = ref(1);
+const MycarId = ref(0); // 儲存車子的ID
 const errorMessage = ref(''); // 儲存錯誤訊息
+const durationHours = ref(0); // 儲存停車時數
+const plateAmount = ref(0); // 儲存停車費用
+const entryTime = ref(''); // 儲存從 API 回傳的進場時間
+
+// 計算總金額 (plateAmount - selectedCoupon 的折扣金額)
+const totalAmount = computed(() => {
+    if (!plateAmount.value) return 0;
+    const discount = selectedCoupon.value?.couponAmount || 0; // 使用 couponAmount 作為折扣金額
+    return plateAmount.value - discount;
+});
 
 const licensePlatePattern = /^[A-Z]{3}\d{4}$/;
 
@@ -27,21 +38,21 @@ const checkCouponsByLicensePlate = async () => {
             return;
         }
 
-        console.log(licensePlate.value);
-
         const response = await axios.post(`${baseUrl}testddd`, {
             licensePlate: licensePlate.value,
         });
 
         Mycoupons.value = response.data.couponIds || [];
-        console.log('優惠券資料:', Mycoupons.value);
+        durationHours.value = response.data.durationHours;
+        plateAmount.value = response.data.plateAmount;
+        entryTime.value = response.data.entryTime; // 從 API 回傳時間並儲存
+        MycarId.value = response.data.carId;
 
         step.value = 2;
-        errorMessage.value = ''; // 請求成功時清除錯誤訊息
+        errorMessage.value = ''; // 清除錯誤訊息
     } catch (error) {
-        console.error('發生錯誤:', error);
         if (error.response && error.response.status === 404) {
-            errorMessage.value = error.response.data.message; // 儲存錯誤訊息
+            errorMessage.value = error.response.data.message;
         } else {
             errorMessage.value = '系統錯誤，請稍後再試';
         }
@@ -53,20 +64,19 @@ const submitForm = () => {
         alert('請填寫車牌號碼');
         return;
     }
-
-    console.log('提交的車牌號碼:', licensePlate.value);
-
+    console.log('車子的ID: ' + MycarId.value);
     if (selectedCoupon.value && selectedCoupon.value.couponId !== null) {
-        console.log('選擇的優惠券ID:', selectedCoupon.value.couponId);
+        console.log('選擇的優惠券ID: ', selectedCoupon.value.couponId);
     } else {
         console.log('未使用優惠券');
     }
 
+    // 重置狀態
     licensePlate.value = '';
     selectedCoupon.value = null;
     Mycoupons.value = [];
     step.value = 1;
-    errorMessage.value = ''; // 重置錯誤訊息
+    errorMessage.value = '';
 };
 </script>
 
@@ -96,7 +106,7 @@ const submitForm = () => {
                                     <div class="mb-4">
                                         <label for="plate" class="form-label fs-5">車牌號碼：</label>
                                         <input type="text" id="plate" class="form-control form-control-lg"
-                                            v-model="licensePlate" @input="onLicensePlateInput"
+                                            v-model="licensePlate" @input="onLicensePlateInput" :readonly="step === 2"
                                             placeholder="請輸入車牌號碼 (格式：ABC1234)" required />
                                     </div>
 
@@ -105,9 +115,22 @@ const submitForm = () => {
                                         <select class="form-select form-select-lg" id="coupon" v-model="selectedCoupon">
                                             <option :value="null">不使用優惠券</option>
                                             <option v-for="coupon in Mycoupons" :key="coupon.couponId" :value="coupon">
-                                                折價: {{ coupon.amount }} 元，到期日: {{ coupon.endTime }}
+                                                折價: {{ coupon.couponAmount }} 元，到期日: {{ coupon.endTime }}
                                             </option>
                                         </select>
+                                        <label for="entry-time" class="form-label fs-5 mt-3">進場時間 :</label>
+                                        <input type="text" id="entry-time" class="form-control form-control-lg"
+                                            :value="entryTime" readonly />
+                                        <label for="duration" class="form-label fs-5 mt-3">停車時間 :</label>
+                                        <input type="text" id="duration" class="form-control form-control-lg"
+                                            :value="`${durationHours} 小時`" readonly />
+                                        <label for="amount" class="form-label fs-5 mt-3">原始金額 :</label>
+                                        <input type="text" id="total" class="form-control form-control-lg"
+                                            :value="`${plateAmount} 元`" readonly />
+                                        <label for="total" class="form-label fs-5 mt-3">總金額 :</label>
+                                        <input type="text" id="total" class="form-control form-control-lg"
+                                            :value="`${totalAmount} 元`" readonly />
+
                                     </div>
 
                                     <div class="d-grid gap-2">
@@ -125,6 +148,7 @@ const submitForm = () => {
         </main>
     </div>
 </template>
+
 
 <style scoped>
 .form-wrapper {
