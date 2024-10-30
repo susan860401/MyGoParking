@@ -16,7 +16,7 @@ import { onBeforeUnmount, onMounted } from "vue";
 import { checkReminder } from "./js/com";
 let intervalId;
 onMounted(async () => {
-  intervalId = setInterval(checkReminder, 1 * 60 * 1000);
+  intervalId = setInterval(checkReminder, 10 * 60 * 1000);
 });
 onBeforeUnmount(() => {
   if (intervalId) clearInterval(intervalId);
