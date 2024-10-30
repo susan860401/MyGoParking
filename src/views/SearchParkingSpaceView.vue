@@ -107,8 +107,9 @@ const loadParkingLots = async () => {
     const data = await res.json();
     //console.log(data);
     data.forEach((lot) => {
+      //console.log("monRate:", lot.MonRate);
       lot.isETC = lot.etcSpace > 0;
-      lot.monRentalRate = lot.monRate > 0;
+      lot.monRentalRate = lot.MonRate > 0;
       lot.deposit = lot.resDeposit > 0;
     });
     parkingLots.value = data;

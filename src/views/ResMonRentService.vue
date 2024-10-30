@@ -67,53 +67,63 @@ const submitRes = async () => {
     lotName: lotsInfo.value.lotName,
     licensePlate: selectedCarPlate.value,
   };
-  console.log(payload);
-  let res = await fetch(
-    `${BASE_URL}/Reservations/newReservation?userId=${userId}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    }
-  );
-
+  //console.log(payload);
   try {
-    let fetchRes = await res.json();
-    //console.log(fetchRes);
-    if (fetchRes.message == "該停車場不提供預約服務") {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: fetchRes.message,
-      });
-    } else if (fetchRes.message == "車位已滿, 無法進行預約") {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: fetchRes.message,
-      });
-    } else if (fetchRes.message == "無效的停車場") {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: fetchRes.message,
-      });
-    } else if (fetchRes.message == "該車牌不屬於當前用戶") {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: fetchRes.message,
-      });
+    let res = await fetch(
+      `${BASE_URL}/Reservations/newReservation?userId=${userId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    if (!res.ok) {
+      if (res.status === 400) {
+        const errorData = await res.json();
+        Swal.fire({
+          icon: "warning",
+          title: "Oops...",
+          text: errorData.message,
+        });
+      }
     } else {
-      await getLotsInfo();
-      sessionStorage.setItem("carId", fetchRes.newRes.carId);
-      sessionStorage.setItem("lotId", fetchRes.newRes.lotId);
-      sessionStorage.setItem("resDeposit", lotsInfo?.value.resDeposit);
-      sessionStorage.setItem("startTime", fetchRes.newRes.startTime);
-      date.value = null;
-      GotoRes();
+      let fetchRes = await res.json();
+      //console.log(fetchRes);
+      if (fetchRes.message == "該停車場不提供預約服務") {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: fetchRes.message,
+        });
+      } else if (fetchRes.message == "車位已滿, 無法進行預約") {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: fetchRes.message,
+        });
+      } else if (fetchRes.message == "無效的停車場") {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: fetchRes.message,
+        });
+      } else if (fetchRes.message == "該車牌不屬於當前用戶") {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: fetchRes.message,
+        });
+      } else {
+        await getLotsInfo();
+        sessionStorage.setItem("carId", fetchRes.newRes.carId);
+        sessionStorage.setItem("lotId", fetchRes.newRes.lotId);
+        sessionStorage.setItem("resDeposit", lotsInfo?.value.resDeposit);
+        sessionStorage.setItem("startTime", fetchRes.newRes.startTime);
+        date.value = null;
+        GotoRes();
+      }
     }
   } catch (err) {
     Swal.fire({

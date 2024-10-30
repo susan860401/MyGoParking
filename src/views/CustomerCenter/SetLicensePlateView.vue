@@ -8,9 +8,10 @@ const API_URL = "https://localhost:7077/api";
 const cars = ref([]);
 let originalCars = []; //存放原始資料
 const remind = ref("");
+const user = JSON.parse(localStorage.getItem("user")).userId;
 
 const loadLicensePlates = async () => {
-  const response = await fetch(`${API_URL}/Cars_?userId=1`);
+  const response = await fetch(`${API_URL}/Cars_?userId=${user}`);
   const datas = await response.json();
   cars.value = datas.map((item) => ({
     ...item,
@@ -63,7 +64,7 @@ const saveCar = async () => {
 
   //處理新增的車牌
   if (newCars.length > 0) {
-    const response = await fetch(`${API_URL}/Cars_?userId=1`, {
+    const response = await fetch(`${API_URL}/Cars_?userId=${user}`, {
       method: "POST",
       body: JSON.stringify(newCars),
       headers: { "Content-Type": "application/json" },
