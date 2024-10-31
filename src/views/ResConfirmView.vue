@@ -17,11 +17,10 @@ const baseApiUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay`;
 // 取得 sessionStorage 中的付款資料
 onMounted(() => {
   const storedInfo = JSON.parse(sessionStorage.getItem("paymentInfo"));
-
+  startTime.value = dayjs(sessionStorage.getItem("startTime")).format('YYYY-MM-DD HH:mm');
   if (storedInfo) {
     amount.value = storedInfo.amount;
     lotName.value = storedInfo.lot;
-    startTime.value = dayjs(storedInfo.startTime).format('YYYY-MM-DD HH:mm');
   } else {
     alert("無法讀取方案資料，請重新選擇方案。");
     window.location.href = "/";

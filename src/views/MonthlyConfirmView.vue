@@ -2,21 +2,21 @@
 import { ref, onMounted } from 'vue';
 import BreadcrumbsComponent from '@/components/BreadcrumbsComponent.vue';
 import axios from 'axios';
-
+import dayjs from 'dayjs';
 // 初始化資料
 const amount = ref(0);
 const planLabel = ref('');
 const paymentStatus = ref('等待確認...');
 const isDisabled = ref(true);
 const buttonClass = ref('btn-secondary');
-
+const startTime = ref('');
 // API 路徑
 const baseApiUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay`;
 
 // 取得 sessionStorage 中的付款資料
 onMounted(() => {
     const storedInfo = JSON.parse(sessionStorage.getItem('paymentInfo'));
-
+    startTime.value = dayjs(sessionStorage.getItem("startTime")).format('YYYY-MM-DD HH:mm');
     if (storedInfo) {
         amount.value = storedInfo.amount;
         planLabel.value = storedInfo.planLabel;
@@ -92,6 +92,11 @@ async function confirmPayment() {
             <div class="form-group mb-4">
                 <label for="amount" class="form-label">方案金額</label>
                 <input type="text" id="amount" class="form-control form-control-lg" :value="`${amount} TWD`" readonly />
+            </div>
+            <div class="form-group mb-4">
+                <label for="paymentStatus" class="form-label">入場時間</label>
+                <input type="text" id="paymentStatus" class="form-control form-control-lg" readonly
+                    :value="startTime" />
             </div>
             <div class="form-group mb-4">
                 <label for="paymentStatus" class="form-label">交易狀態</label>

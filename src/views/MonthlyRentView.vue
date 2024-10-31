@@ -2,12 +2,12 @@
 import { ref, computed, onMounted, reactive } from 'vue';
 import BreadcrumbsComponent from '@/components/BreadcrumbsComponent.vue';
 import axios from 'axios';
-
+import dayjs from 'dayjs';
 
 const MycarId = ref(0);
 const MylotId = ref(0);
 const MyAmount = ref(0);
-
+const startTime = ref('');
 
 // 宣告方案資料，使用 reactive 包裹
 const planData = reactive({
@@ -72,6 +72,8 @@ onMounted(() => {
 
     MyAmount.value = Number(sessionStorage.getItem("amount")) || 0;
     console.log("A=" + MyAmount.value);
+
+    startTime.value = sessionStorage.getItem("startTime");
 
     // 確保 MyAmount.value 取得的是數字
     if (MyAmount.value === 0) {
@@ -176,6 +178,7 @@ async function requestPayment() {
         planId: selectedPlan.value.id,  // 方案 ID
         carId: MycarId.value,
         lotId: MylotId.value,
+        startTime: startTime.value,
         packages: [
             {
                 id: `pkg_${Date.now()}_${Math.floor(Math.random() * 10000)}`,  // 包裹 ID
@@ -220,11 +223,18 @@ async function requestPayment() {
 <template>
     <div>
         <main id="main">
-            <BreadcrumbsComponent>
+            <BreadcrumbsComponent backgroundImage="/03.jpg" :breadcrumbs="[
+                { name: 'Home', link: '/' },
+                { name: 'GoParkingMap', link: '/search' },
+            ]">
                 <template #title>
-                    <h2>月租付款</h2>
+                    <!-- 插入到 title 插槽 -->
+                    <h2>Reservation & MonthlyRental</h2>
                 </template>
-                <template #page>月租付款</template>
+                <template #page>
+                    <!-- 插入到 page 插槽 -->
+                    月租服務
+                </template>
             </BreadcrumbsComponent>
 
             <div class="container py-5">

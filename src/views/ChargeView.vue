@@ -63,26 +63,7 @@ const checkCouponsByLicensePlate = async () => {
     }
 };
 
-// const submitForm = () => {
-//     if (!licensePlate.value) {
-//         alert('請填寫車牌號碼');
-//         return;
-//     }
-//     console.log('停車場的ID: ' + MylotId.value);
-//     console.log('車子的ID: ' + MycarId.value);
-//     if (selectedCoupon.value && selectedCoupon.value.couponId !== null) {
-//         console.log('選擇的優惠券ID: ', selectedCoupon.value.couponId);
-//     } else {
-//         console.log('未使用優惠券');
-//     }
 
-//     // 重置狀態
-//     licensePlate.value = '';
-//     selectedCoupon.value = null;
-//     Mycoupons.value = [];
-//     step.value = 1;
-//     errorMessage.value = '';
-// };
 async function validatePlan() {
     // 安全取得資料
     const couponId = selectedCoupon.value ? selectedCoupon.value.couponId : null;
@@ -160,7 +141,7 @@ async function requestPayment() {
             },
         ],
         redirectUrls: {
-            confirmUrl: `${window.location.origin}/TestConfirmView`,  // 確認頁面
+            confirmUrl: `${window.location.origin}/ChargConfirmView`,  // 確認頁面
             cancelUrl: `${baseUrl}Cancel`,  // 取消頁面
         },
     };

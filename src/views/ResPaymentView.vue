@@ -6,7 +6,7 @@ const baseUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay/`;
 const MylotId = ref(0);
 const MycarId = ref(0);
 const MyAmount = ref(0);
-const startTime = ref();
+const startTime = ref('');
 const lotInfo = reactive({
   lotName: "",
   lotType: "",
@@ -104,7 +104,7 @@ async function requestPayment() {
     });
 
     const paymentUrl = response.data.info.paymentUrl.web;
-
+    alert("交易失敗，請稍後再試。");
     console.log("前往支付頁面:", paymentUrl);
     window.location.href = paymentUrl;
   } catch (error) {
@@ -117,11 +117,18 @@ async function requestPayment() {
 <template>
   <div>
     <main id="main">
-      <BreadcrumbsComponent>
+      <BreadcrumbsComponent backgroundImage="/03.jpg" :breadcrumbs="[
+        { name: 'Home', link: '/' },
+        { name: 'GoParkingMap', link: '/search' },
+      ]">
         <template #title>
-          <h2>預約付款</h2>
+          <!-- 插入到 title 插槽 -->
+          <h2>Reservation & MonthlyRental</h2>
         </template>
-        <template #page>預約付款</template>
+        <template #page>
+          <!-- 插入到 page 插槽 -->
+          預約服務
+        </template>
       </BreadcrumbsComponent>
 
       <div class="container py-5">
@@ -133,12 +140,8 @@ async function requestPayment() {
             <div class="text-left p-4 bg-white rounded shadow">
               <div class="row">
                 <div class="col-md-5 p-3 img-container">
-                  <img
-                    :src="mapUrl"
-                    alt="Map of {{ lotInfo.lotName }}"
-                    class="rounded img-fluid"
-                    style="width: 100%; height: 100%"
-                  />
+                  <img :src="mapUrl" alt="Map of {{ lotInfo.lotName }}" class="rounded img-fluid"
+                    style="width: 100%; height: 100%" />
                 </div>
                 <div class="col-md-7 p-3 mt-2">
                   <h1>{{ lotInfo.lotName }}</h1>

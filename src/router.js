@@ -22,8 +22,10 @@ import ResPaymentView from "./views/ResPaymentView.vue";
 import MonthlyRentalView from "./views/CustomerCenter/MonthlyRentalView.vue";
 import Test from "./views/CustomerCenter/test.vue";
 import MonApplyView from "./views/MonApplyView.vue";
-import TestView from "./views/TestView.vue";
-import TestConfirmView from "./views/TestConfirmView.vue";
+import TestView from "./views/ChargeView.vue";
+import TestConfirmView from "./views/ChargeConfirmView.vue";
+import ChargeView from "./views/ChargeView.vue";
+import ChargConfirmView from "./views/ChargeConfirmView.vue";
 
 const routes = [
   {
@@ -72,13 +74,13 @@ const routes = [
     name: "resPayment",
   },
   {
-    path: "/TestView",
-    component: TestView,
-    name: "TestView",
+    path: "/ChargeView",
+    component: ChargeView,
+    name: "ChargeView",
   }, {
-    path: "/TestConfirmView",
-    component: TestConfirmView,
-    name: "TestConfirmView",
+    path: "/ChargeConfirmView",
+    component: ChargConfirmView,
+    name: "ChargeConfirmView",
   },
   {
     path: "/CustomerCenter",
