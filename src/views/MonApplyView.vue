@@ -1,6 +1,7 @@
 <script setup>
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
 import { getUserCarPlate, getUserData } from "@/js/com";
+import { useUserStore } from "@/stores/userStore";
 import Swal from "sweetalert2";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
@@ -15,12 +16,12 @@ const email = ref("");
 const phone = ref("");
 const cars = ref([]);
 const selectedCarPlate = ref("");
-const userId = JSON.parse(localStorage.getItem("user")).userId;
+const user = useUserStore();
 
 const newMonApply = async () => {
   try {
     const apply = {
-      userId: userId,
+      userId: user.userId,
       lotId: lotId,
       licensePlate: selectedCarPlate?.value,
       lotName: lotName,
@@ -54,8 +55,8 @@ const newMonApply = async () => {
 };
 
 onMounted(async () => {
-  if (userId) {
-    await getUserData(userId, username, email, phone);
+  if (user.userId) {
+    await getUserData(user.userId, username, email, phone);
   }
   await getUserCarPlate(cars);
 });

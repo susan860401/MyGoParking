@@ -50,10 +50,11 @@ export const getUserData = async (userId, username, email, phone) => {
 };
 
 export const checkReminder = async () => {
-  const user = JSON.parse(localStorage.getItem("user")).userId;
+  const user = useUserStore();
+  //const user = JSON.parse(localStorage.getItem("user")).userId;
   //console.log(user);
   const res = await fetch(
-    `${BASE_URL}/Notification/CheckAndSendOverdueReminder?userId=${user}`
+    `${BASE_URL}/Notification/CheckAndSendOverdueReminder?userId=${user.userId}`
   );
   if (res.status === 204) {
     console.log("沒有新通知");
