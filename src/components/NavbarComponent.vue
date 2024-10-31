@@ -1,17 +1,17 @@
 <script setup>
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/authStore"; // 引入 store
+import { useUserStore } from "@/stores/userStore";
 
 const router = useRouter();
-const authStore = useAuthStore();
+const userStore = useUserStore();
 const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 分鐘
 let timeout;
 
 
 //pinia
 const logout = () => {
-  authStore.logout();
+  userStore.logout();
   alert("已登出")
   router.push("/"); // 導向登入頁面
 };
@@ -24,7 +24,7 @@ const resetTimeout = () => {
 };
 
 onMounted(() => {
-  authStore.checkLoginStatus(); // 初始化時檢查登入狀態
+  userStore.checkLoginStatus(); // 初始化時檢查登入狀態
   // 監聽用戶活動事件
   window.addEventListener("mousemove", resetTimeout);
   window.addEventListener("keypress", resetTimeout);
@@ -84,7 +84,7 @@ onMounted(() => {
               >
             </li>
             <!-- 用戶中心選單 -->
-            <li v-if="authStore.isLogin" class="dropdown">
+            <li v-if="userStore.isLogin" class="dropdown">
               <RouterLink
                 class="nav-link"
                 activeClass="active"
@@ -130,7 +130,7 @@ onMounted(() => {
                 </li>
               </ul>
             </li>
-            <li v-if="!authStore.isLogin">
+            <li v-if="!userStore.isLogin">
               <RouterLink
                 class="nav-link"
                 activeClass="active"
@@ -138,7 +138,7 @@ onMounted(() => {
                 >註冊</RouterLink
               >
             </li>
-            <li v-if="!authStore.isLogin">
+            <li v-if="!userStore.isLogin">
               <RouterLink
                 class="nav-link"
                 activeClass="active"
@@ -146,7 +146,7 @@ onMounted(() => {
                 >登入</RouterLink
               >
             </li>
-            <li v-if="authStore.isLogin">
+            <li v-if="userStore.isLogin">
               <button class="btn btn-light" @click="logout">登出</button>
             </li>
           </ul>

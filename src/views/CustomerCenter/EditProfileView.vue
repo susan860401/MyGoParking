@@ -1,33 +1,46 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { useAuthStore } from "@/stores/authStore"; // 引入 pinia store
+// import { useAuthStore } from "@/stores/authStore"; // 引入 pinia store
+import { useUserStore } from "@/stores/userStore";
 
-const authStore = useAuthStore();
+// const authStore = useAuthStore();
+const userStore = useUserStore();
+
 const GET_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/info`;
 const PUT_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/id`;
 
 // Pinia store
-const user = ref(authStore.user);
+const user = {
+ userId : userStore.userId,
+ username : userStore.username,
+ email : userStore.email,
+ password : userStore.password,
+ salt : userStore.salt,
+ phone : userStore.phone,
+ licensePlate : userStore.licensePlate,
+}
+ 
 
 // 定義編輯模式狀態
 const isEditing = ref(false);
+const isEditingPsw = ref(false);
 
 // 加載用戶信息的函數
 const loadUserInfo = async () => {
   // 檢查用戶是否已登入
-  if (!authStore.isLogin) {
+  if (!userStore.isLogin) {
     alert("請先登入以便看用戶資訊");
     return;
   }
 
-  const storedUser = localStorage.getItem("user");
-  if (!storedUser) {
+  const storedUser = userStore.userId;
+  if (storedUser === 0) {
     alert("無此用戶");
     return;
   }
 
-  const parsedUser = JSON.parse(storedUser);
-  const userId = parsedUser.userId;
+ 
+  const userId = userStore.userId;
   const GET_TURL = `${GET_URL}${userId}`;
 
   try {
@@ -37,31 +50,28 @@ const loadUserInfo = async () => {
     }
 
     const data = await response.json();
-    authStore.updateUser(data);
-  } catch (error) {
+    userStore.updateUser(data);
+    } catch (error) {
     alert("讀取失敗: " + error.message);
-  }
+    }
 };
 
 // 切換編輯模式並更新用戶信息的函數
 const toggleEdit = async () => {
   if (isEditing.value) {
-    const storedUser = localStorage.getItem("user");
-    const parsedUser = JSON.parse(storedUser);
-    const userId = parsedUser.userId;
+    const userId = userStore.userId;
     const PUT_TURL = `${PUT_URL}${userId}`;
 
     try {
       const response = await fetch(PUT_TURL, {
         method: "PUT",
-        body: JSON.stringify(authStore.user),
+        body: JSON.stringify(userStore.$state),
         headers: { "Content-Type": "application/json" },
       });
 
       if (!response.ok) {
         throw new Error("更新失敗");
       }
-      authStore.updateUser(authStore.user); // 更新 Pinia store
       alert("用戶資料已成功更新");
     } catch (error) {
       alert("更新用戶資料失敗: " + error.message);
@@ -70,6 +80,29 @@ const toggleEdit = async () => {
   isEditing.value = !isEditing.value; // 切換編輯模式
 };
 
+
+// const toggleEditPsw = async () => {
+//   if (isEditingPsw.value) {
+//     const userId = userStore.userId;
+//     const PUT_TURL = `${PUT_URL}${userId}`;
+
+//     try {
+//       const response = await fetch(PUT_TURL, {
+//         method: "PUT",
+//         body: JSON.stringify(userStore.$state),
+//         headers: { "Content-Type": "application/json" },
+//       });
+
+//       if (!response.ok) {
+//         throw new Error("更新失敗");
+//       }
+//       alert("用戶密碼已成功更新");
+//     } catch (error) {
+//       alert("更新用戶資料失敗: " + error.message);
+//     }
+//   }
+//   isEditingPsw.value = !isEditingPsw.value; // 切換編輯模式
+// };
 // 在組件掛載時加載用戶信息
 onMounted(loadUserInfo);
 </script>
@@ -81,42 +114,44 @@ onMounted(loadUserInfo);
         <div class="container">
           <div class="form-group">
             <li>姓名</li>
-            <span v-if="!isEditing">{{ authStore.user.username }}</span>
-            <input v-if="isEditing" v-model="authStore.user.username" />
+            <span v-if="!isEditing">{{ userStore.username }}</span>
+            <input v-if="isEditing" v-model="userStore.username" />
           </div>
           <div class="form-group">
             <li class="">電話</li>
-            <span v-if="!isEditing">{{ authStore.user.phone }}</span>
-            <input v-if="isEditing" v-model="authStore.user.phone" />
+            <span v-if="!isEditing">{{ userStore.phone }}</span>
+            <input v-if="isEditing" v-model="userStore.phone" />
           </div>
           <div class="form-group">
             <li>車牌</li>
-            <span v-if="!isEditing">{{ authStore.user.licensePlate }}</span>
-            <input v-if="isEditing" v-model="authStore.user.licensePlate" />
+            <span v-if="!isEditing">{{ userStore.licensePlate }}</span>
+            <input v-if="isEditing" v-model="userStore.licensePlate" />
           </div>
           <div class="form-group">
             <li>密碼</li>
-            <span v-if="!isEditing">***********</span>
-            <input v-if="isEditing" v-model="authStore.user.password" />
+            <span v-if="!isEditing">{{ userStore.password }}</span>
+            <input v-if="isEditing" v-model="userStore.password" />
           </div>
         </div>
 
         <div class="container col-12">
           <li>Email信箱</li>
-          <span v-if="!isEditing">{{ authStore.user.email }}</span>
-          <input v-if="isEditing" v-model="authStore.user.email" />
+          <span v-if="!isEditing">{{ userStore.email }}</span>
+          <input v-if="isEditing" v-model="userStore.email" />
         </div>
       </ul>
-      <a href="#" class="button-17" @click="toggleEdit">{{
+      <a href="#" class="button-17 me-3" @click="toggleEdit">{{
         isEditing ? "保存" : "修改"
       }}</a>
+      <!-- <a class="button-17" @click="toggleEditPsw">{{
+        isEditingPsw ? "密碼保存" : "密碼修改"
+      }}</a> -->
     </div>
   </div>
 </template>
 
 <style lang="css" scoped>
-.form-group {
-}
+
 
 .button-17 {
   align-items: center;
