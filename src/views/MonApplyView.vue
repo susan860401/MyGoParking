@@ -4,8 +4,9 @@ import { getUserCarPlate, getUserData } from "@/js/com";
 import { useUserStore } from "@/stores/userStore";
 import Swal from "sweetalert2";
 import { onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 const route = useRoute();
+const router = useRouter();
 const lotId = route.query.lotId;
 const lotName = route.query.lotName;
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
@@ -17,6 +18,10 @@ const phone = ref("");
 const cars = ref([]);
 const selectedCarPlate = ref("");
 const user = useUserStore();
+const now = new Date();
+const localDate = new Date(
+  now.getTime() - now.getTimezoneOffset() * 60000
+).toISOString();
 
 const newMonApply = async () => {
   try {
@@ -25,10 +30,10 @@ const newMonApply = async () => {
       lotId: lotId,
       licensePlate: selectedCarPlate?.value,
       lotName: lotName,
-      applyDate: new Date().toISOString(),
+      applyDate: localDate,
     };
     console.log(apply);
-    const res = await fetch(`${BASE_URL}/MonRental/newMonApplyList`, {
+    const res = await fetch(`${BASE_URL}/MonthlyRentals/newMonApplyList`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -44,6 +49,7 @@ const newMonApply = async () => {
         text: data.message,
         showConfirmButton: true,
       });
+      router.push("/");
     }
   } catch (error) {
     Swal.fire({
@@ -58,6 +64,7 @@ onMounted(async () => {
   if (user.userId) {
     await getUserData(user.userId, username, email, phone);
   }
+  console.log(user.userId);
   await getUserCarPlate(cars);
 });
 </script>
@@ -171,8 +178,12 @@ onMounted(async () => {
             id="licensePlate"
           >
             <option value="">--請選擇車牌--</option>
-            <option v-for="(car, index) in cars" :key="index" :value="car">
-              {{ car }}
+            <option
+              v-for="(car, index) in cars"
+              :key="index"
+              :value="car.licensePlate"
+            >
+              {{ car.licensePlate }}
             </option>
           </select>
         </div>
