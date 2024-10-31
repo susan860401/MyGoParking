@@ -1,4 +1,5 @@
 import Swal from "sweetalert2";
+
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 
 export const getUserCarPlate = async (cars) => {
@@ -79,5 +80,20 @@ export const checkReminder = async () => {
     });
   } else {
     console.error("通知請求失敗", response.statusText);
+  }
+};
+
+// 定義通知權限請求的函式
+export const requestNotificationPermission = () => {
+  if ("Notification" in window) {
+    Notification.requestPermission().then((permission) => {
+      if (permission === "granted") {
+        console.log("通知權限已授予");
+      } else {
+        console.log("通知權限未授予或被拒絕");
+      }
+    });
+  } else {
+    console.log("此瀏覽器不支援 Notification API");
   }
 };
