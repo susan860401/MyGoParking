@@ -8,6 +8,7 @@ import { onMounted, ref } from "vue";
 import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel";
 import Swal from "sweetalert2";
 import { getUserCarPlate } from "@/js/com";
+import { useUserStore } from "@/stores/userStore";
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const route = useRoute();
@@ -17,6 +18,7 @@ const lotsInfo = ref(null);
 const date = ref();
 const cars = ref([]);
 const selectedCarPlate = ref("");
+const userStore = useUserStore();
 
 const getLotsInfo = async () => {
   try {
@@ -56,7 +58,7 @@ const submitRes = async () => {
     return;
   }
 
-  const userId = JSON.parse(localStorage.getItem("user")).userId;
+  //const userId = JSON.parse(localStorage.getItem("user")).userId;
   //console.log(userId);
   const formattedDate = new Date(date.value);
   const utcFormattedDate = new Date(
@@ -70,7 +72,7 @@ const submitRes = async () => {
   //console.log(payload);
   try {
     let res = await fetch(
-      `${BASE_URL}/Reservations/newReservation?userId=${userId}`,
+      `${BASE_URL}/Reservations/newReservation?userId=${userStore.userId}`,
       {
         method: "POST",
         headers: {

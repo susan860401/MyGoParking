@@ -1,12 +1,14 @@
+import { useUserStore } from "@/stores/userStore";
 import Swal from "sweetalert2";
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 
 export const getUserCarPlate = async (cars) => {
+  const user = useUserStore();
   try {
-    const userId = JSON.parse(localStorage.getItem("user")).userId;
+    //const userId = JSON.parse(localStorage.getItem("user")).userId;
     const res = await fetch(
-      `https://localhost:7077/api/Reservations/GetUserCarPlate?userId=${userId}`
+      `https://localhost:7077/api/Reservations/GetUserCarPlate?userId=${user.userId}`
     );
     if (res.ok) {
       const data = await res.json();

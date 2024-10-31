@@ -15,6 +15,7 @@ import NavbarComponent from "./components/NavbarComponent.vue";
 import FooterComponent from "./components/FooterComponent.vue";
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { checkReminder, requestNotificationPermission } from "./js/com";
+import { useUserStore } from "./stores/userStore";
 let intervalId;
 const connection = ref(null); // 保存 SignalR 連接
 const notifications = ref([]); // 保存收到的通知
@@ -48,6 +49,8 @@ const startSignalRConnection = async () => {
 };
 
 onMounted(async () => {
+  const user = useUserStore();
+  console.log(user.userId);
   //輪洵(polling)很爛
   intervalId = setInterval(checkReminder, 10 * 60 * 1000);
   // startSignalRConnection();

@@ -8,15 +8,12 @@ const userStore = useUserStore();
 const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 分鐘
 let timeout;
 
-
 //pinia
 const logout = () => {
   userStore.logout();
-  alert("已登出")
+  alert("已登出");
   router.push("/"); // 導向登入頁面
 };
-
-
 
 const resetTimeout = () => {
   clearTimeout(timeout);
