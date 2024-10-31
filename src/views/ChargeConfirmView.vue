@@ -2,27 +2,33 @@
 import { ref, onMounted } from 'vue';
 import BreadcrumbsComponent from '@/components/BreadcrumbsComponent.vue';
 import axios from 'axios';
-import dayjs from 'dayjs';
+
 // 初始化資料
 const amount = ref(0);
-const planLabel = ref('');
+const MycouponId = ref(0);
+const MycarId = ref(0);
+const MylotName = ref('');
+const MycouponAmount = ref(0);
 const paymentStatus = ref('等待確認...');
 const isDisabled = ref(true);
 const buttonClass = ref('btn-secondary');
-const startTime = ref('');
+
 // API 路徑
 const baseApiUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay`;
 
 // 取得 sessionStorage 中的付款資料
 onMounted(() => {
-    const storedInfo = JSON.parse(sessionStorage.getItem('paymentInfo'));
-    startTime.value = dayjs(sessionStorage.getItem("startTime")).format('YYYY-MM-DD HH:mm');
+    const storedInfo = JSON.parse(sessionStorage.getItem('MyInfo'));
+
     if (storedInfo) {
         amount.value = storedInfo.amount;
-        planLabel.value = storedInfo.planLabel;
+        MylotName.value = storedInfo.lotName;
+        MycouponId.value = storedInfo.couponsId;
+        MycouponAmount.value = storedInfo.componsAmount;
+        MycarId.value = storedInfo.car;
     } else {
         alert('無法讀取方案資料，請重新選擇方案。');
-        window.location.href = '/';
+        ;
     }
 
     setTimeout(() => {
@@ -31,7 +37,6 @@ onMounted(() => {
     }, 5000);
 });
 
-// 確認付款
 async function confirmPayment() {
     try {
         isDisabled.value = true;
@@ -48,27 +53,46 @@ async function confirmPayment() {
             headers: { 'Content-Type': 'application/json' },
         });
 
+        const payload = {
+            MycarId: MycarId.value, // 車輛 ID 必傳
+            Myamount: amount.value
+        };
+        // 如果 MycouponId 有值才加入 payload
+        if (MycouponId.value !== null) {
+            payload.MycouponId = MycouponId.value;
+        }
+        console.log('發送的 Payload:', JSON.stringify(payload, null, 2));
+
+
+
         if (check.data.returnCode === '0000') {
             alert('付款確認成功');
+            const response = await axios.post(
+                `${baseApiUrl}/UpdateEntryExitPayment`,
+                payload,
+                { headers: { 'Content-Type': 'application/json' } }
+            );
             paymentStatus.value = '交易狀態: 成功';
-
-            // 更新付款狀態
-            const response = await axios.post(`${baseApiUrl}/UpdatePaymentStatus`,
-                { orderId }, { headers: { 'Content-Type': 'application/json' } });
-
-            console.log('確認成功:', response.data);
+            setTimeout(() => (window.location.href = "/"), 5000);
         } else if (check.data.returnCode === '1172') {
             alert('重複付款');
             paymentStatus.value = '交易狀態: 已有重複訂單';
+            setTimeout(() => (window.location.href = "/"), 5000);
         } else {
             paymentStatus.value = `交易狀態: ${check.data.message}`;
+            setTimeout(() => (window.location.href = "/"), 5000);
         }
 
-        setTimeout(() => window.location.href = '/', 5000);
     } catch (error) {
         console.error('交易確認失敗:', error);
         paymentStatus.value = '交易狀態: 失敗，請稍後再試';
-        setTimeout(() => window.location.href = '/', 5000);
+
+        // 使用 error.response 來檢查錯誤回應
+        if (error.response) {
+            console.log('錯誤詳細:', error.response.data);
+        } else {
+            console.log('錯誤詳細:', error.message);
+        }
     } finally {
         isDisabled.value = false;
     }
@@ -87,16 +111,16 @@ async function confirmPayment() {
         <h1 class="text-center mb-4">支付確認頁面</h1>
         <form class="payment-form shadow-lg p-5 rounded">
             <div class="form-group mb-4">
-                <h2>{{ planLabel }}</h2>
+                <h2>{{ MylotName }}</h2>
             </div>
             <div class="form-group mb-4">
-                <label for="amount" class="form-label">方案金額</label>
+                <label for="amount" class="form-label">停車金額</label>
                 <input type="text" id="amount" class="form-control form-control-lg" :value="`${amount} TWD`" readonly />
             </div>
             <div class="form-group mb-4">
-                <label for="paymentStatus" class="form-label">入場時間</label>
-                <input type="text" id="paymentStatus" class="form-control form-control-lg" readonly
-                    :value="startTime" />
+                <label for="coupon" class="form-label">優惠券</label>
+                <input type="text" id="coupon" class="form-control form-control-lg"
+                    :value="MycouponId ? `折抵 ${MycouponAmount} TWD` : '沒有使用優惠券'" readonly />
             </div>
             <div class="form-group mb-4">
                 <label for="paymentStatus" class="form-label">交易狀態</label>
