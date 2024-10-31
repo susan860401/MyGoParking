@@ -3,6 +3,7 @@ import "@fortawesome/fontawesome-free/js/all.min.js";
 import "aos/dist/aos.css";
 import "glightbox/dist/css/glightbox.min.css";
 import "../node_modules/swiper/swiper-bundle.min.css";
+import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 
 import ElementPlus from "element-plus";
 import "element-plus/dist/index.css";
@@ -15,7 +16,14 @@ import router from "./router";
 
 const app = createApp(App);
 const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
+pinia.use(
+  createPersistedState({
+    storage: sessionStorage,
+  })
+);
 import { createPinia } from "pinia";
+import { createPersistedState } from "pinia-plugin-persistedstate";
 app.use(router);
 app.use(pinia);
 app.use(ElementPlus);

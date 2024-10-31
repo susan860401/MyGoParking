@@ -14,51 +14,48 @@ import "@/assets/theme.js";
 import NavbarComponent from "./components/NavbarComponent.vue";
 import FooterComponent from "./components/FooterComponent.vue";
 import { onBeforeUnmount, onMounted, ref } from "vue";
-import { checkReminder, requestNotificationPermission } from "./js/com";
-let intervalId;
-const connection = ref(null); // 保存 SignalR 連接
+
+//let intervalId;
 const notifications = ref([]); // 保存收到的通知
 
-//慢慢測試
-const startSignalRConnection = async () => {
-  connection.value = new signalR.HubConnectionBuilder()
-    .withUrl("http://localhost:7077/reservationHub")
-    .withAutomaticReconnect() //自動連線
-    .build();
+//建立Signal連接
+const connection = new signalR.HubConnectionBuilder()
+  .withUrl("https://localhost:7077/reservationHub", {
+    withCredentials: true,
+  })
+  .withAutomaticReconnect() //自動重連
+  .build();
 
-  //處裡來自後端訊息
-  connection.value.on("ReceiveNotification", (title, message) => {
-    notifications.value.push({ title, message });
-
-    // 如果通知權限已經授予，則顯示通知
-    if (Notification.permission === "granted") {
-      new Notification(title, {
-        body: message,
-        icon: "/logo.png",
-      });
-    }
-  });
-
+const startSignalRConnnection = async () => {
   try {
-    await connection.value.start();
-    console.log("SignalR 已連接");
-  } catch (err) {
-    console.error("SignalR 連接失敗:", error);
+    await connection.start();
+    console.log("SignalR Connected");
+
+    //接收事件
+    connection.on("ReceiveNotification", (title, message) => {
+      notifications.value.push({ title, message });
+
+      // 如果通知權限允許，顯示瀏覽器通知
+      if (Notification.permission === "granted") {
+        new Notification(title, {
+          body: message,
+          icon: "/logo.png", // 替換成你的圖示路徑
+        });
+      }
+    });
+  } catch (error) {
+    console.error("無法建立 SignalR 連接:", error);
   }
 };
 
 onMounted(async () => {
+  startSignalRConnnection();
   //輪洵(polling)很爛
-  intervalId = setInterval(checkReminder, 10 * 60 * 1000);
-  // startSignalRConnection();
-  // requestNotificationPermission();
+  //intervalId = setInterval(checkReminder, 10 * 60 * 1000);
 });
 onBeforeUnmount(async () => {
-  if (intervalId) clearInterval(intervalId);
-  // if (connection.value) {
-  //   await connection.value.stop();
-  //   console.log("SignalR 連接已停止");
-  // }
+  connection.stop();
+  //if (intervalId) clearInterval(intervalId);
 });
 </script>
 

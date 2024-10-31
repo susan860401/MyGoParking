@@ -101,6 +101,7 @@ export const useUserStore = defineStore(
     persist: {
       enabled: true,
       storage: sessionStorage, // 使用 sessionStorage 來持久化數據
+      paths: ["userId", "isLogin"],
     },
   }
 );
