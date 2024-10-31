@@ -1,10 +1,14 @@
+import router from "@/router";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
+
+        
 export const useUserStore = defineStore(
   "user",
   () => {
     const isLogin = ref(false); // 初始登錄狀態
+    const isRegisterSuccess = ref(false);
     const email = ref("");
     const token = ref("");
 
@@ -22,6 +26,7 @@ export const useUserStore = defineStore(
     // 登錄方法
     const login = () => {
       isLogin.value = true;
+      localStorage.setItem('isLogin', true);
     };
 
     // 登出方法，清除所有資料
@@ -34,18 +39,24 @@ export const useUserStore = defineStore(
       email.value = "";
       phone.value = "";
       licensePlate.value = "";
+      exit.value = false;
+      message.value = "";
+      isRegisterSuccess.value = false;
+      localStorage.removeItem('isLogin');
+      alert("已登出");
+      router.push("/");
     };
 
-    // 檢查是否已登錄
+
     const checkLoginStatus = () => {
-      //isLogin.value = email.value !== null;
-      //   if (isLogin.value == true) {
-      //     isLogin.value = false;
-      //   } else {
-      //     isLogin.value = true;
-      //   }
-      isLogin.value = !!true; // 如果本地存儲有用戶資料，設置為 true
-    };
+      // 從 localStorage 中檢查是否有登入狀態
+      const storedIsLogin = localStorage.getItem('isLogin');
+      if (storedIsLogin !== null) {
+        isLogin.value = true;
+      } else {
+        isLogin.value = false;
+      }
+  };
 
     // 更新用戶資料
     const updateUser = (data) => {
@@ -58,6 +69,7 @@ export const useUserStore = defineStore(
       licensePlate.value = data.licensePlate ?? licensePlate.value;
       exit.value = data.exit ?? exit.value;
       message.value = data.message ?? message.value;
+      
     };
 
     // 設定 Email
@@ -88,6 +100,7 @@ export const useUserStore = defineStore(
       licensePlate,
       exit,
       message,
+      isRegisterSuccess,
       login,
       logout,
       checkLoginStatus,
@@ -100,7 +113,8 @@ export const useUserStore = defineStore(
   {
     persist: {
       enabled: true,
-      storage: sessionStorage, // 使用 sessionStorage 來持久化數據
+      storage: localStorage, // 使用 sessionStorage 來持久化數據
     },
   }
+
 );

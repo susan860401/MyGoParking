@@ -31,7 +31,7 @@ export const useCouponStore = defineStore('couponStore', {
         });
 
         const result = await response.json();
-        console.log(result);
+        //console.log(result);
 
         if (response.ok) {
           alert(result.message)

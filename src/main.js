@@ -16,11 +16,14 @@ import router from "./router";
 const app = createApp(App);
 const pinia = createPinia();
 import { createPinia } from "pinia";
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
+pinia.use(piniaPluginPersistedstate);
 app.use(router);
 app.use(pinia);
 app.use(ElementPlus);
 app.mount("#app");
 
+export default pinia;
 //serviceWorker
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {

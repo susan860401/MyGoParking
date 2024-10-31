@@ -11,8 +11,6 @@ let timeout;
 //pinia
 const logout = () => {
   userStore.logout();
-  alert("已登出");
-  router.push("/"); // 導向登入頁面
 };
 
 const resetTimeout = () => {

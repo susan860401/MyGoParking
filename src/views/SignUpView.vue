@@ -1,84 +1,16 @@
 <script setup>
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
-import router from "@/router";
 import { ref } from "vue";
-
-import { useCouponStore } from "@/stores/couponStore";
 import { useUserStore } from "@/stores/userStore";
+import router from "@/router";
 
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const API_URL = `${BASE_URL}/Customers/sign`;
 const GET_URL = `${BASE_URL}/Customers/login`;
-const GET_TURL = `${BASE_URL}/Customers/id`;
 
 
-const couponStore = useCouponStore();
 const userStore = useUserStore();
 
-//modal form
-const name = ref("");
-const phone = ref("");
-
-const updateMemberInfo = async () => {
-  const userId = userStore.userId;
-  const PUTT_TURL = `${GET_TURL}${userId}`;
-
- 
-    const renew = {
-      userId: userStore.userId,
-      username: name.value,
-      password: userStore.password,
-      email: userStore.email,
-      phone: phone.value,
-      salt: userStore.salt,
-      licensePlate: userStore.licensePlate
-    }
-    console.log(renew);
-    const response = await fetch(PUTT_TURL, {
-      method: 'PUT',
-      body: JSON.stringify(renew),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    if (response.ok) {
-      const result = await response.text();
-      console.log(result)
-      userStore.updateUser(renew);
-      alert('會員資料已成功更新');
-    } else {
-      throw new Error('會員資料更新失敗');
-    }
- 
-};
-
-
-
-const submitMemberInfo = async () => {
-  await updateMemberInfo();
-  await couponStore.addCoupon();
-  autoClose();
-  alert(couponStore.couponMessage);
-};
-
-
-//隱藏按鈕
-const hiddenButton = ref(null);
-const closeForm = ref(null);
-
-// 自動點擊的功能
-const autoClick = () => {
-  // 自動觸發隱藏按鈕的點擊事件
-  if (hiddenButton.value) {
-    hiddenButton.value.click();
-  }
-};
-
-const autoClose = () => {
-  if (closeForm.value) {
-    closeForm.value.click();
-  }
-}
 
 
 const autoLogin = async () => {
@@ -100,15 +32,11 @@ const autoLogin = async () => {
   if (response.ok) {
     const data = await response.json();
     if (data.exit) {//若已登入
-      console.log(data);
       userStore.updateUser(data);
-      console.log(userStore.email)
-      console.log(userStore.exit)
       userStore.login();
-      autoClick();
       alert(data.message); // 提示成功訊息
-      router.push("/"); // 導向主頁
-      
+      userStore.isRegisterSuccess = true;
+      router.push("/");
     } else {
       // 登入失敗處理
       alert(data.message); // 顯示失敗訊息
@@ -116,7 +44,6 @@ const autoLogin = async () => {
   } else {
     alert("登入失敗");
   }
-  // console.log(userStore.exit);
 };
 
 
@@ -143,7 +70,6 @@ const pswRule = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+]{8,}$/;
 const licenseRule = /^[A-Z]{3}\d{4}$/;
 
 const validate = async () => {
-  //console.log("GOOOO");
   const { useremail, license, psw } = userData.value;
 
   validity.value.licenseRequired = license.length > 0;
@@ -272,117 +198,10 @@ const validate = async () => {
       </section>
       <!-- End Get Started Section -->
     </main>
-    <!-- modal -->
-    <!-- 隱藏的按鈕，點擊後顯示 Modal -->
-    <button ref="hiddenButton" type="button" style="display: none;" data-bs-toggle="modal"
-      data-bs-target="#exampleModal" data-bs-whatever="@mdo">Open Modal</button>
-
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">註冊成功! <P>填寫完整會員資訊即可取得三張優惠券!</P>
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ref="closeForm"></button>
-          </div>
-          <div class="modal-body">
-            <form>
-              <div class="mb-3">
-                <label for="recipient-name" class="col-form-label">姓名:</label>
-                <input name="name" type="text" class="form-control" id="recipient-name" v-model="name" placeholder="請輸入姓名">
-              </div>
-              <div class="mb-3">
-                <label for="message-text" class="col-form-label">電話:</label>
-                <input name="phone" type="text" class="form-control" id="recipient-phone" v-model="phone" placeholder="請輸入電話">
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="button-17" data-bs-dismiss="modal">稍後再填</button>
-            <button type="button" class="button-17" @click="submitMemberInfo"><i class="fa-solid fa-gift me-2"
-                style="color: #f3c212;"></i>送出並領取優惠券</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- modal end -->
+    
   </div>
 </template>
 
 <style lang="css" scoped>
-.button-17 {
-  align-items: center;
-  appearance: none;
-  background-color: #fff;
-  border-radius: 24px;
-  border-style: none;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 3px 5px -1px,
-    rgba(0, 0, 0, 0.14) 0 6px 10px 0, rgba(0, 0, 0, 0.12) 0 1px 18px 0;
-  box-sizing: border-box;
-  color: #3c4043;
-  cursor: pointer;
-  display: inline-flex;
-  fill: currentcolor;
-  font-family: "Google Sans", Roboto, Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  height: 48px;
-  justify-content: center;
-  letter-spacing: 0.25px;
-  line-height: normal;
-  max-width: 100%;
-  overflow: visible;
-  padding: 2px 24px;
-  position: relative;
-  text-align: center;
-  text-transform: none;
-  transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 15ms linear 30ms, transform 270ms cubic-bezier(0, 0, 0.2, 1) 0ms;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  width: auto;
-  will-change: transform, opacity;
-  z-index: 0;
-}
 
-.button-17:hover {
-  background: #f1f1f1;
-  color: #4f4f4f;
-}
-
-.button-17:active {
-  box-shadow: 0 4px 4px 0 rgb(60 64 67 / 30%),
-    0 8px 12px 6px rgb(60 64 67 / 15%);
-  outline: none;
-}
-
-.button-17:focus {
-  outline: none;
-}
-
-.button-17:not(:disabled) {
-  box-shadow: rgba(60, 64, 67, 0.3) 0 1px 3px 0,
-    rgba(60, 64, 67, 0.15) 0 4px 8px 3px;
-}
-
-.button-17:not(:disabled):hover {
-  box-shadow: rgba(60, 64, 67, 0.3) 0 2px 3px 0,
-    rgba(60, 64, 67, 0.15) 0 6px 10px 4px;
-}
-
-.button-17:not(:disabled):focus {
-  box-shadow: rgba(60, 64, 67, 0.3) 0 1px 3px 0,
-    rgba(60, 64, 67, 0.15) 0 4px 8px 3px;
-}
-
-.button-17:not(:disabled):active {
-  box-shadow: rgba(60, 64, 67, 0.3) 0 4px 4px 0,
-    rgba(60, 64, 67, 0.15) 0 8px 12px 6px;
-}
-
-.button-17:disabled {
-  box-shadow: rgba(60, 64, 67, 0.3) 0 1px 3px 0,
-    rgba(60, 64, 67, 0.15) 0 4px 8px 3px;
-}
 </style>
