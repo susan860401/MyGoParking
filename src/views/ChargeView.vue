@@ -17,13 +17,12 @@ const entryTime = ref(''); // 儲存從 API 回傳的進場時間
 const MylotName = ref('');
 const MylotId = ref(0);
 
-// 計算總金額 (plateAmount - selectedCoupon 的折扣金額)
 const totalAmount = computed(() => {
     if (!plateAmount.value) return 0;
     const discount = selectedCoupon.value?.couponAmount || 0; // 使用 couponAmount 作為折扣金額
-    return plateAmount.value - discount;
+    const amount = plateAmount.value - discount;
+    return amount > 0 ? amount : 0; // 如果小於或等於 0，則返回 0
 });
-
 const licensePlatePattern = /^[A-Z]{3}\d{4}$/;
 
 const isFormValid = computed(() => licensePlatePattern.test(licensePlate.value.trim()));
@@ -72,7 +71,7 @@ async function validatePlan() {
     const amount = totalAmount.value;
 
     // 確認所有必要的欄位都有值
-    if (!lotId || !carId || !amount) {
+    if (!lotId || !carId) {
         alert('缺少必要的資訊，請檢查資料是否完整。');
         return false;
     }
@@ -91,7 +90,13 @@ async function validatePlan() {
             headers: { 'Content-Type': 'application/json' },
         });
         console.log('驗證結果:', response.data);
-        alert('方案驗證成功。');
+
+        if (amount === 0) {
+            alert('金額為 0，已記錄並提交成功。');
+        } else {
+            alert('方案驗證成功。');
+        }
+
         return response.data.isValid;
     } catch (error) {
         console.error('方案驗證失敗:', error.response?.data?.message || error.message);
@@ -99,8 +104,6 @@ async function validatePlan() {
         return false;
     }
 }
-
-// 建立交易請求
 // 建立交易請求
 async function requestPayment() {
     const isValid = await validatePlan();
@@ -119,6 +122,14 @@ async function requestPayment() {
 
     // 儲存金額與方案資訊於 sessionStorage
     sessionStorage.setItem('MyInfo', JSON.stringify(MyInfo))
+
+    // 如果金額為 0，直接跳轉到 /ChargeConfirmView 頁面
+    console.log("總金額:", totalAmount.value);
+    if (totalAmount.value === 0) {
+        window.location.href = '/ChargeConfirmView';
+        return;
+    }
+
 
     const payment = {
         amount: totalAmount.value,  // 總金額
@@ -141,7 +152,7 @@ async function requestPayment() {
             },
         ],
         redirectUrls: {
-            confirmUrl: `${window.location.origin}/ChargConfirmView`,  // 確認頁面
+            confirmUrl: `${window.location.origin}/ChargeConfirmView`,  // 確認頁面
             cancelUrl: `${baseUrl}Cancel`,  // 取消頁面
         },
     };
@@ -162,12 +173,12 @@ async function requestPayment() {
         console.error('交易失敗:', error.response?.data?.message || error.message);
         alert('交易失敗，請稍後再試。');
     }
-    // 重置狀態
-    // licensePlate.value = '';
-    // selectedCoupon.value = null;
-    // Mycoupons.value = [];
-    // step.value = 1;
-    // errorMessage.value = '';
+    重置狀態
+    licensePlate.value = '';
+    selectedCoupon.value = null;
+    Mycoupons.value = [];
+    step.value = 1;
+    errorMessage.value = '';
 }
 </script>
 

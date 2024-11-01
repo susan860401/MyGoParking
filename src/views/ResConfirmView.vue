@@ -3,6 +3,8 @@ import { ref, onMounted } from "vue";
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
 import axios from "axios";
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 // 初始化資料
 const amount = ref(0);
 const lotName = ref("");
@@ -17,7 +19,7 @@ const baseApiUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay`;
 // 取得 sessionStorage 中的付款資料
 onMounted(() => {
   const storedInfo = JSON.parse(sessionStorage.getItem("paymentInfo"));
-  startTime.value = dayjs(sessionStorage.getItem("startTime")).format('YYYY-MM-DD HH:mm');
+  startTime.value = dayjs.utc(sessionStorage.getItem("startTime")).format('YYYY-MM-DD HH:mm');
   if (storedInfo) {
     amount.value = storedInfo.amount;
     lotName.value = storedInfo.lot;
@@ -67,11 +69,11 @@ async function confirmPayment() {
       paymentStatus.value = `交易狀態: ${check.data.message}`;
     }
 
-    setTimeout(() => (window.location.href = "/"), 5000);
+    setTimeout(() => (window.location.href = "/"), 3000);
   } catch (error) {
     console.error("交易確認失敗:", error);
     paymentStatus.value = "交易狀態: 失敗，請稍後再試";
-    setTimeout(() => (window.location.href = "/"), 5000);
+    setTimeout(() => (window.location.href = "/"), 3000);
   } finally {
     isDisabled.value = false;
   }
