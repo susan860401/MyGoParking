@@ -37,7 +37,9 @@ const autoLogin = async () => {
       alert(data.message); // 提示成功訊息
       userStore.isRegisterSuccess = true;
       router.push("/");
-    } else {
+    } 
+    else if (!data.exit)
+    {
       // 登入失敗處理
       alert(data.message); // 顯示失敗訊息
     }
@@ -45,7 +47,6 @@ const autoLogin = async () => {
     alert("登入失敗");
   }
 };
-
 
 
 const userData = ref({
@@ -80,7 +81,7 @@ const validate = async () => {
   validity.value.emailFormat = emailRule.test(useremail);
   validity.value.licenseFormat = licenseRule.test(license);
 
-  validity.value.isValid =
+    validity.value.isValid =
     validity.value.pswRequired &&
     validity.value.emailRequired &&
     validity.value.emailFormat &&
@@ -89,7 +90,6 @@ const validate = async () => {
     validity.value.licenseFormat;
 
   if (validity.value.isValid) {
-    // console.log("OKKKKKK");
     const data = {
       userId: 0, // 預設值，如果是自動生成的，可以忽略或設為 null
       username: "Null",
@@ -109,11 +109,9 @@ const validate = async () => {
     });
     if (response.ok) {
       const result = await response.json();
-      console.log(result);
       if (result.message === "註冊成功!") {
         alert(result.message);
         userStore.updateUser(data);
-        console.log(data);
         await autoLogin(); // 註冊成功後自動登入
       }
       else {
