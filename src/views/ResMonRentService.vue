@@ -258,7 +258,8 @@ onMounted(async () => {
                   >
                     <img
                       :src="img"
-                      class="card-img-top"
+                      class="card-img-top p-2"
+                      style="width: 550px; height: 300px"
                       :alt="lotsInfo?.lotName"
                     />
                   </Slide>

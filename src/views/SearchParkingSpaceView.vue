@@ -39,6 +39,7 @@ const updateUrlQuery = (newQuery) => {
 
 // ResMon 方法裡加上導航邏輯
 const ResMon = (lot) => {
+  console.log("lot:", lot);
   router.push({
     name: "resmon", // 目標路由的名稱
     query: {
@@ -105,11 +106,11 @@ const loadParkingLots = async () => {
       throw new Error("Server無法獲取停車場數據");
     }
     const data = await res.json();
-    //console.log(data);
+    console.log(data);
     data.forEach((lot) => {
       //console.log("monRate:", lot.MonRate);
       lot.isETC = lot.etcSpace > 0;
-      lot.monRentalRate = lot.MonRate > 0;
+      lot.monRentalRate = lot.monRate > 0;
       lot.deposit = lot.resDeposit > 0;
     });
     parkingLots.value = data;

@@ -14,13 +14,15 @@ import "@/assets/theme.js";
 import NavbarComponent from "./components/NavbarComponent.vue";
 import FooterComponent from "./components/FooterComponent.vue";
 import { onBeforeUnmount, onMounted, ref } from "vue";
+import { useUserStore } from "./stores/userStore";
+//import { checkReminder } from "./js/com";
 
 //let intervalId;
-const notifications = ref([]); // 保存收到的通知
+const userStore = useUserStore();
 
 //建立Signal連接
 const connection = new signalR.HubConnectionBuilder()
-  .withUrl("https://localhost:7077/reservationHub", {
+  .withUrl(`https://localhost:7077/reservationHub?userId=${userStore.userId}`, {
     withCredentials: true,
   })
   .withAutomaticReconnect() //自動重連
@@ -28,30 +30,36 @@ const connection = new signalR.HubConnectionBuilder()
 
 const startSignalRConnnection = async () => {
   try {
-    await connection.start();
-    console.log("SignalR Connected");
-
-    //接收事件
-    connection.on("ReceiveNotification", (title, message) => {
-      notifications.value.push({ title, message });
-
-      // 如果通知權限允許，顯示瀏覽器通知
-      if (Notification.permission === "granted") {
-        new Notification(title, {
-          body: message,
-          icon: "/logo.png", // 替換成你的圖示路徑
-        });
-      }
-    });
+    await connection
+      .start()
+      .then(function () {
+        console.log("Hub 連線完成");
+      })
+      .catch(function (err) {
+        alert("連線錯誤: " + err.toString());
+      });
   } catch (error) {
     console.error("無法建立 SignalR 連接:", error);
   }
 };
+//接收事件
+connection.on("ReceiveNotification", (title, message) => {
+  console.log("ReceiveNotification");
+  console.log(title, message);
+
+  // 如果通知權限允許，顯示瀏覽器通知
+  if (Notification.permission === "granted") {
+    new Notification(title, {
+      body: message,
+      icon: "/logo.png", // 替換成你的圖示路徑
+    });
+  }
+});
 
 onMounted(async () => {
-  startSignalRConnnection();
+  await startSignalRConnnection();
   //輪洵(polling)很爛
-  //intervalId = setInterval(checkReminder, 10 * 60 * 1000);
+  //intervalId = setInterval(checkReminder, 1 * 60 * 1000);
 });
 onBeforeUnmount(async () => {
   connection.stop();
