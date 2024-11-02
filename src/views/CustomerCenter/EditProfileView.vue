@@ -63,7 +63,7 @@ const loadUserInfo = async () => {
     }
 
     const data = await response.json();
-    userStore.updateUser(data);
+    userStore.updateUser(userStore.$state);
     } catch (error) {
     alert("讀取失敗: " + error.message);
     }
@@ -79,7 +79,7 @@ const toggleEdit = async () => {
     try {
       const response = await fetch(PUT_TURL, {
         method: "PUT",
-        body: JSON.stringify(user),
+        body: JSON.stringify(userStore.$state),
         headers: { "Content-Type": "application/json" },
       });
 
@@ -104,7 +104,7 @@ const toggleEditPsw = async () => {
     try {
       const response = await fetch(PUT_TURL, {
         method: "PUT",
-        body: JSON.stringify(user),
+        body: JSON.stringify(userStore.$state),
         headers: { "Content-Type": "application/json" },
       });
 
@@ -181,13 +181,6 @@ const toggleEditPsw = async () => {
 </template>
 
 <style lang="css" scoped>
-
-.modal {
-    z-index: 1050 !important; /* 設置 modal 層級 */
-}
-.modal-backdrop {
-    z-index: 1040 !important; /* 背景層應在 modal 之下 */
-}
 .button-17 {
   align-items: center;
   appearance: none;
