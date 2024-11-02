@@ -11,8 +11,6 @@ const GET_URL = `${BASE_URL}/Customers/login`;
 
 const userStore = useUserStore();
 
-
-
 const autoLogin = async () => {
   const email = userStore.email;
   const password = userStore.password;
@@ -26,7 +24,6 @@ const autoLogin = async () => {
     headers: {
       "Content-Type": "application/json",
     },
-
   });
 
   if (response.ok) {
@@ -36,7 +33,7 @@ const autoLogin = async () => {
       userStore.login();
       alert(data.message); // 提示成功訊息
       userStore.isRegisterSuccess = true;
-      router.push("/");
+      router.push("/search");
     } 
     else if (!data.exit)
     {
@@ -132,7 +129,7 @@ const validate = async () => {
           <h2>Sign Up</h2>
         </template>
         <template #page> 註冊 </template>
-      </BreadcrumbsComponent>
+      </BreadcrumbsComponent> 
 
       <!-- ======= Get Started Section ======= -->
       <section id="get-started" class="get-started section-bg">
@@ -140,25 +137,24 @@ const validate = async () => {
           <div class="row justify-content-between gy-4">
             <div class="col-lg-6 d-flex align-items-center" data-aos="fade-up">
               <div class="content">
-                <h3>Minus hic non reiciendis ea possimus at quia.</h3>
+                <h3>歡迎註冊我們的停車場服務</h3>
                 <p>
-                  Rem id rerum. Debitis deserunt quidem delectus expedita
-                  ducimus dolor. Aut iusto ipsa. Eos ipsum nobis ipsa soluta
-                  itaque perspiciatis fuga ipsum perspiciatis. Eum amet fugiat
-                  totam nisi possimus ut delectus dicta.
+                  在我們的停車場平台，註冊過程簡單快速，只需幾步即可完成。通過註冊，您將能夠輕鬆管理您的停車需求，享受以下便利服務：
                 </p>
                 <p>
-                  Aliquam velit deserunt autem. Inventore et saepe. Tenetur
-                  suscipit eligendi labore culpa eos. Deserunt porro magni qui
-                  necessitatibus dolorem at animi cupiditate.
-                </p>
+                  方便預訂車位：提前預訂，確保無論何時何地都有車位等您。<br>
+                  -車輛資訊管理：儲存您的車牌資訊，快速進入停車場，免去排隊煩惱。<br>
+                  -專屬優惠：註冊會員可享有不定期的停車優惠及專屬活動。<br>
+                  -即時通知：掌握最新的停車場資訊與車位狀況，無需擔心滿位問題。<br><br>
+                  立即點擊註冊，輸入您的車牌號碼、聯絡方式及其他基本資料，即可成為我們的尊貴會員，開始享受更輕鬆便捷的停車體驗！
+                                  </p>
               </div>
             </div>
 
             <div class="col-lg-5" data-aos="fade">
-              <h3>註冊</h3>
-              <p>請輸入信箱及密碼</p>
               <form name="userData" id="registerForm" novalidate @submit.prevent="validate" class="php-email-form">
+                <h3>註冊</h3>
+                <p>請輸入信箱及密碼</p>
                 <div class="row gy-3">
                   <div class="col-md-12 input-group">
                     <input type="email" class="form-control" name="useremail" v-model.trim="userData.useremail"
@@ -188,6 +184,7 @@ const validate = async () => {
                     <button type="submit">註冊</button>
                   </div>
                 </div>
+              
               </form>
             </div>
             <!-- End Quote Form -->
@@ -196,7 +193,6 @@ const validate = async () => {
       </section>
       <!-- End Get Started Section -->
     </main>
-    
   </div>
 </template>
 

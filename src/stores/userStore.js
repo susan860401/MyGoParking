@@ -10,7 +10,7 @@ export const useUserStore = defineStore(
     const isLogin = ref(false); // 初始登錄狀態
     const isRegisterSuccess = ref(false);
     const email = ref("");
-    const token = ref("");
+    // const token = ref("");
 
     // 用戶資訊
     const userId = ref(0);
@@ -27,6 +27,7 @@ export const useUserStore = defineStore(
     const login = () => {
       isLogin.value = true;
       localStorage.setItem('isLogin', true);
+      sessionStorage.setItem('hasVisited', true);
     };
 
     // 登出方法，清除所有資料
@@ -72,26 +73,25 @@ export const useUserStore = defineStore(
       
     };
 
-    // 設定 Email
-    const setEmail = (newEmail) => {
-      email.value = newEmail;
-    };
+    // // 設定 Email
+    // const setEmail = (newEmail) => {
+    //   email.value = newEmail;
+    // };
 
-    // 設定 Token
-    const setToken = (newToken) => {
-      token.value = newToken;
-    };
+    // // 設定 Token
+    // const setToken = (newToken) => {
+    //   token.value = newToken;
+    // };
 
-    // 清空 Email 和 Token
-    const clear = () => {
-      email.value = "";
-      token.value = "";
-    };
+    // // 清空 Email 和 Token
+    // const clear = () => {
+    //   email.value = "";
+    //   token.value = "";
+    // };
 
     return {
       isLogin,
       email,
-      token,
       userId,
       username,
       password,
@@ -105,9 +105,6 @@ export const useUserStore = defineStore(
       logout,
       checkLoginStatus,
       updateUser,
-      setEmail,
-      setToken,
-      clear,
     };
   },
   {
@@ -115,6 +112,14 @@ export const useUserStore = defineStore(
       enabled: true,
       storage: localStorage, 
     },
+    strategies: [
+      {
+        key: 'user', 
+        storage: localStorage,
+        paths: ['isLogin','isRegisterSuccess'], // 僅持久化這些非敏感資料
+      }
+    ]
   }
 
 );
+

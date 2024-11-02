@@ -1,9 +1,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
-// import { useAuthStore } from "@/stores/authStore"; // 引入 pinia store
 import { useUserStore } from "@/stores/userStore";
 
-// const authStore = useAuthStore();
+
 const userStore = useUserStore();
 
 const GET_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/info`;
@@ -21,6 +20,20 @@ const user = {
 }
  
 
+const isOther = ref(true);
+const isPsw = ref(false);
+
+
+const toggleCardB = () => {
+  isOther.value = false;
+  isPsw.value = true;
+}
+
+const toggleCardA = () => {
+  isOther.value = true;
+  isPsw.value = false;
+}
+
 // 定義編輯模式狀態
 const isEditing = ref(false);
 const isEditingPsw = ref(false);
@@ -29,15 +42,15 @@ const isEditingPsw = ref(false);
 const loadUserInfo = async () => {
   // 檢查用戶是否已登入
   if (!userStore.isLogin) {
+    localStorage.removeItem("user");
     alert("請先登入以便看用戶資訊");
     return;
   }
-
-  const storedUser = userStore.userId;
-  if (storedUser === 0) {
-    alert("無此用戶");
-    return;
-  }
+  // const storedUser = userStore.userId;
+  // if (storedUser === 0) {
+  //   alert("無此用戶");
+  //   return;
+  // }
 
  
   const userId = userStore.userId;
@@ -56,6 +69,7 @@ const loadUserInfo = async () => {
     }
 };
 
+
 // 切換編輯模式並更新用戶信息的函數
 const toggleEdit = async () => {
   if (isEditing.value) {
@@ -65,7 +79,7 @@ const toggleEdit = async () => {
     try {
       const response = await fetch(PUT_TURL, {
         method: "PUT",
-        body: JSON.stringify(userStore.$state),
+        body: JSON.stringify(user),
         headers: { "Content-Type": "application/json" },
       });
 
@@ -80,35 +94,36 @@ const toggleEdit = async () => {
   isEditing.value = !isEditing.value; // 切換編輯模式
 };
 
+// $('#resetModal').appendTo('body').modal('show');   
 
-// const toggleEditPsw = async () => {
-//   if (isEditingPsw.value) {
-//     const userId = userStore.userId;
-//     const PUT_TURL = `${PUT_URL}${userId}`;
+const toggleEditPsw = async () => {
+  if (isEditingPsw.value) {
+    const userId = userStore.userId;
+    const PUT_TURL = `${PUT_URL}${userId}`;
 
-//     try {
-//       const response = await fetch(PUT_TURL, {
-//         method: "PUT",
-//         body: JSON.stringify(userStore.$state),
-//         headers: { "Content-Type": "application/json" },
-//       });
+    try {
+      const response = await fetch(PUT_TURL, {
+        method: "PUT",
+        body: JSON.stringify(user),
+        headers: { "Content-Type": "application/json" },
+      });
 
-//       if (!response.ok) {
-//         throw new Error("更新失敗");
-//       }
-//       alert("用戶密碼已成功更新");
-//     } catch (error) {
-//       alert("更新用戶資料失敗: " + error.message);
-//     }
-//   }
-//   isEditingPsw.value = !isEditingPsw.value; // 切換編輯模式
-// };
+      if (!response.ok) {
+        throw new Error("更新失敗");
+      }
+      alert("用戶密碼已成功更新");
+    } catch (error) {
+      alert("更新用戶資料失敗: " + error.message);
+    }
+  }
+  isEditingPsw.value = !isEditingPsw.value; // 切換編輯模式
+};
 // 在組件掛載時加載用戶信息
-onMounted(loadUserInfo);
+    onMounted(loadUserInfo);
 </script>
 
 <template>
-  <div class="card">
+  <div v-if="isOther" class="card">
     <div class="card-body">
       <ul v-if="user">
         <div class="container">
@@ -127,13 +142,7 @@ onMounted(loadUserInfo);
             <span v-if="!isEditing">{{ userStore.licensePlate }}</span>
             <input v-if="isEditing" v-model="userStore.licensePlate" />
           </div>
-          <div class="form-group">
-            <li>密碼</li>
-            <span v-if="!isEditing">{{ userStore.password }}</span>
-            <input v-if="isEditing" v-model="userStore.password" />
-          </div>
         </div>
-
         <div class="container col-12">
           <li>Email信箱</li>
           <span v-if="!isEditing">{{ userStore.email }}</span>
@@ -143,16 +152,42 @@ onMounted(loadUserInfo);
       <a href="#" class="button-17 me-3" @click="toggleEdit">{{
         isEditing ? "保存" : "修改"
       }}</a>
-      <!-- <a class="button-17" @click="toggleEditPsw">{{
-        isEditingPsw ? "密碼保存" : "密碼修改"
-      }}</a> -->
+      <button type="button" class="button-17" @click="toggleCardB">更改密碼</button>
     </div>
   </div>
+
+  <div v-if="isPsw" class="card">
+    <div class="card-body">
+      <ul v-if="user">     
+        <div class="container col-12">
+          <li>密碼</li>
+          <span v-if="!isEditingPsw">請按更改密碼鍵</span>
+          <input v-if="isEditingPsw" placeholder="請輸入新密碼" type="password" />
+        </div>
+      </ul>
+      <a href="#" class="button-17 me-3" @click="toggleCardA">{{
+        isEditing ? "保存" : "修改"
+      }}</a>
+      <button type="button" class="button-17" @click="toggleEditPsw">更改密碼</button>
+      
+    </div>
+  </div>
+
+  <!-- reset password modal -->
+ <!-- Button trigger modal -->
+
+
+
 </template>
 
 <style lang="css" scoped>
 
-
+.modal {
+    z-index: 1050 !important; /* 設置 modal 層級 */
+}
+.modal-backdrop {
+    z-index: 1040 !important; /* 背景層應在 modal 之下 */
+}
 .button-17 {
   align-items: center;
   appearance: none;

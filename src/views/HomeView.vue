@@ -5,8 +5,9 @@ import SearchInputComponent from "@/components/SearchInputComponent.vue";
 import { ref } from "vue";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
 import { subscribeUserToPush } from "../js/userToPush";
+import { useUserStore } from "@/stores/userStore";
 
-
+const userStore = useUserStore();
 const router = useRouter();
 const searchQuery = ref("");
 const isLoading = ref(true);
@@ -21,6 +22,13 @@ const SearchHandler = (searchQuery) => {
 };
 
 onMounted(async () => {
+  userStore.checkLoginStatus(); // 初始化時檢查登入狀態
+  const user = localStorage.getItem("isLogin");
+  const data = JSON.parse(user);
+  console.log(`登入狀態：${data}`)
+  if (userStore.isLogin) {
+    await router.push('/search');
+  };
   try {
     await scrollanimation();
     await new Promise((resolve) => setTimeout(resolve, 300)); // 模擬加載
@@ -37,6 +45,8 @@ onMounted(async () => {
       console.warn("拒絕");
     }
   });
+
+  
 });
 
 onBeforeUnmount(() => {
@@ -75,10 +85,7 @@ onBeforeRouteLeave(() => {
           <div class="function_desc">試試我們的功能吧</div>
           <div class="component">
             <div id="searchbar">
-              <SearchInputComponent
-                @search="SearchHandler"
-                v-model="searchQuery"
-              ></SearchInputComponent>
+              <SearchInputComponent @search="SearchHandler" v-model="searchQuery"></SearchInputComponent>
             </div>
           </div>
           <img v-once src="@/images/location.svg" alt="" />
@@ -191,6 +198,7 @@ onBeforeRouteLeave(() => {
   opacity: 1;
   z-index: 9999;
 }
+
 .loader {
   /* background-color: blue; */
   display: flex;
@@ -263,14 +271,17 @@ onBeforeRouteLeave(() => {
     justify-items: center;
     justify-content: center;
   }
+
   .phone img {
     width: 130vw;
   }
+
   .function {
     justify-content: center;
     align-content: center;
     flex-wrap: nowrap;
   }
+
   .function_desc {
     font-size: 1.3rem;
   }
@@ -279,17 +290,21 @@ onBeforeRouteLeave(() => {
 .phone img {
   height: 100vh;
 }
+
 .function {
   /* pointer-events: auto; */
   position: absolute;
   width: 60%;
   height: 70%;
-  color: black; /* 設定文字顏色，使其在圖片上清晰可見 */
-  font-size: 1.5rem; /* 根據需求調整文字大小 */
+  color: black;
+  /* 設定文字顏色，使其在圖片上清晰可見 */
+  font-size: 1.5rem;
+  /* 根據需求調整文字大小 */
   text-align: center;
   align-items: center;
   align-content: center;
 }
+
 .function img {
   display: block;
   /* position: relative; */
@@ -304,17 +319,24 @@ onBeforeRouteLeave(() => {
   z-index: 3000;
   opacity: 0;
 }
+
 .chat img {
   width: 100vmin;
   display: block;
 }
+
 .story {
   position: absolute;
-  top: 50%; /* 將文字置於垂直中間 */
-  left: 50%; /* 將文字置於水平中間 */
-  transform: translate(-65%, -75%); /* 平移使文字居中 */
-  color: black; /* 設定文字顏色，使其在圖片上清晰可見 */
-  font-size: 4vmin; /* 根據需求調整文字大小 */
+  top: 50%;
+  /* 將文字置於垂直中間 */
+  left: 50%;
+  /* 將文字置於水平中間 */
+  transform: translate(-65%, -75%);
+  /* 平移使文字居中 */
+  color: black;
+  /* 設定文字顏色，使其在圖片上清晰可見 */
+  font-size: 4vmin;
+  /* 根據需求調整文字大小 */
   text-align: center;
 }
 
@@ -327,17 +349,21 @@ onBeforeRouteLeave(() => {
   justify-content: space-between;
   z-index: -1;
 }
+
 .sun * {
   height: 20vmin;
 }
+
 .moon * {
   height: 20vmin;
 }
+
 .stars {
   opacity: 0;
   height: 50%;
   width: 100vmax;
 }
+
 #stars g {
   width: 100vw;
   animation: twinkle 3s infinite;
@@ -347,15 +373,19 @@ onBeforeRouteLeave(() => {
   0% {
     opacity: 0;
   }
+
   25% {
     opacity: 0.5;
   }
+
   50% {
     opacity: 1;
   }
+
   75% {
     opacity: 0.5;
   }
+
   100% {
     opacity: 0;
   }
@@ -367,6 +397,7 @@ onBeforeRouteLeave(() => {
   width: 100%;
   opacity: 0;
 }
+
 .cloud_front {
   position: absolute;
   top: 10vmax;
@@ -374,6 +405,7 @@ onBeforeRouteLeave(() => {
   display: flex;
   justify-content: space-around;
 }
+
 .cloud_back {
   height: 30vmin;
   width: 100vmax;
@@ -381,13 +413,16 @@ onBeforeRouteLeave(() => {
   position: absolute;
   z-index: -10;
 }
+
 #cloud_big1 {
   top: 10vmin;
   width: 70vmin;
 }
+
 #cloud_small1 {
   width: 30vmin;
 }
+
 #cloud_long1 {
   height: inherit;
   position: absolute;
@@ -406,10 +441,12 @@ onBeforeRouteLeave(() => {
   padding: 0;
   z-index: 10;
 }
+
 .building {
   position: relative;
   bottom: 0;
 }
+
 .building img {
   width: 50vmin;
 }
@@ -433,23 +470,27 @@ onBeforeRouteLeave(() => {
   position: relative;
   align-items: center;
 }
+
 /* 搜尋欄 */
 .component {
   height: 10vh;
   margin-top: 1vh;
 }
+
 .component * {
   /* pointer-events: auto; */
   height: 5vh;
   z-index: 1000;
   position: relative;
 }
+
 #searchbar {
   position: absolute;
   width: 100%;
   justify-content: center;
   justify-items: center;
 }
+
 #searchbar div {
   width: 100%;
 }
@@ -481,18 +522,23 @@ onBeforeRouteLeave(() => {
   0% {
     background-color: skyblue;
   }
+
   50% {
     background-color: #ff8600;
   }
+
   100% {
     background-color: #000;
   }
 }
 
 .view-container {
-  position: relative; /* 關鍵：確保子元素相對這個容器定位 */
-  overflow: hidden; /* 防止子元素超出這個區域 */
-  min-height: 500vh; /* 留出足夠的空間讓動畫運行 */
+  position: relative;
+  /* 關鍵：確保子元素相對這個容器定位 */
+  overflow: hidden;
+  /* 防止子元素超出這個區域 */
+  min-height: 500vh;
+  /* 留出足夠的空間讓動畫運行 */
 }
 
 /* 停車格 */
@@ -507,6 +553,7 @@ onBeforeRouteLeave(() => {
   opacity: 1;
   z-index: -1;
 }
+
 #parking_slot img {
   height: 5vmin;
   /* width: 7vmin; */
@@ -548,6 +595,7 @@ onBeforeRouteLeave(() => {
   bottom: 0;
   right: 0;
 }
+
 #car,
 #car_path,
 #car_body {
@@ -566,15 +614,19 @@ onBeforeRouteLeave(() => {
 
 @keyframes moveCar {
   to {
-    transform: translateX(-100vw); /* 完全移出視窗 */
+    transform: translateX(-100vw);
+    /* 完全移出視窗 */
   }
 }
 
 @keyframes shakeCar {
+
   0%,
   100% {
-    transform: translateY(0); /* 垂直方向震動 */
+    transform: translateY(0);
+    /* 垂直方向震動 */
   }
+
   50% {
     transform: translateY(-1px);
   }
@@ -616,5 +668,4 @@ onBeforeRouteLeave(() => {
 #footer {
   z-index: 1001;
 }
-
 </style>

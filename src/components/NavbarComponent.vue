@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from "vue";
+import { nextTick, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { ref, watch } from "vue";
 import { useUserStore } from "@/stores/userStore";
@@ -20,6 +20,7 @@ const GET_TURL = `${BASE_URL}/Customers/id`;
 //pinia
 const logout = () => {
   userStore.logout();
+  sessionStorage.removeItem('hasVisited'); // 登出時清除 sessionStorage 中的標記
 };
 
 const resetTimeout = () => {
@@ -27,9 +28,8 @@ const resetTimeout = () => {
   timeout = setTimeout(logout, TIMEOUT_DURATION);
 };
 
-onMounted(() => {
+onMounted ( async () => {
   userStore.checkLoginStatus(); // 初始化時檢查登入狀態
-  // 監聽用戶活動事件
   window.addEventListener("mousemove", resetTimeout);
   window.addEventListener("keypress", resetTimeout);
   resetTimeout(); // 初始化計時器
@@ -48,7 +48,6 @@ onMounted(() => {
     }
   );
 
-
     //隱藏按鈕
     const hiddenButton = ref(null);
     const closeForm = ref(null);
@@ -56,14 +55,6 @@ onMounted(() => {
     //modal form
     const name = ref("");
     const phone = ref("");
-
-    // // 自動點擊的功能
-    // const autoClick = () => {
-    //   // 自動觸發隱藏按鈕的點擊事件
-    //   if (hiddenButton.value) {
-    //     hiddenButton.value.click();
-    //   }
-    // };
 
     const autoClose = () => {
       if (closeForm.value) {
@@ -93,11 +84,11 @@ onMounted(() => {
       },
     });
     if (response.ok) {
-      //const result = await response.text();
       userStore.updateUser(renew);
       alert('會員資料已成功更新');
       await couponStore.addCoupon();
       alert(couponStore.couponMessage);
+      // console.log('mess');
       autoClose();
     } else {
       throw new Error('會員資料更新失敗');
@@ -105,9 +96,9 @@ onMounted(() => {
  
 };
 
-const submitMemberInfo = async () => {
-  await updateMemberInfo();
-};
+  const submitMemberInfo = async () => {
+    await updateMemberInfo();
+  };
 
 </script>
 
@@ -133,7 +124,7 @@ const submitMemberInfo = async () => {
         <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
         <nav id="navbar" class="navbar">
           <ul>
-            <li>
+            <li v-if="userStore.isLogin">
               <RouterLink class="nav-link" activeClass="active" to="/"
                 >Home</RouterLink
               >
@@ -146,7 +137,7 @@ const submitMemberInfo = async () => {
                 >查找停車位</RouterLink
               >
             </li> -->
-            <li>
+            <li v-if="userStore.isLogin">
               <RouterLink
                 class="nav-link"
                 activeClass="active"
@@ -154,7 +145,7 @@ const submitMemberInfo = async () => {
                 >使用者教學及規範</RouterLink
               >
             </li>
-            <li>
+            <li v-if="userStore.isLogin">
               <RouterLink
                 class="nav-link"
                 activeClass="active"
@@ -209,6 +200,13 @@ const submitMemberInfo = async () => {
                 </li>
               </ul>
             </li>
+            <li>
+                <RouterLink
+                    class="nav-link"
+                    activeClass="active"
+                    :to="{ name: 'ChargeView' }"
+                    >繳費</RouterLink>
+               </li>
             <li v-if="!userStore.isLogin">
               <RouterLink
                 class="nav-link"
@@ -226,7 +224,7 @@ const submitMemberInfo = async () => {
               >
             </li>
             <li v-if="userStore.isLogin">
-              <button class="btn btn-light" @click="logout">登出</button>
+              <button class="button-17 ms-3 my-3" @click="logout">登出</button>
             </li>
           </ul>
         </nav>
@@ -234,7 +232,7 @@ const submitMemberInfo = async () => {
       </div>
     </header>
     <!-- End Header -->
-     <!-- modal -->
+    <!-- modal -->
     <!-- 隱藏的按鈕，點擊後顯示 Modal -->
     <button ref="hiddenButton" type="button" style="display: none;" data-bs-toggle="modal"
       data-bs-target="#exampleModal" data-bs-whatever="@mdo">Open Modal</button>

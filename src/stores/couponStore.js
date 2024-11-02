@@ -29,10 +29,7 @@ export const useCouponStore = defineStore('couponStore', {
           },
           body: JSON.stringify(couponData),
         });
-
         const result = await response.json();
-        //console.log(result);
-
         if (response.ok) {
           alert(result.message)
         } else {
