@@ -21,6 +21,9 @@ const SearchHandler = (searchQuery) => {
   }
 };
 
+
+
+
 onMounted(async () => {
   userStore.checkLoginStatus(); // 初始化時檢查登入狀態
   const user = localStorage.getItem("isLogin");

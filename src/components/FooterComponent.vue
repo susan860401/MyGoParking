@@ -130,13 +130,47 @@ const reply = async () => {
   
 }
 
-
 </script>
 
 <template>
   <div>
+    <!-- 可以互動的選單, 如果不喜歡可以不要 -->
+    <nav class="menu" v-if="userStore.isLogin">
+      <input type="checkbox" href="#" class="menu-open" name="menu-open" id="menu-open"/>
+      <label class="menu-open-button" for="menu-open">
+        <span class="hamburger hamburger-1"></span>
+        <span class="hamburger hamburger-2"></span>
+        <span class="hamburger hamburger-3"></span>
+      </label>
+      <!-- <a title="搜尋停車場"  class="menu-item"> <i class="fa-solid fa-location-dot"></i> </a> -->
+      <RouterLink :to="{name:'search'}" activeClass="active" title="搜尋停車場" class="menu-item"> <i class="fa-solid fa-location-dot"></i> </RouterLink>
+      <RouterLink :to="{name:'customer'}" title="使用者中心" class="menu-item"> <i class="fa-solid fa-user"></i> </RouterLink>
+      <RouterLink :to="{name:'ChargeView'}" title="繳費" class="menu-item"> <i class="fa-solid fa-dollar-sign"></i> </RouterLink>
+      <a title="意見回覆" href="#" @click.prevent="reply" class="menu-item"> <i class="fa fa-envelope"></i> </a>
+    </nav>
+    <!-- filters -->
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+        <defs>
+          <filter id="shadowed-goo">
+              
+              <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10" />
+              <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+              <feGaussianBlur in="goo" stdDeviation="3" result="shadow" />
+              <feColorMatrix in="shadow" mode="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 -0.2" result="shadow" />
+              <feOffset in="shadow" dx="1" dy="1" result="shadow" />
+              <feComposite in2="shadow" in="goo" result="goo" />
+              <feComposite in2="goo" in="SourceGraphic" result="mix" />
+          </filter>
+          <filter id="goo">
+              <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10" />
+              <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+              <feComposite in2="goo" in="SourceGraphic" result="mix" />
+          </filter>
+        </defs>
+    </svg>
     <!-- scroll-top button 頁面往上的button-->
     <a
+      :style="{opacity:userStore.isLogin ? 0:1, pointerEvents:userStore.isLogin ? 'none':'auto'}"
       href="#"
       class="scroll-top d-flex align-items-center justify-content-center"
       ><i class="bi bi-arrow-up-short"></i
@@ -246,4 +280,160 @@ const reply = async () => {
   </div>
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+/* :root{
+  --i:3;
+} */
+
+.menu-open {
+  display: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.menu-item {
+  background: #feb900;
+  border-radius: 100%;
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  /* top: 20px; */
+  bottom: 20px;
+  right: 20px;
+  color: white;
+  text-align: center;
+  line-height: 50px;
+  transform: translate3d(0, 0, 0);
+  transition: transform ease-out 200ms;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .menu-item:active{
+  background: white;
+  color: #333;
+  touch-action: manipulation;
+  }
+}
+
+/* 只在支援 hover 的設備上啟用懸停效果 */
+@media (hover: hover) {
+  .menu-item:hover{
+  background: white;
+  color: #333;
+  touch-action: manipulation;
+  }
+}
+
+.menu-item:nth-child(3) {
+  transition-duration: 180ms;
+}
+.menu-item:nth-child(4) {
+  transition-duration: 180ms;
+}
+.menu-item:nth-child(5) {
+  transition-duration: 180ms;
+}
+.menu-item:nth-child(6) {
+  transition-duration: 180ms;
+}
+
+.hamburger {
+  width: 25px;
+  height: 3px;
+  background: white;
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -12.5px;
+  margin-top: -1.5px;
+  transition: transform 200ms;
+}
+
+.hamburger-1 {
+  transform: translate3d(0, -8px, 0);
+}
+
+.hamburger-2 {
+  transform: translate3d(0, 0, 0);
+}
+
+.hamburger-3 {
+  transform: translate3d(0, 8px, 0);
+}
+
+.menu-open:checked + .menu-open-button .hamburger-1 {
+  transform: translate3d(0, 0, 0) rotate(45deg);
+}
+
+.menu-open:checked + .menu-open-button .hamburger-2 {
+  transform: translate3d(0, 0, 0) scale(0.1, 1);
+}
+
+.menu-open:checked + .menu-open-button .hamburger-3 {
+  transform: translate3d(0, 0, 0) rotate(-45deg);
+}
+
+.menu {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 150px;
+  height: 650px;
+  box-sizing: border-box;
+  font-size: 20px;
+  text-align: left;
+  filter: url('#shadowed-goo');
+  z-index: 99999;
+}
+
+.menu-open-button {
+  background: #feb900;
+  border-radius: 100%;
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  bottom: 20px;
+  right: 15px;
+  color: white;
+  text-align: center;
+  line-height: 80px;
+  transform: scale(1.1, 1.1) translate3d(0, 0, 0);
+  transition-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1.275);
+  transition-duration: 400ms;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.menu-open-button:hover {
+  transform: scale(1.2, 1.2) translate3d(0, 0, 0);
+}
+
+.menu-open:checked + .menu-open-button {
+  transition-timing-function: linear;
+  transition-duration: 200ms;
+  transform: scale(0.8, 0.8) translate3d(0, 0, 0);
+}
+
+.menu-open:checked ~ .menu-item:nth-child(3) {
+  transition-duration: 190ms;
+  transform: translate3d(0, -80px, 0);
+}
+
+.menu-open:checked ~ .menu-item:nth-child(4) {
+  transition-duration: 290ms;
+  transform: translate3d(0, -160px, 0);
+}
+
+.menu-open:checked ~ .menu-item:nth-child(5) {
+  transition-duration: 390ms;
+  transform: translate3d(0, -240px, 0);
+}
+
+.menu-open:checked ~ .menu-item:nth-child(6) {
+  transition-duration: 490ms;
+  transform: translate3d(0, -320px, 0);
+}
+
+</style>
