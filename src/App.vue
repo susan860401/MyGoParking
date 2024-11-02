@@ -46,7 +46,6 @@ const startSignalRConnnection = async () => {
 connection.on("ReceiveNotification", (title, message) => {
   console.log("ReceiveNotification");
   console.log(title, message);
-
   // 如果通知權限允許，顯示瀏覽器通知
   if (Notification.permission === "granted") {
     new Notification(title, {
@@ -55,6 +54,9 @@ connection.on("ReceiveNotification", (title, message) => {
     });
   }
 });
+// connection.on("UserConnected", function (msg) {
+//   console.log(msg);
+// });
 
 onMounted(async () => {
   await startSignalRConnnection();

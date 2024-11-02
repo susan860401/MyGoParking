@@ -106,7 +106,7 @@ const loadParkingLots = async () => {
       throw new Error("Server無法獲取停車場數據");
     }
     const data = await res.json();
-    console.log(data);
+    //console.log(data);
     data.forEach((lot) => {
       //console.log("monRate:", lot.MonRate);
       lot.isETC = lot.etcSpace > 0;
