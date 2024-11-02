@@ -51,6 +51,11 @@ onBeforeRouteLeave(() => {
 // window.addEventListener('resize',() => {
 //   window.location.reload();
 // })
+
+const redirectSignUp = () => {
+  router.push('signUp')
+}
+
 </script>
 
 <template>
@@ -83,9 +88,9 @@ onBeforeRouteLeave(() => {
       <div class="phone" id="phone2">
         <img v-once src="@/images/phone.svg" alt="" />
         <div class="function">
-          <div class="function_desc">試試我們的功能吧</div>
+          <div class="function_desc mb-3">加入我們, 試試預訂或月租!</div>
           <div class="component">
-            <div id="searchbar">我這邊要放預定或加入會員的連結</div>
+            <div id="searchbar"><button class="btn btn-outline-success" @click="redirectSignUp">加入會員</button></div>
           </div>
           <img v-once src="@/images/location.svg" alt="" />
         </div>

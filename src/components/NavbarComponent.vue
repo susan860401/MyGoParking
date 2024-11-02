@@ -1,7 +1,9 @@
 <script setup>
 import { onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter,onBeforeRouteLeave } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
+import SearchInputComponent from "@/components/SearchInputComponent.vue";
+import { ref } from "vue";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -27,6 +29,43 @@ onMounted(() => {
   window.addEventListener("keypress", resetTimeout);
   resetTimeout(); // 初始化計時器
 });
+
+
+const searchQuery = ref("");
+const searchInput = ref(null);
+const SearchHandler = (searchQuery) => {
+  if (searchQuery) {
+    router.push({
+      name: "search",
+      query: { searchQuery: searchQuery },
+    });
+  }
+};
+
+const isSearch_barOpen = ref(false);
+
+const handleBlur = (event) => {
+      // 檢查當前失去焦點的元素是否為按鈕
+      const relatedTarget = event.relatedTarget;
+      // console.log(relatedTarget)
+      if (!relatedTarget) {
+        isSearch_barOpen.value = false; 
+      }
+    };
+
+const enable_Search_bar = () => {
+  if (isSearch_barOpen.value){
+    // console.log(searchQuery.value)
+    SearchHandler(searchQuery.value)
+    // 在猶豫按下去跳轉後這邊要關起來還是保持開著
+    isSearch_barOpen.value = false;
+  }
+  else{
+    // console.log("Focus",isSearch_barOpen.value)
+    searchInput.value.focus();
+    isSearch_barOpen.value = true;
+  }
+}
 </script>
 
 <template>
@@ -37,16 +76,29 @@ onMounted(() => {
         id="test"
         class="container-fluid container-xl d-flex align-items-center justify-content-between"
       >
-        <RouterLink
-          class="nav-link logo d-flex align-items-center"
-          activeClass="active"
-          to="/"
-        >
-          <!-- Uncomment the line below if you also wish to use an image logo -->
-          <!-- <img src="assets/img/logo.png" alt=""> -->
-          <h1>MyGO Parking<span>.</span></h1>
-        </RouterLink>
-
+        <div style="display: inline-flex;">
+          <RouterLink
+            class="nav-link logo d-flex align-items-center"
+            activeClass="active"
+            to="/"
+          >
+            <!-- Uncomment the line below if you also wish to use an image logo -->
+            <!-- <img src="assets/img/logo.png" alt=""> -->
+            <h1>MyGO Parking<span>.</span></h1>
+          </RouterLink>
+          <div class="nav_search_bar" :class="{'nav_search_bar_animation_forwards':isSearch_barOpen},{'nav_search_bar_animation_reverse':!isSearch_barOpen}">
+            <a id="nav_search_bar_icon" href="" @click.prevent="enable_Search_bar" :class="{'nav_search_bar_icon_animation':isSearch_barOpen}"><i id="nav_search_bar_icon_size" class="fa-solid fa-magnifying-glass fa-beat"></i></a>
+            <input 
+              v-model="searchQuery" 
+              @blur="handleBlur" 
+              type="text" 
+              ref="searchInput" 
+              class="nav_search_bar_input" 
+              :class="{'nav_search_bar_input_animation_forwards':isSearch_barOpen},{'nav_search_bar_animation_reverse':!isSearch_barOpen}"
+              placeholder="搜尋停車場"
+              >
+          </div>
+        </div>
         <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
         <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
         <nav id="navbar" class="navbar">
@@ -70,6 +122,14 @@ onMounted(() => {
                 activeClass="active"
                 :to="{ name: 'guide' }"
                 >使用者教學及規範</RouterLink
+              >
+            </li>
+            <li>
+              <RouterLink
+                class="nav-link"
+                activeClass="active"
+                :to="{ name: 'service' }"
+                >客服中心</RouterLink
               >
             </li>
             <li>
@@ -155,4 +215,56 @@ onMounted(() => {
   </div>
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+.nav_search_bar{
+  margin-left: 3px;
+  align-content: center;
+  width: 0;
+  /* background-color: aqua; */
+  transition: width 3s;
+}
+
+.nav_search_bar_input{
+  border-radius: 5px;
+  background-color: white;
+  width: 0;
+  border: 1px;
+  outline: none;
+  transition: width 3s;
+}
+
+.nav_search_bar_animation_forwards, .nav_search_bar_input_animation_forwards{
+  width: 20vmin; 
+  transition: width 0.3s ease;
+}
+
+.nav_search_bar_animation_reverse, .nav_search_bar_input_animation_reverse{
+  width: 0; 
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+#nav_search_bar_icon{
+  position: absolute;
+  display: inline-block;
+  transition: 0.3s ease-in-out;
+}
+
+.nav_search_bar_icon_animation{
+  transform: translateX(21vmin);
+}
+
+#nav_search_bar_icon_size {
+  font-size: 3vmin;
+  color: rgb(226, 183, 43);
+}
+
+@keyframes searchbar {
+  0%{
+    transform: translateX(0px);
+  }
+  100%{
+    transform: translateX(15vmin);
+  }
+}
+</style>

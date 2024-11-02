@@ -1,14 +1,16 @@
 t<script setup>
 import router from '@/router';
 import Swal from 'sweetalert2';
+import {useUserStore} from '@/stores/userStore';
 
 // API 基本路徑
 const baseUrl = `${import.meta.env.VITE_API_BASEURL}`;
+const userStore = useUserStore();
 
 const reply = async () => {
   try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const userId = user.userId;
+    const userId = userStore.userId;
+    // console.log(userStore.userId);
     if (userId === null || userId === ""){
       await Swal.fire({
         title:'請先登入系統',
@@ -107,6 +109,7 @@ const reply = async () => {
             icon:"error",
             showConfirmButton:true
           })
+          console.log(error)
         }
         //console.log(JSON.stringify(question));
       }
