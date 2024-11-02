@@ -4,7 +4,7 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import "vue3-carousel/dist/carousel.css";
 import { useRoute, useRouter } from "vue-router";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel";
 import Swal from "sweetalert2";
 import { getUserCarPlate } from "@/js/com";
@@ -16,8 +16,10 @@ const router = useRouter();
 const lotId = route.query.lotId;
 const lotsInfo = ref(null);
 const date = ref();
+const dateMon = ref();
 const cars = ref([]);
 const selectedCarPlate = ref("");
+const selectedCarPlateforMon = ref("");
 const userStore = useUserStore();
 
 const getLotsInfo = async () => {
@@ -140,17 +142,16 @@ const GoToMonPay = async () => {
   if (!lotsInfo.value) {
     await getLotsInfo(); // 確保此時已經獲取了 lotId 和 lotName
   }
-  const formattedDate = new Date(date.value);
+  const formattedDate = new Date(dateMon.value);
   const utcFormattedDate = new Date(
     formattedDate.getTime() - formattedDate.getTimezoneOffset() * 60000
   ).toISOString();
   const selectCar = cars.value.find(
-    (car) => car.licensePlate === selectedCarPlate.value
+    (car) => car.licensePlate === selectedCarPlateforMon.value
   );
-  console.log(selectCar);
-  console.log(selectedCarPlate.value);
-  console.log(cars.value); //抓不到
-  if (!selectedCarPlate.value) {
+  // console.log(selectCar);
+  // console.log(cars.value); //抓不到
+  if (!selectedCarPlateforMon.value) {
     Swal.fire({
       icon: "warning",
       title: "錯誤",
@@ -356,7 +357,6 @@ onMounted(async () => {
                       <!-- 使用 VueDatePicker 並綁定 v-model -->
                       <VueDatePicker
                         v-model="date"
-                        class="form-control"
                         id="exampleInputPassword1"
                       />
                     </div>
@@ -374,11 +374,11 @@ onMounted(async () => {
                     <div class="form-group">
                       <label for="InputName">車牌號碼</label>
                       <select
-                        v-model="selectedCarPlate"
-                        class="form-control"
+                        v-model="selectedCarPlateforMon"
+                        class="form-control mb-2"
                         id="InputName"
                       >
-                        <option :value="selectedCarPlate">
+                        <option :value="selectedCarPlateforMon">
                           --請選擇車牌--
                         </option>
                         <option
@@ -391,13 +391,9 @@ onMounted(async () => {
                       </select>
                     </div>
                     <div class="form-group">
-                      <label for="exampleInputPassword1">預約時間</label>
+                      <label for="MonTime">預約時間</label>
                       <!-- 使用 VueDatePicker 並綁定 v-model -->
-                      <VueDatePicker
-                        v-model="date"
-                        class="form-control"
-                        id="exampleInputPassword1"
-                      />
+                      <VueDatePicker v-model="dateMon" id="MonTime" />
                     </div>
                     <button
                       type="button"
