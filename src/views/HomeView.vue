@@ -29,14 +29,16 @@ onMounted(async () => {
   if (userStore.isLogin) {
     await router.push("/search");
   }
-  try {
+  else{
+    try {
     await scrollanimation();
     await new Promise((resolve) => setTimeout(resolve, 300)); // 模擬加載
     await nextTick();
-  } catch (error) {
-    console.error("Error during mounted:", error);
-  } finally {
-    isLoading.value = false;
+    } catch (error) {
+      console.error("Error during mounted:", error);
+    } finally {
+      isLoading.value = false;
+    }
   }
   Notification.requestPermission().then((permission) => {
     if (permission == "granted") {

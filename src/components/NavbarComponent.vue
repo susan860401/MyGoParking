@@ -53,6 +53,7 @@ const handleBlur = (event) => {
   const relatedTarget = event.relatedTarget;
   // console.log(relatedTarget)
   if (!relatedTarget) {
+    console.log("blur",isSearch_barOpen.value)
     isSearch_barOpen.value = false;
   }
 };
@@ -64,7 +65,7 @@ const enable_Search_bar = () => {
     // 在猶豫按下去跳轉後這邊要關起來還是保持開著
     isSearch_barOpen.value = false;
   } else {
-    // console.log("Focus",isSearch_barOpen.value)
+    console.log("Focus",isSearch_barOpen.value)
     searchInput.value.focus();
     isSearch_barOpen.value = true;
   }
@@ -154,11 +155,7 @@ const submitMemberInfo = async () => {
           </RouterLink>
           <div
             class="nav_search_bar"
-            :class="
-              ({ nav_search_bar_animation_forwards: isSearch_barOpen },
-              { nav_search_bar_animation_reverse: !isSearch_barOpen })
-            "
-          >
+            :class="({ nav_search_bar_animation_forwards: isSearch_barOpen, nav_search_bar_animation_reverse: !isSearch_barOpen })">
             <a
               id="nav_search_bar_icon"
               href=""
@@ -172,13 +169,12 @@ const submitMemberInfo = async () => {
             <input
               v-model="searchQuery"
               @blur="handleBlur"
+              @keydown.enter.prevent="enable_Search_bar"
               type="text"
               ref="searchInput"
               class="nav_search_bar_input"
               :class="
-                ({ nav_search_bar_input_animation_forwards: isSearch_barOpen },
-                { nav_search_bar_animation_reverse: !isSearch_barOpen })
-              "
+                ({ nav_search_bar_input_animation_forwards: isSearch_barOpen, nav_search_bar_animation_reverse: !isSearch_barOpen})"
               placeholder="搜尋停車場"
             />
           </div>
@@ -206,14 +202,6 @@ const submitMemberInfo = async () => {
                 activeClass="active"
                 :to="{ name: 'guide' }"
                 >使用者教學及規範</RouterLink
-              >
-            </li>
-            <li v-if="userStore.isLogin">
-              <RouterLink
-                class="nav-link"
-                activeClass="active"
-                :to="{ name: 'service' }"
-                >客服中心</RouterLink
               >
             </li>
             <li v-if="userStore.isLogin">
@@ -391,7 +379,7 @@ const submitMemberInfo = async () => {
 
 .nav_search_bar_input {
   border-radius: 5px;
-  background-color: white;
+  background-color: rgba(255,255,255,0.8);
   width: 0;
   border: 1px;
   outline: none;
