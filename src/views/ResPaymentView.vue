@@ -104,7 +104,6 @@ async function requestPayment() {
     });
 
     const paymentUrl = response.data.info.paymentUrl.web;
-    alert("交易失敗，請稍後再試。");
     console.log("前往支付頁面:", paymentUrl);
     window.location.href = paymentUrl;
   } catch (error) {

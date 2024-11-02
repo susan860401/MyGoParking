@@ -42,6 +42,30 @@ async function confirmPayment() {
         isDisabled.value = true;
         paymentStatus.value = '確認中...';
 
+
+        // 如果金額為 0 且有使用優惠券，直接呼叫 `UpdateEntryExitPayment` 並返回
+        if (amount.value === 0 && MycouponId.value) {
+            const payload = {
+                MycarId: MycarId.value,
+                Myamount: amount.value,
+                MycouponId: MycouponId.value
+            };
+            console.log('發送的 Payload (金額為0且有優惠券):', JSON.stringify(payload, null, 2));
+
+            const response = await axios.post(
+                `${baseApiUrl}/UpdateEntryExitPayment`,
+                payload,
+                { headers: { 'Content-Type': 'application/json' } }
+            );
+
+            paymentStatus.value = '交易狀態: 成功 (0 元優惠交易)';
+            alert('付款確認成功 (0 元優惠交易)');
+            setTimeout(() => (window.location.href = "/"), 3000);
+            return;
+        }
+
+        //----------------------------------------------------------------------------------
+
         const params = new URLSearchParams(window.location.search);
         const orderId = params.get('orderId');
         const transactionId = params.get('transactionId');
@@ -73,14 +97,14 @@ async function confirmPayment() {
                 { headers: { 'Content-Type': 'application/json' } }
             );
             paymentStatus.value = '交易狀態: 成功';
-            setTimeout(() => (window.location.href = "/"), 5000);
+            setTimeout(() => (window.location.href = "/"), 3000);
         } else if (check.data.returnCode === '1172') {
             alert('重複付款');
             paymentStatus.value = '交易狀態: 已有重複訂單';
-            setTimeout(() => (window.location.href = "/"), 5000);
+            setTimeout(() => (window.location.href = "/"), 3000);
         } else {
             paymentStatus.value = `交易狀態: ${check.data.message}`;
-            setTimeout(() => (window.location.href = "/"), 5000);
+            setTimeout(() => (window.location.href = "/"), 3000);
         }
 
     } catch (error) {
