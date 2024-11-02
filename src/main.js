@@ -18,19 +18,20 @@ import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 
 const app = createApp(App);
 const pinia = createPinia();
-pinia.use(piniaPluginPersistedstate);
 pinia.use(
   createPersistedState({
     storage: sessionStorage,
   })
 );
 import { createPinia } from "pinia";
-import { createPersistedState } from "pinia-plugin-persistedstate";
+import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
+pinia.use(piniaPluginPersistedstate);
 app.use(router);
 app.use(pinia);
 app.use(ElementPlus);
 app.mount("#app");
 
+export default pinia;
 //serviceWorker
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {

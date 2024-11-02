@@ -26,6 +26,8 @@ import TestView from "./views/ChargeView.vue";
 import TestConfirmView from "./views/ChargeConfirmView.vue";
 import ChargeView from "./views/ChargeView.vue";
 import ChargConfirmView from "./views/ChargeConfirmView.vue";
+import { useUserStore } from './stores/userStore';
+
 
 const routes = [
   {
@@ -162,5 +164,27 @@ const router = createRouter({
   history: createWebHistory(),
   routes: routes, //名字一樣可以寫routes就好
 });
+
+
+// // 在 router/index.js 或路由文件中
+//   router.beforeEach((to, from, next) => {
+//   const userStore = useUserStore();
+
+//   // 檢查登入狀態
+//   userStore.checkLoginStatus();
+//   const hasVisited = sessionStorage.getItem('hasVisited');
+//   // 如果登入，並且第一次訪問
+//   if (userStore.isLogin && hasVisited === false) {
+//     sessionStorage.setItem('hasVisited', true);
+//     next('/search'); // 導向目標頁面
+//   }
+//    // 如果目標路由不是 search 頁面才進行跳轉，避免重複導航
+//    if (to.name !== 'Search') {
+//     return next({ name: 'Search' });
+//   }
+
+// next(); // 確保導航繼續進行
+// });
+
 
 export default router;

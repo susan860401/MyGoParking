@@ -20,13 +20,12 @@ const send = async () => {
   });
   if (response.ok) {
     const datas = await response.json(); // 取得會員資訊
-    console.log(datas);
     if (datas.message === "登入成功") {
       // 成功登入時，儲存資料並更新 Pinia 狀態
       userStore.updateUser(datas);
       userStore.login(); // 更新登入狀態
       alert("登入成功!!");
-      router.push("/");
+      router.push("/search");
     } else if (datas.message === "無此帳號") {
       alert("無此帳號,請重新登入!!");
     } else {
@@ -53,18 +52,18 @@ const send = async () => {
           <div class="row justify-content-between gy-4">
             <div class="col-lg-6 d-flex align-items-center" data-aos="fade-up">
               <div class="content">
-                <h3>Minus hic non reiciendis ea possimus at quia.</h3>
+                <h3>歡迎回到我們的停車場平台</h3>
                 <p>
-                  Rem id rerum. Debitis deserunt quidem delectus expedita
-                  ducimus dolor. Aut iusto ipsa. Eos ipsum nobis ipsa soluta
-                  itaque perspiciatis fuga ipsum perspiciatis. Eum amet fugiat
-                  totam nisi possimus ut delectus dicta.
+                  透過登入帳戶，您可以快速存取個人停車資訊，管理車位預訂，並享受專屬會員優惠。只需輸入您的電子郵件和密碼，即可隨時隨地輕鬆掌握您的停車動態。
                 </p>
 
                 <p>
-                  Aliquam velit deserunt autem. Inventore et saepe. Tenetur
-                  suscipit eligendi labore culpa eos. Deserunt porro magni qui
-                  necessitatibus dolorem at animi cupiditate.
+                  登入後，您將能夠：<br>
+                  查看與管理預訂：隨時查看您已預訂的車位，或進行修改與取消。<br>
+                  -即時通知：接收車位可用性提醒，確保您不會錯過任何機會。<br>
+                  -更新個人資料：輕鬆管理車輛資訊與聯絡方式，確保停車場快速識別您的車輛。<br>
+                  -專屬會員優惠：登入後可查看最新的停車優惠與促銷活動，節省更多停車費用。<br><br>
+                  如果您還沒有帳戶，歡迎先前往註冊頁面創建帳戶，開始享受便捷的停車服務！
                 </p>
               </div>
             </div>
@@ -122,11 +121,8 @@ const send = async () => {
                         class="link-secondary text-decoration-none"
                         >註冊新帳號</RouterLink
                       >
-                      <RouterLink
-                        :to="{ name: 'reset' }"
-                        class="link-secondary text-decoration-none"
-                        >忘記密碼</RouterLink
-                      >
+                      <a>忘記密碼</a>
+                      
                     </div>
                   </div>
                 </div>
@@ -141,4 +137,5 @@ const send = async () => {
   </div>
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+</style>
