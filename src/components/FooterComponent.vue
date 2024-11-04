@@ -26,38 +26,40 @@ const reply = async () => {
       })
     }else{
       /* 舊版本, 我不知道有沒有要允許訪客回復 */
-      // const { value: formValues } = await Swal.fire({
-      // title: '意見回復',
-      // html:
-      //   '<div class="row">' +
-      //   '<div class="d-flex justify-content-evenly align-items-center align-content-center mb-3 row">' +
-      //   '<div class="col-12 col-md-2"><label>姓名: </label></div><input id="name" class="swal2-input" style="width:70%;margin:0" placeholder="請輸入你的名字"></div>' +
-      //   '<div class="d-flex justify-content-evenly align-items-center align-content-center mb-3 row">' +
-      //   '<div class="col-12 col-md-2"><label>Email: </label></div><input id="email" class="swal2-input" style="width:70%;margin:0" placeholder="請輸入你的Email"></div>' +
-      //   '<textarea id="reply_text" class="swal2-input form-control" style="height:300px;" placeholder="輸入你的意見"></textarea>' + // 修正 style 錯誤
-      //   '</div>',
-      // focusConfirm: false,
-      // showCancelButton: true,
-      // preConfirm: () => {
-      //   const input1 = document.getElementById('name').value;
-      //   const input2 = document.getElementById('email').value;
-      //   const input3 = document.getElementById('reply_text').value;
-      //   if (!input1 || !input2 || !input3) {
-      //     Swal.showValidationMessage('所有欄位都必須填寫');
-      //     return null;
-      //   }
-      //   return [input1, input2, input3]; // 返回多個輸入值
-      // }
-      // });
-      // if (formValues) {
-      //   const question_object = ({
-      //     "Name":formValues[0],
-      //     "Email":formValues[1],
-      //     "question":formValues[2]
-      //   })
-      //   console.log(JSON.stringify(question_object));
-      //   // Swal.fire(JSON.stringify(formValues));
-      // }
+      /*
+      const { value: formValues } = await Swal.fire({
+      title: '意見回復',
+      html:
+        '<div class="row">' +
+        '<div class="d-flex justify-content-evenly align-items-center align-content-center mb-3 row">' +
+        '<div class="col-12 col-md-2"><label>姓名: </label></div><input id="name" class="swal2-input" style="width:70%;margin:0" placeholder="請輸入你的名字"></div>' +
+        '<div class="d-flex justify-content-evenly align-items-center align-content-center mb-3 row">' +
+        '<div class="col-12 col-md-2"><label>Email: </label></div><input id="email" class="swal2-input" style="width:70%;margin:0" placeholder="請輸入你的Email"></div>' +
+        '<textarea id="reply_text" class="swal2-input form-control" style="height:300px;" placeholder="輸入你的意見"></textarea>' + // 修正 style 錯誤
+        '</div>',
+      focusConfirm: false,
+      showCancelButton: true,
+      preConfirm: () => {
+        const input1 = document.getElementById('name').value;
+        const input2 = document.getElementById('email').value;
+        const input3 = document.getElementById('reply_text').value;
+        if (!input1 || !input2 || !input3) {
+          Swal.showValidationMessage('所有欄位都必須填寫');
+          return null;
+        }
+        return [input1, input2, input3]; // 返回多個輸入值
+      }
+      });
+      if (formValues) {
+        const question_object = ({
+          "Name":formValues[0],
+          "Email":formValues[1],
+          "question":formValues[2]
+        })
+        console.log(JSON.stringify(question_object));
+        // Swal.fire(JSON.stringify(formValues));
+      }
+      */
       const { value: text } = await Swal.fire({
         input: "textarea",
         inputLabel: "意見回復",
