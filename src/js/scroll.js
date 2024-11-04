@@ -364,9 +364,8 @@ export function killAnimation() {
   gsap.killTweensOf("*");
 }
 
-
-
-//載入SVG的Car
+//載入我需要的SVG, 有Car, Star,Mountain
+//為了不讓HTML看起來擁腫, 所以使用fetch後再將它放置需要的位置
 async function LoadSVG() {
   await fetch("src/images/car.svg")
     .then((response) => {
@@ -384,15 +383,8 @@ async function LoadSVG() {
     .then((svg) => {
       //console.log(svg)
       document.querySelector(".stars").innerHTML = svg;
-
+      //設定svg內的star動畫
       const stars = document.querySelectorAll("#stars g");
-      /*
-        stars.forEach((star) => {
-            const randomDelay = Math.random() * 2; // 隨機延遲時間（0 - 2秒）
-            star.style.animationDelay = `${randomDelay}s`;
-            star.style.animation = "twinkle 3s infinite"; // 設定動畫
-        });
-        */
       stars.forEach((star) => {
         const randomDelay = Math.random() * 2; // 隨機延遲時間（0 - 2秒）
         const randomDuration = 2 + Math.random() * 4; // 隨機持續時間（2 到 4 秒）
@@ -409,6 +401,8 @@ async function LoadSVG() {
       // console.log(stars);
     });
 
+
+    //載入山的背景, 要用svg, 因為我要改變山的顏色
     await fetch("src/images/background.svg")
     .then((response) => { return response.text()})
     .then((svg) => {

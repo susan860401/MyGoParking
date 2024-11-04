@@ -21,6 +21,9 @@ const SearchHandler = (searchQuery) => {
   }
 };
 
+
+
+
 onMounted(async () => {
   userStore.checkLoginStatus(); // 初始化時檢查登入狀態
   const user = localStorage.getItem("isLogin");
@@ -29,14 +32,16 @@ onMounted(async () => {
   if (userStore.isLogin) {
     await router.push("/search");
   }
-  try {
+  else{
+    try {
     await scrollanimation();
     await new Promise((resolve) => setTimeout(resolve, 300)); // 模擬加載
     await nextTick();
-  } catch (error) {
-    console.error("Error during mounted:", error);
-  } finally {
-    isLoading.value = false;
+    } catch (error) {
+      console.error("Error during mounted:", error);
+    } finally {
+      isLoading.value = false;
+    }
   }
   Notification.requestPermission().then((permission) => {
     if (permission == "granted") {
@@ -134,7 +139,10 @@ const redirectSignUp = () => {
         </div>
       </div>
       <div class="buildings" style="--width: 300px; --quantity: 7">
-        <div class="building" style="--position: 1">
+        <div class="building">
+          <img v-once src="@/images/buildings.svg" alt="">
+        </div>
+        <!-- <div class="building" style="--position: 1">
           <img v-once src="@/images/school.svg" alt="" />
         </div>
         <div class="building" style="--position: 2">
@@ -154,7 +162,7 @@ const redirectSignUp = () => {
         </div>
         <div class="building" style="--position: 6">
           <img v-once src="@/images/apartment_rent.svg" alt="" />
-        </div>
+        </div> -->
       </div>
       <div class="question">
         <img v-once src="@/images/question_cloud.svg" alt="" />
@@ -439,7 +447,7 @@ const redirectSignUp = () => {
 .buildings {
   /* pointer-events: none; */
   position: absolute;
-  bottom: 15vmin;
+  bottom: 13vmin;
   display: flex;
   align-items: flex-end;
   flex-wrap: nowrap;
@@ -453,7 +461,9 @@ const redirectSignUp = () => {
 }
 
 .building img {
-  width: 50vmin;
+  /* width: 50vmin; */
+  width: 400vmin;
+  transform: translate();
 }
 
 /* 這是拿來做一個視野窗來放我要載入的東西 */
