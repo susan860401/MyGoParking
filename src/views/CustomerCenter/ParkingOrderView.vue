@@ -6,13 +6,13 @@ const API_URL = "https://localhost:7077/api";
 const reservations = ref([]); //傳回的預訂資料放此
 const search = ref("");
 const router = useRouter();
-const completedRes = ref([]); //已完成的訂單
-const ongoingRes = ref([]); //還在進行的訂單
+const completedRes = ref([]); //已完成的訂單(用isFinish判斷，區分為上下區塊)
+const ongoingRes = ref([]); //還在進行的訂單(用isFinish判斷，區分為上下區塊)
 const isAllStatus = ref(true); //用來判斷如果是顯示全部的情況(才會顯示現正進行中區塊)
-const countAll = ref(0);
-const countComplete = ref(0);
-const countCancel = ref(0);
-const countOverdue = ref(0);
+const countAll = ref(0); //上方顯示全部預訂數字
+const countComplete = ref(0); //上方顯示已完成預訂數字
+const countCancel = ref(0); //上方顯示已取消預訂數字
+const countOverdue = ref(0); //上方顯示逾時預訂數字(違規)
 
 const loadReservations = async () => {
   const response = await fetch(`${API_URL}/Reservations?userId=1`);
@@ -78,6 +78,12 @@ const toRes = (res) => {
       // 傳遞選中的停車場名稱
     },
   });
+};
+
+//開啟地圖(導航)
+const openMap = (latitude, longitude) => {
+  const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+  window.location.href = url;
 };
 
 //取消預訂
@@ -187,10 +193,21 @@ onMounted(() => {
                   <p style="text-align: right">
                     {{ ongoing.licensePlate }}
                   </p>
-                  <h5 class="card-title">{{ ongoing.lotName }}</h5>
-
-                  <p>預訂時間：{{ formatTime(ongoing.resTime) }}</p>
-                  <p>預計入場時間：{{ formatTime(ongoing.startTime) }}</p>
+                  <p></p>
+                  <h5 class="card-title">
+                    {{ ongoing.lotName }}
+                  </h5>
+                  <p style="line-height: 30px">
+                    <strong>位置</strong> {{ ongoing.district }}
+                    {{ ongoing.location }}
+                  </p>
+                  <p class="mb-1">
+                    預訂時間： {{ formatTime(ongoing.resTime) }}
+                  </p>
+                  <p>
+                    預計入場時間：
+                    {{ formatTime(ongoing.startTime) }}
+                  </p>
                   <p v-if="ongoing.paymentStatus" class="text-success">
                     <i class="fa-regular fa-clock"></i>
                     最遲於 {{ formatTime(ongoing.validUntil) }} 入場
@@ -200,6 +217,12 @@ onMounted(() => {
                     請盡速繳費
                   </p>
                   <div style="text-align: right">
+                    <button
+                      @click="openMap(ongoing.latitude, ongoing.longitude)"
+                      class="btn btn-light"
+                    >
+                      <i class="fa-solid fa-location-crosshairs"></i> 開啟導航
+                    </button>
                     <button
                       @click="cancelRes(ongoing.resId)"
                       type="button"
@@ -237,8 +260,13 @@ onMounted(() => {
                     {{ complete.licensePlate }}
                   </p>
                   <h5 class="card-title">{{ complete.lotName }}</h5>
-
-                  <p>預訂時間：{{ formatTime(complete.resTime) }}</p>
+                  <p style="line-height: 30px">
+                    <strong>位置</strong> {{ complete.district }}
+                    {{ complete.location }}
+                  </p>
+                  <p class="mb-1">
+                    預訂時間：{{ formatTime(complete.resTime) }}
+                  </p>
                   <p>預計入場時間：{{ formatTime(complete.startTime) }}</p>
                   <small
                     v-if="
@@ -294,5 +322,12 @@ onMounted(() => {
 
 #nav li:hover {
   color: #fabc3f;
+}
+
+strong {
+  /* background-color: rgb(247, 238, 238); */
+  border: 1px solid lightgray;
+  border-radius: 10px;
+  padding: 5px;
 }
 </style>
