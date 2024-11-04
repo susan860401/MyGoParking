@@ -8,10 +8,11 @@ const API_URL = "https://localhost:7077/api";
 const cars = ref([]);
 let originalCars = []; //存放原始資料
 const remind = ref("");
-const user = JSON.parse(localStorage.getItem("user")).userId;
+//之後要改
+// const user = JSON.parse(localStorage.getItem("user")).userId;
 
 const loadLicensePlates = async () => {
-  const response = await fetch(`${API_URL}/Cars_?userId=${user}`);
+  const response = await fetch(`${API_URL}/Cars_?userId=1`);
   const datas = await response.json();
   cars.value = datas.map((item) => ({
     ...item,
