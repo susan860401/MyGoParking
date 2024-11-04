@@ -184,7 +184,7 @@ onMounted(() => {
           <div class="container mb-3 noDataArea" v-if="isNoData && isAllStatus">
             <div class="row">
               <div class="col-md-6">
-                <div class="d-flex">
+                <div class="d-flex mb-2">
                   <img
                     src="/src/assets/images/parkinglot.png"
                     alt="無預訂資料"
