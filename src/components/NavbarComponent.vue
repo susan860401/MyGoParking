@@ -150,7 +150,7 @@ const submitMemberInfo = async () => {
           >
             <!-- Uncomment the line below if you also wish to use an image logo -->
             <!-- <img src="assets/img/logo.png" alt=""> -->
-            <h1>MyGO Parking<span>.</span></h1>
+            <h1><img src="../images/logo_mygo.png" alt=""><span></span></h1>
           </RouterLink>
           <div
             class="nav_search_bar"

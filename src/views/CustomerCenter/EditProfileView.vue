@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { useUserStore } from "@/stores/userStore";
 
 
@@ -18,7 +18,6 @@ const user = {
  phone : userStore.phone,
  licensePlate : userStore.licensePlate,
 }
- 
 
 const isOther = ref(true);
 const isPsw = ref(false);
@@ -42,17 +41,9 @@ const isEditingPsw = ref(false);
 const loadUserInfo = async () => {
   // 檢查用戶是否已登入
   if (!userStore.isLogin) {
-    localStorage.removeItem("user");
     alert("請先登入以便看用戶資訊");
     return;
   }
-  // const storedUser = userStore.userId;
-  // if (storedUser === 0) {
-  //   alert("無此用戶");
-  //   return;
-  // }
-
- 
   const userId = userStore.userId;
   const GET_TURL = `${GET_URL}${userId}`;
 
@@ -61,9 +52,8 @@ const loadUserInfo = async () => {
     if (!response.ok) {
       throw new Error("讀取失敗");
     }
-
     const data = await response.json();
-    userStore.updateUser(userStore.$state);
+    userStore.updateUser(data);
     } catch (error) {
     alert("讀取失敗: " + error.message);
     }
@@ -93,8 +83,7 @@ const toggleEdit = async () => {
   }
   isEditing.value = !isEditing.value; // 切換編輯模式
 };
-
-// $('#resetModal').appendTo('body').modal('show');   
+ 
 
 const toggleEditPsw = async () => {
   if (isEditingPsw.value) {
@@ -120,6 +109,8 @@ const toggleEditPsw = async () => {
 };
 // 在組件掛載時加載用戶信息
     onMounted(loadUserInfo);
+
+
 </script>
 
 <template>
@@ -130,7 +121,7 @@ const toggleEditPsw = async () => {
           <div class="form-group">
             <li>姓名</li>
             <span v-if="!isEditing">{{ userStore.username }}</span>
-            <input v-if="isEditing" v-model="userStore.username" />
+            <input v-if="isEditing" v-model="userStore.username"/>
           </div>
           <div class="form-group">
             <li class="">電話</li>
@@ -153,9 +144,9 @@ const toggleEditPsw = async () => {
         isEditing ? "保存" : "修改"
       }}</a>
       <button type="button" class="button-17" @click="toggleCardB">更改密碼</button>
+      <!-- <button v-if="useUserStore.isProfileComplete && !userStore.isCouponClaimed" type="button" class="button-17 blinking-button" id="couBtn" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo" @click="claimCoupon" > <i class="fa-solid fa-gift me-2" style="color: #f3c212"></i>領取優惠券 </button> -->
     </div>
   </div>
-
   <div v-if="isPsw" class="card">
     <div class="card-body">
       <ul v-if="user">     
@@ -181,6 +172,20 @@ const toggleEditPsw = async () => {
 </template>
 
 <style lang="css" scoped>
+.blinking-button {
+  animation: blinking 1s infinite;
+}
+
+@keyframes blinking {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+#couBtn {
+  margin-left:20px;
+  margin-top: 15px;
+}
 .button-17 {
   align-items: center;
   appearance: none;

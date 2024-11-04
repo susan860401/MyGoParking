@@ -32,6 +32,7 @@ export const useCouponStore = defineStore('couponStore', {
         const result = await response.json();
         if (response.ok) {
           alert(result.message)
+          // userStore.isCouponClaimed = true;
         } else {
           alert(result.message)
         }

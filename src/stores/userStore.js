@@ -1,6 +1,6 @@
 import router from "@/router";
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
 export const useUserStore = defineStore(
   "user",
@@ -9,7 +9,6 @@ export const useUserStore = defineStore(
     const isRegisterSuccess = ref(false);
     const email = ref("");
     // const token = ref("");
-
     // 用戶資訊
     const userId = ref(0);
     const username = ref("");
@@ -21,11 +20,16 @@ export const useUserStore = defineStore(
     const exit = ref(false);
     const message = ref("");
 
+    // const isCouponClaimed = ref(false);// 是否已領取優惠券
+
+    // const isProfileComplete = computed(() => {
+    //   username.value !== null && phone.value !== null;
+    // });
+
     // 登錄方法
     const login = () => {
       isLogin.value = true;
       localStorage.setItem("isLogin", true);
-      sessionStorage.setItem("hasVisited", true);
     };
 
     // 登出方法，清除所有資料
@@ -97,6 +101,8 @@ export const useUserStore = defineStore(
       exit,
       message,
       isRegisterSuccess,
+      // isCouponClaimed,
+      // isProfileComplete,
       login,
       logout,
       checkLoginStatus,
