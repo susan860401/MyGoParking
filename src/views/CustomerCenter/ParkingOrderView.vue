@@ -13,6 +13,7 @@ const countAll = ref(0); //上方顯示全部預訂數字
 const countComplete = ref(0); //上方顯示已完成預訂數字
 const countCancel = ref(0); //上方顯示已取消預訂數字
 const countOverdue = ref(0); //上方顯示逾時預訂數字(違規)
+const isNoData = ref();
 
 const loadReservations = async () => {
   const response = await fetch(`${API_URL}/Reservations?userId=1`);
@@ -27,6 +28,9 @@ const loadReservations = async () => {
   ).length;
   countCancel.value = reservations.value.filter((res) => res.isCanceled).length;
   countOverdue.value = reservations.value.filter((res) => res.isOverdue).length;
+  if (ongoingRes.value.length == 0) {
+    isNoData.value = true;
+  }
 };
 
 //切換觀看不同狀態的預訂紀錄
@@ -47,15 +51,17 @@ const filterByStatus = async (filter) => {
 };
 
 //待改成以區域篩選
-const filterByLotName = async () => {
+const filterByDistrict = async () => {
   if (search.value == "") {
     loadReservations();
   } else {
     const response = await fetch(
-      `${API_URL}/Reservations/search/${search.value}?userId=1`
+      `${API_URL}/Reservations/search/?userId=1&district=${search.value}`
     );
     const datas = await response.json();
     reservations.value = datas;
+    completedRes.value = reservations.value.filter((res) => res.isFinish);
+    ongoingRes.value = reservations.value.filter((res) => !res.isFinish);
   }
 };
 //格式化時間
@@ -152,12 +158,12 @@ onMounted(() => {
             <div class="input-group input-group-sm mb-3">
               <input
                 v-model="search"
-                @keyup="filterByLotName"
+                @keyup="filterByDistrict"
                 type="text"
                 class="form-control"
                 aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm"
-                placeholder="查詢停車場"
+                placeholder="預訂停車場行政區(e.g., 三民區)"
               />
             </div>
           </div>
@@ -169,7 +175,30 @@ onMounted(() => {
           data-aos-delay="100"
         >
           <!-- 現正進行中區塊:還未取消、還未overdue -->
-          <h2 v-if="isAllStatus">現正進行中</h2>
+          <i
+            ><h3 class="title" v-if="isAllStatus && !isNoData">
+              現正進行中
+            </h3></i
+          >
+          <!-- place holder -->
+          <div class="container mb-3 noDataArea" v-if="isNoData && isAllStatus">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="d-flex">
+                  <img
+                    src="/src/assets/images/parkinglot.png"
+                    alt="無預訂資料"
+                    class="img-fluid"
+                    style="width: 400px; height: 250px; object-fit: cover"
+                  />
+                </div>
+              </div>
+              <div class="col-md-6 d-flex flex-column justify-content-center">
+                <h2>無進行中預訂</h2>
+                <p>立即開始您的預訂，體驗我們的便捷服務！</p>
+              </div>
+            </div>
+          </div>
           <div
             v-if="isAllStatus"
             v-for="ongoing in ongoingRes"
@@ -236,7 +265,8 @@ onMounted(() => {
             </div>
           </div>
           <!-- 已完成區塊 -->
-          <h2 v-if="isAllStatus">歷史預訂</h2>
+
+          <i><h3 class="title" v-if="isAllStatus">歷史預訂</h3></i>
           <div
             v-for="complete in completedRes"
             :key="complete.resId"
@@ -329,5 +359,16 @@ strong {
   border: 1px solid lightgray;
   border-radius: 10px;
   padding: 5px;
+}
+
+.title {
+  padding: 2px 5px;
+  color: lightslategrey;
+  font-weight: normal;
+  background: linear-gradient(to right, #dfe9f3 0%, white 100%);
+  background-color: transparent;
+}
+
+.noDataArea {
 }
 </style>
