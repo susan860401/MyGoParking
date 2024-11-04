@@ -18,6 +18,7 @@ const lotsInfo = ref(null);
 const date = ref();
 const dateMon = ref();
 const cars = ref([]);
+const carsForMon = ref([]);
 const selectedCarPlate = ref("");
 const selectedCarPlateforMon = ref("");
 const userStore = useUserStore();
@@ -146,7 +147,7 @@ const GoToMonPay = async () => {
   const utcFormattedDate = new Date(
     formattedDate.getTime() - formattedDate.getTimezoneOffset() * 60000
   ).toISOString();
-  const selectCar = cars.value.find(
+  const selectCar = carsForMon.value.find(
     (car) => car.licensePlate === selectedCarPlateforMon.value
   );
   // console.log(selectCar);
@@ -222,6 +223,7 @@ const GoToMonPay = async () => {
 onMounted(async () => {
   await getLotsInfo();
   await getUserCarPlate(cars);
+  await getUserCarPlate(carsForMon);
 });
 </script>
 
@@ -378,22 +380,27 @@ onMounted(async () => {
                         class="form-control mb-2"
                         id="InputName"
                       >
-                        <option :value="selectedCarPlateforMon">
-                          --請選擇車牌--
-                        </option>
+                        <option value="">--請選擇車牌--</option>
                         <option
-                          v-for="(car, index) in cars"
+                          v-for="(car, index) in carsForMon"
                           :key="index"
                           :value="car.licensePlate"
                         >
                           {{ car.licensePlate }}
                         </option>
                       </select>
-                    </div>
-                    <div class="form-group">
-                      <label for="MonTime">預約時間</label>
-                      <!-- 使用 VueDatePicker 並綁定 v-model -->
-                      <VueDatePicker v-model="dateMon" id="MonTime" />
+                      <!-- <div class="form-group">
+                        <label for="MonTime">預約時間</label>
+                        <select name="" id="">
+                          <option value="123">123</option>
+                          <option value="456">456</option>
+                        </select>
+                      </div> -->
+                      <div class="form-group">
+                        <label for="MonTime">預約時間</label>
+                        <!-- 使用 VueDatePicker 並綁定 v-model -->
+                        <VueDatePicker v-model="dateMon" id="MonTime" />
+                      </div>
                     </div>
                     <button
                       type="button"
