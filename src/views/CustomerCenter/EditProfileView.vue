@@ -2,7 +2,6 @@
 import { ref, onMounted, watch, computed } from "vue";
 import { useUserStore } from "@/stores/userStore";
 
-
 const userStore = useUserStore();
 
 const GET_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/info`;
@@ -10,28 +9,27 @@ const PUT_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/id`;
 
 // Pinia store
 const user = {
- userId : userStore.userId,
- username : userStore.username,
- email : userStore.email,
- password : userStore.password,
- salt : userStore.salt,
- phone : userStore.phone,
- licensePlate : userStore.licensePlate,
-}
+  userId: userStore.userId,
+  username: userStore.username,
+  email: userStore.email,
+  password: userStore.password,
+  salt: userStore.salt,
+  phone: userStore.phone,
+  licensePlate: userStore.licensePlate,
+};
 
 const isOther = ref(true);
 const isPsw = ref(false);
 
-
 const toggleCardB = () => {
   isOther.value = false;
   isPsw.value = true;
-}
+};
 
 const toggleCardA = () => {
   isOther.value = true;
   isPsw.value = false;
-}
+};
 
 // 定義編輯模式狀態
 const isEditing = ref(false);
@@ -54,11 +52,10 @@ const loadUserInfo = async () => {
     }
     const data = await response.json();
     userStore.updateUser(data);
-    } catch (error) {
+  } catch (error) {
     alert("讀取失敗: " + error.message);
-    }
+  }
 };
-
 
 // 切換編輯模式並更新用戶信息的函數
 const toggleEdit = async () => {
@@ -83,7 +80,6 @@ const toggleEdit = async () => {
   }
   isEditing.value = !isEditing.value; // 切換編輯模式
 };
- 
 
 const toggleEditPsw = async () => {
   if (isEditingPsw.value) {
@@ -108,9 +104,7 @@ const toggleEditPsw = async () => {
   isEditingPsw.value = !isEditingPsw.value; // 切換編輯模式
 };
 // 在組件掛載時加載用戶信息
-    onMounted(loadUserInfo);
-
-
+onMounted(loadUserInfo);
 </script>
 
 <template>
@@ -121,7 +115,7 @@ const toggleEditPsw = async () => {
           <div class="form-group">
             <li>姓名</li>
             <span v-if="!isEditing">{{ userStore.username }}</span>
-            <input v-if="isEditing" v-model="userStore.username"/>
+            <input v-if="isEditing" v-model="userStore.username" />
           </div>
           <div class="form-group">
             <li class="">電話</li>
@@ -143,32 +137,38 @@ const toggleEditPsw = async () => {
       <a href="#" class="button-17 me-3" @click="toggleEdit">{{
         isEditing ? "保存" : "修改"
       }}</a>
-      <button type="button" class="button-17" @click="toggleCardB">更改密碼</button>
+      <button type="button" class="button-17" @click="toggleCardB">
+        更改密碼
+      </button>
       <!-- <button v-if="useUserStore.isProfileComplete && !userStore.isCouponClaimed" type="button" class="button-17 blinking-button" id="couBtn" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo" @click="claimCoupon" > <i class="fa-solid fa-gift me-2" style="color: #f3c212"></i>領取優惠券 </button> -->
     </div>
   </div>
   <div v-if="isPsw" class="card">
     <div class="card-body">
-      <ul v-if="user">     
+      <ul v-if="user">
         <div class="container col-12">
           <li>密碼</li>
-          <span v-if="!isEditingPsw">請按更改密碼鍵</span>
-          <input v-if="isEditingPsw" placeholder="請輸入新密碼" type="password" />
+          <span v-if="!isEditingPsw">請輸入密碼</span>
+          <span v-if="!isEditingPsw">{{ userStore.password }}</span>
+          <input
+            v-if="isEditingPsw"
+            v-model="userStore.password"
+            placeholder="請輸入新密碼"
+            type="password"
+          />
         </div>
       </ul>
       <a href="#" class="button-17 me-3" @click="toggleCardA">{{
         isEditing ? "保存" : "修改"
       }}</a>
-      <button type="button" class="button-17" @click="toggleEditPsw">更改密碼</button>
-      
+      <button type="button" class="button-17" @click="toggleEditPsw">
+        更改密碼
+      </button>
     </div>
   </div>
 
   <!-- reset password modal -->
- <!-- Button trigger modal -->
-
-
-
+  <!-- Button trigger modal -->
 </template>
 
 <style lang="css" scoped>
@@ -177,13 +177,19 @@ const toggleEditPsw = async () => {
 }
 
 @keyframes blinking {
-  0% { opacity: 1; }
-  50% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 #couBtn {
-  margin-left:20px;
+  margin-left: 20px;
   margin-top: 15px;
 }
 .button-17 {
