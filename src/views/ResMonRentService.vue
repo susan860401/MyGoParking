@@ -389,13 +389,6 @@ onMounted(async () => {
                           {{ car.licensePlate }}
                         </option>
                       </select>
-                      <!-- <div class="form-group">
-                        <label for="MonTime">預約時間</label>
-                        <select name="" id="">
-                          <option value="123">123</option>
-                          <option value="456">456</option>
-                        </select>
-                      </div> -->
                       <div class="form-group">
                         <label for="MonTime">預約時間</label>
                         <!-- 使用 VueDatePicker 並綁定 v-model -->
