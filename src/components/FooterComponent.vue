@@ -1,7 +1,8 @@
-t<script setup>
+<script setup>
 import router from '@/router';
 import Swal from 'sweetalert2';
 import {useUserStore} from '@/stores/userStore';
+import { onMounted } from "vue";
 
 // API 基本路徑
 const baseUrl = `${import.meta.env.VITE_API_BASEURL}`;
@@ -130,6 +131,24 @@ const reply = async () => {
   
 }
 
+onMounted(()=>{
+  const menu = document.querySelector(".menu")
+  document.addEventListener("DOMContentLoaded",() => {
+    // console.log(menu)
+    togglescrollTop(menu);
+  })
+  window.addEventListener("scroll", () => {
+    togglescrollTop(menu);
+  });
+  function togglescrollTop(menu) {
+    console.log('test')
+    if (menu) {
+      window.scrollY > 100
+        ? menu.style.opacity = '1'
+        : menu.style.opacity = '0';
+    }
+  }
+})
 </script>
 
 <template>
@@ -290,6 +309,7 @@ const reply = async () => {
   position: absolute;
   bottom: 0;
   left: 0;
+  pointer-events: auto;
 }
 
 .menu-item {
@@ -306,6 +326,7 @@ const reply = async () => {
   line-height: 50px;
   transform: translate3d(0, 0, 0);
   transition: transform ease-out 200ms;
+  pointer-events: auto;
 }
 
 @media (hover: none) and (pointer: coarse) {
@@ -379,13 +400,15 @@ const reply = async () => {
   position: fixed;
   right: 0;
   bottom: 0;
-  width: 150px;
-  height: 650px;
+  width: 100px;
+  height: 400px;
   box-sizing: border-box;
   font-size: 20px;
   text-align: left;
   filter: url('#shadowed-goo');
   z-index: 99999;
+  pointer-events: none;
+  transition: 0.3s;
 }
 
 .menu-open-button {
@@ -404,6 +427,7 @@ const reply = async () => {
   transition-duration: 400ms;
   cursor: pointer;
   z-index: 2;
+  pointer-events: auto;
 }
 
 .menu-open-button:hover {
