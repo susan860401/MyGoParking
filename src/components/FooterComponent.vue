@@ -141,7 +141,7 @@ onMounted(()=>{
     togglescrollTop(menu);
   });
   function togglescrollTop(menu) {
-    console.log('test')
+    // console.log('test')
     if (menu) {
       window.scrollY > 100
         ? menu.style.opacity = '1'
