@@ -54,7 +54,7 @@ const sanitizeData = (car) => {
 };
 
 const saveCar = async () => {
-  const newCars = cars.value.filter((car) => car.isNew).map(sanitizeData); // 新增車牌，不含多餘屬性; //抓出新增的車牌
+  const newCars = cars.value.filter((car) => car.isNew).map(sanitizeData); // 新增的車牌，不含多餘屬性; //抓出新增的車牌
   const updatedCars = cars.value
     .filter((car, index) => {
       if (!car.isNew) {
@@ -65,15 +65,17 @@ const saveCar = async () => {
 
   //處理新增的車牌
   if (newCars.length > 0) {
-    const response = await fetch(`${API_URL}/Cars_?userId=${user}`, {
+    const response = await fetch(`${API_URL}/Cars_?userId=1`, {
       method: "POST",
       body: JSON.stringify(newCars),
       headers: { "Content-Type": "application/json" },
     });
-    if (response.ok) {
-      alert("新增成功");
+    const result = await response.json(); // 解析 JSON 響應
+
+    if (result.success) {
+      alert(result.message);
     } else {
-      alert("新增失敗");
+      alert(result.message); //顯示錯誤訊息
     }
   }
   if (updatedCars.length > 0) {
