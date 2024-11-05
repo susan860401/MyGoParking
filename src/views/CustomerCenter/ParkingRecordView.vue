@@ -2,20 +2,79 @@
 //表格 暫放 尚未用到
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-
+const userId = 1;
 const API_URL = "https://localhost:7077/api";
-const parkingRecords = ref([]);
+const parkingRecords = ref([]); //儲存所有停車紀錄
+const filteredRecords = ref([]); // 儲存經過過濾的紀錄
+const licensePlate = ref([]); //儲存用戶的車牌
+const choseCar = ref("請選擇車牌");
+const choseDate = ref("");
+const search = ref(""); //搜尋行政區
 //用來判斷視窗大小決定顯示欄位
 const isPhoneSize = ref(false);
 const isSmallScreen = ref(false);
 const isMiddleScreen = ref(false);
 
 const router = useRouter();
+//取得用戶的車牌
+const getLicensePlate = async () => {
+  const response = await fetch(
+    `${API_URL}/Reservations/GetUserCarPlate?userId=${userId}`
+  );
+  const datas = await response.json();
+  licensePlate.value = datas.userCarPlate;
+  console.log(licensePlate);
+};
 
 const loadParkingRecords = async () => {
-  const response = await fetch(`${API_URL}/EntryExitManagements?userId=1`);
+  const response = await fetch(
+    `${API_URL}/EntryExitManagements?userId=${userId}`
+  );
   const datas = await response.json();
   parkingRecords.value = datas;
+  filteredRecords.value = datas;
+};
+//進階篩選
+const applyFilters = () => {
+  console.log("Applying filters...");
+  console.log("Selected Car Plate:", choseCar.value);
+  console.log("Selected Date:", choseDate.value);
+  filteredRecords.value = parkingRecords.value.filter((record) => {
+    // 滿足條件的項目才會保留
+    let isMatch = true;
+
+    // 如果有選擇車牌，進行車牌篩選
+    if (choseCar.value != "請選擇車牌") {
+      isMatch = isMatch && record.licensePlate == choseCar.value;
+    }
+
+    // 如果有選擇日期，亦進行日期篩選
+    if (choseDate.value) {
+      //只比對日期部分
+      const recordDate = new Date(record.entryTime).toLocaleDateString();
+      const chosenDate = new Date(choseDate.value).toLocaleDateString();
+      isMatch = isMatch && recordDate == chosenDate;
+    }
+    //如果有搜尋行政區
+    if (search.value) {
+      isMatch = isMatch && record.district.includes(search.value);
+    }
+
+    return isMatch; // 滿足所有篩選條件的紀錄才保留
+  });
+};
+
+//依照車牌篩選
+const filterByCar = () => {
+  applyFilters();
+};
+//依照入場日期篩選
+const filterbByDate = () => {
+  applyFilters();
+};
+
+const filterByDistrict = () => {
+  applyFilters();
 };
 
 //辨識視窗大小(依照視窗大小調整看到的表格欄位)
@@ -42,6 +101,7 @@ const viewDetails = (id) => {
 
 onMounted(() => {
   checkScreenSize();
+  getLicensePlate();
   loadParkingRecords();
   window.addEventListener("resize", checkScreenSize); // 監聽視窗大小變化
 });
@@ -53,25 +113,55 @@ onMounted(() => {
       <div class="row">
         <div class="col-12 col-md-4 ps-0">
           <!-- 設定寬度 -->
-          <select
-            class="form-select form-select-sm mb-2"
-            aria-label=".form-select-sm example"
-          >
-            <option selected>所有紀錄</option>
-            <option value="1">過去30天</option>
-            <option value="2">過去3個月</option>
-            <option value="3">過去1年</option>
-          </select>
         </div>
       </div>
 
       <!-- 表格區 -->
       <!-- 屬性說明:show-overflow-tooltip-欄位超出寬度會顯示提示 -->
-      <el-table :data="parkingRecords" style="width: 100%" height="400">
+      <!----- 篩選區塊 ----->
+      <!-- 篩選入場日期 -->
+      <div class="mb-2">
+        <span>入場日期 </span>
+        <el-date-picker
+          @change="filterbByDate"
+          v-model="choseDate"
+          type="date"
+          placeholder="Pick a day"
+        />
+      </div>
+      <div class="row mb-2">
+        <!-- 搜尋行政區 -->
+        <div class="col-md-8 mb-2">
+          <input
+            v-model="search"
+            @keyup="filterByDistrict"
+            type="text"
+            class="form-control"
+            aria-label="Sizing example input"
+            aria-describedby="inputGroup-sizing-sm"
+            placeholder="預訂停車場行政區(e.g., 三民區)"
+          />
+        </div>
+        <!-- 選擇車牌 -->
+        <div class="col-md-4">
+          <select
+            @change="filterByCar"
+            v-model="choseCar"
+            width="300px"
+            class="form-select form-select-sm mb-2"
+            aria-label=".form-select-sm example"
+          >
+            <option value="請選擇車牌">請選擇車牌</option>
+            <option v-for="car in licensePlate" :value="car">{{ car }}</option>
+          </select>
+        </div>
+      </div>
+
+      <el-table :data="filteredRecords" height="400">
         <el-table-column
           prop="lotName"
           label="停車場名稱"
-          :width="isPhoneSize ? 120 : 150"
+          :min-width="isPhoneSize ? 120 : 150"
           :sortable="true"
           show-overflow-tooltip
           header-cell-class-name="custom-header"
@@ -81,13 +171,13 @@ onMounted(() => {
           v-if="!isPhoneSize"
           prop="licensePlate"
           label="車牌號碼"
-          width="105"
+          :min-width="105"
           :sortable="true"
         ></el-table-column>
         <el-table-column
           v-if="!isSmallScreen && !isPhoneSize"
           label="入場時間"
-          width="150"
+          :min-width="150"
           :sortable="true"
           ><template #default="scope">
             <div>
@@ -98,7 +188,7 @@ onMounted(() => {
         <el-table-column
           v-if="!isMiddleScreen && !isSmallScreen && !isPhoneSize"
           label="離場時間"
-          width="150"
+          :min-width="150"
           :sortable="true"
           ><template #default="scope">
             <div>
@@ -109,13 +199,13 @@ onMounted(() => {
         <el-table-column
           prop="totalMins"
           label="時長(分)"
-          width="100"
+          :min-width="100"
           :sortable="true"
         ></el-table-column>
         <el-table-column
           prop="amount"
           label="金額"
-          width="80"
+          :min-width="80"
           :sortable="true"
         ></el-table-column>
         <el-table-column prop="amount" label="" width="60">
