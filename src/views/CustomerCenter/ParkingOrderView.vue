@@ -4,7 +4,8 @@ import { useRouter } from "vue-router";
 
 const API_URL = "https://localhost:7077/api";
 const reservations = ref([]); //傳回的預訂資料放此
-const search = ref("");
+const search = ref(""); //搜尋關鍵字
+const period = ref("all"); //選擇篩選區段
 const router = useRouter();
 const completedRes = ref([]); //已完成的訂單(用isFinish判斷，區分為上下區塊)
 const ongoingRes = ref([]); //還在進行的訂單(用isFinish判斷，區分為上下區塊)
@@ -29,7 +30,7 @@ const loadReservations = async () => {
   countCancel.value = reservations.value.filter((res) => res.isCanceled).length;
   countOverdue.value = reservations.value.filter((res) => res.isOverdue).length;
   if (ongoingRes.value.length == 0) {
-    isNoData.value = true;
+    isNoData.value = true; //判斷有無資料顯示佔位符
   }
 };
 
@@ -50,20 +51,49 @@ const filterByStatus = async (filter) => {
   }
 };
 
-//待改成以區域篩選
+//待改成以區域篩選(可能改前端篩選就好?)
 const filterByDistrict = async () => {
   if (search.value == "") {
-    loadReservations();
+    loadReservations(); //但其實要考慮可能有進階篩選問題
   } else {
     const response = await fetch(
       `${API_URL}/Reservations/search/?userId=1&district=${search.value}`
     );
     const datas = await response.json();
     reservations.value = datas;
-    completedRes.value = reservations.value.filter((res) => res.isFinish);
-    ongoingRes.value = reservations.value.filter((res) => !res.isFinish);
+    completedRes.value = datas.filter((res) => res.isFinish);
+    ongoingRes.value = datas.filter((res) => !res.isFinish);
   }
 };
+
+// 以預訂日期篩選預訂紀錄
+const changePeriod = () => {
+  const today = new Date();
+
+  if (period.value === "all") {
+    // 所有區間，這裡可以放置處理所有預訂的邏輯
+    loadReservations(); //但要考慮進階篩選..
+    return;
+  } else {
+    let filterDate;
+
+    if (period.value === "month") {
+      filterDate = new Date(today.setDate(today.getDate() - 30));
+    } else if (period.value === "month_3") {
+      filterDate = new Date(today.setMonth(today.getMonth() - 3));
+    } else if (period.value === "year") {
+      filterDate = new Date(today.setFullYear(today.getFullYear() - 1));
+    }
+
+    ongoingRes.value = ongoingRes.value.filter(
+      (res) => new Date(res.resTime) >= filterDate
+    );
+    completedRes.value = completedRes.value.filter(
+      (res) => new Date(res.resTime) >= filterDate
+    );
+  }
+};
+
 //格式化時間
 const formatTime = (time) => {
   const date = new Date(time);
@@ -144,13 +174,15 @@ onMounted(() => {
           <!-- 選擇預訂期間 -->
           <div class="col-md-3">
             <select
+              v-model="period"
+              @change="changePeriod"
               class="form-select form-select-sm mb-2"
               aria-label=".form-select-sm example"
             >
-              <option selected>所有預訂</option>
-              <option value="1">過去30天</option>
-              <option value="2">過去3個月</option>
-              <option value="3">過去1年</option>
+              <option value="all" selected>所有預訂</option>
+              <option value="month">過去30天</option>
+              <option value="month_3">過去3個月</option>
+              <option value="year">過去1年</option>
             </select>
           </div>
           <!-- 搜尋特定停車場 -->
