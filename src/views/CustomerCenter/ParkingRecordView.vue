@@ -36,9 +36,6 @@ const loadParkingRecords = async () => {
 };
 //進階篩選
 const applyFilters = () => {
-  console.log("Applying filters...");
-  console.log("Selected Car Plate:", choseCar.value);
-  console.log("Selected Date:", choseDate.value);
   filteredRecords.value = parkingRecords.value.filter((record) => {
     // 滿足條件的項目才會保留
     let isMatch = true;
@@ -62,19 +59,6 @@ const applyFilters = () => {
 
     return isMatch; // 滿足所有篩選條件的紀錄才保留
   });
-};
-
-//依照車牌篩選
-const filterByCar = () => {
-  applyFilters();
-};
-//依照入場日期篩選
-const filterbByDate = () => {
-  applyFilters();
-};
-
-const filterByDistrict = () => {
-  applyFilters();
 };
 
 //辨識視窗大小(依照視窗大小調整看到的表格欄位)
@@ -116,14 +100,12 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- 表格區 -->
-      <!-- 屬性說明:show-overflow-tooltip-欄位超出寬度會顯示提示 -->
       <!----- 篩選區塊 ----->
       <!-- 篩選入場日期 -->
       <div class="mb-2">
         <span>入場日期 </span>
         <el-date-picker
-          @change="filterbByDate"
+          @change="applyFilters"
           v-model="choseDate"
           type="date"
           placeholder="Pick a day"
@@ -134,7 +116,7 @@ onMounted(() => {
         <div class="col-md-8 mb-2">
           <input
             v-model="search"
-            @keyup="filterByDistrict"
+            @keyup="applyFilters"
             type="text"
             class="form-control"
             aria-label="Sizing example input"
@@ -145,7 +127,7 @@ onMounted(() => {
         <!-- 選擇車牌 -->
         <div class="col-md-4">
           <select
-            @change="filterByCar"
+            @change="applyFilters"
             v-model="choseCar"
             width="300px"
             class="form-select form-select-sm mb-2"
@@ -157,6 +139,8 @@ onMounted(() => {
         </div>
       </div>
 
+      <!-- 表格區 -->
+      <!-- 屬性說明:show-overflow-tooltip-欄位超出寬度會顯示提示 -->
       <el-table :data="filteredRecords" height="400">
         <el-table-column
           prop="lotName"
