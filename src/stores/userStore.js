@@ -12,8 +12,8 @@ export const useUserStore = defineStore(
     // 用戶資訊
     const userId = ref(0);
     const username = ref("");
-    const password = ref("");
-    const salt = ref("");
+    // const password = ref("");
+    // const salt = ref("");
     const phone = ref("");
     const licensePlate = ref("");
 
@@ -37,8 +37,8 @@ export const useUserStore = defineStore(
       isLogin.value = false;
       userId.value = 0;
       username.value = "";
-      password.value = "";
-      salt.value = "";
+      // password.value = "";
+      // salt.value = "";
       email.value = "";
       phone.value = "";
       licensePlate.value = "";
@@ -64,8 +64,8 @@ export const useUserStore = defineStore(
     const updateUser = (data) => {
       userId.value = data.userId ?? userId.value;
       username.value = data.username ?? username.value;
-      password.value = data.password ?? password.value;
-      salt.value = data.salt ?? salt.value;
+      // password.value = data.password ?? password.value;
+      // salt.value = data.salt ?? salt.value;
       email.value = data.email ?? email.value;
       phone.value = data.phone ?? phone.value;
       licensePlate.value = data.licensePlate ?? licensePlate.value;
@@ -94,8 +94,8 @@ export const useUserStore = defineStore(
       email,
       userId,
       username,
-      password,
-      salt,
+      // password,
+      // salt,
       phone,
       licensePlate,
       exit,

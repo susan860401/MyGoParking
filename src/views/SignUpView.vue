@@ -11,12 +11,12 @@ const GET_URL = `${BASE_URL}/Customers/login`;
 
 const userStore = useUserStore();
 
-const autoLogin = async () => {
+const autoLogin = async (password) => {
   const email = userStore.email;
-  const password = userStore.password;
+  // const password = userStore.password;
   const loginData = {
     email,
-    password
+    password // 使用註冊時提供的密碼
   }
   const response = await fetch(GET_URL, {
     method: "POST",
@@ -44,6 +44,7 @@ const autoLogin = async () => {
     alert("登入失敗");
   }
 };
+
 
 
 const userData = ref({
@@ -109,7 +110,9 @@ const validate = async () => {
       if (result.message === "註冊成功!") {
         alert(result.message);
         userStore.updateUser(data);
-        await autoLogin(); // 註冊成功後自動登入
+        const password = userData.value.psw
+        await autoLogin(password); // 確保使用者輸入的密碼
+        // await autoLogin(); // 註冊成功後自動登入 
       }
       else {
         alert(result.message);

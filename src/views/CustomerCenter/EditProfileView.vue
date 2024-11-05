@@ -6,6 +6,7 @@ const userStore = useUserStore();
 
 const GET_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/info`;
 const PUT_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/id`;
+const PUT_PURL = `${import.meta.env.VITE_API_BASEURL}/Customers/password`;
 
 // Pinia store
 const user = {
@@ -62,7 +63,7 @@ const toggleEdit = async () => {
   if (isEditing.value) {
     const userId = userStore.userId;
     const PUT_TURL = `${PUT_URL}${userId}`;
-
+    
     try {
       const response = await fetch(PUT_TURL, {
         method: "PUT",
@@ -81,15 +82,22 @@ const toggleEdit = async () => {
   isEditing.value = !isEditing.value; // 切換編輯模式
 };
 
+const chanege = ref({
+  oldPassword : "",
+  newPassword : ""
+})
+
+
+
 const toggleEditPsw = async () => {
   if (isEditingPsw.value) {
     const userId = userStore.userId;
-    const PUT_TURL = `${PUT_URL}${userId}`;
+    const PUT_PPURL = `${PUT_PURL}${userId}`;
 
     try {
-      const response = await fetch(PUT_TURL, {
+      const response = await fetch(PUT_PPURL, {
         method: "PUT",
-        body: JSON.stringify(userStore.$state),
+        body: JSON.stringify(chanege.value),
         headers: { "Content-Type": "application/json" },
       });
 
@@ -131,7 +139,7 @@ onMounted(loadUserInfo);
         <div class="container col-12">
           <li>Email信箱</li>
           <span v-if="!isEditing">{{ userStore.email }}</span>
-          <input v-if="isEditing" v-model="userStore.email" />
+          <input v-if="isEditing" v-model="userStore.email"/>
         </div>
       </ul>
       <a href="#" class="button-17 me-3" @click="toggleEdit">{{
@@ -148,13 +156,24 @@ onMounted(loadUserInfo);
       <ul v-if="user">
         <div class="container col-12">
           <li>密碼</li>
-          <span v-if="!isEditingPsw">請輸入密碼</span>
-          <span v-if="!isEditingPsw">{{ userStore.password }}</span>
-          <input
+          <span v-if="!isEditingPsw">請按更改密碼</span>
+          <!-- <span v-if="!isEditingPsw">{{ userStore.password }}</span> -->
+          <!-- <input
             v-if="isEditingPsw"
             v-model="userStore.password"
-            placeholder="請輸入新密碼"
             type="password"
+          /> -->
+          <input
+            v-if="isEditingPsw"
+            v-model="chanege.oldPassword"
+            type="password"
+            placeholder="請輸入舊密碼"
+          />
+          <input
+            v-if="isEditingPsw"
+            v-model="chanege.newPassword"
+            type="password"
+            placeholder="請輸入新密碼"
           />
         </div>
       </ul>
