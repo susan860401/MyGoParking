@@ -254,31 +254,31 @@ onMounted(async () => {
               style="
                 border: 1px solid gray;
                 border-radius: 10px;
-                background-color: #adadad;
+                background-color: #e6e6f2;
               "
             >
+              <div class="col-lg-12">
+                <Carousel :autoplay="2000" :wrapAround="true" class="p-0">
+                  <Slide
+                    v-for="(img, index) in lotsInfo?.lotImages"
+                    :key="index"
+                  >
+                    <img
+                      :src="img"
+                      class="card-img-top p-2"
+                      style="width: 600px; height: 300px"
+                      :alt="lotsInfo?.lotName"
+                    />
+                  </Slide>
+                  <template #addons>
+                    <Navigation />
+                    <Pagination />
+                  </template>
+                </Carousel>
+              </div>
               <div class="col-lg-6">
                 <div class="col-lg-12">
-                  <Carousel :autoplay="2000" :wrapAround="true" class="p-0">
-                    <Slide
-                      v-for="(img, index) in lotsInfo?.lotImages"
-                      :key="index"
-                    >
-                      <img
-                        :src="img"
-                        class="card-img-top p-2"
-                        style="width: 550px; height: 300px"
-                        :alt="lotsInfo?.lotName"
-                      />
-                    </Slide>
-                    <template #addons>
-                      <Navigation />
-                      <Pagination />
-                    </template>
-                  </Carousel>
-                </div>
-                <div class="col-lg-12">
-                  <div class="card-body mb-3 text-white">
+                  <div class="card-body mb-3">
                     <h5 class="card-title mb-2" style="font-weight: 700">
                       {{ lotsInfo?.lotName
                       }}<span
@@ -325,13 +325,11 @@ onMounted(async () => {
                   </div>
                 </div>
               </div>
-              <div
-                class="col-lg-6 d-flex align-items-center justify-content-center"
-              >
+              <div class="col-lg-6">
                 <div class="content">
                   <!-- Nav pills -->
                   <ul class="nav nav-pills" role="tablist">
-                    <li class="nav-item">
+                    <li class="nav-item" style="overflow: hidden">
                       <a
                         class="nav-link active"
                         data-bs-toggle="pill"
@@ -339,7 +337,7 @@ onMounted(async () => {
                         >預約</a
                       >
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" style="overflow: hidden">
                       <a class="nav-link" data-bs-toggle="pill" href="#Mon"
                         >月租</a
                       >
@@ -403,7 +401,7 @@ onMounted(async () => {
                             </option>
                           </select>
                           <div class="form-group">
-                            <label for="MonTime">預約時間</label>
+                            <label for="MonTime">月租時間</label>
                             <!-- 使用 VueDatePicker 並綁定 v-model -->
                             <VueDatePicker v-model="dateMon" id="MonTime" />
                           </div>
@@ -429,6 +427,82 @@ onMounted(async () => {
 </template>
 
 <style lang="css" scoped>
+/* 背景設計 */
+main {
+  font-family: Arial, sans-serif; /* 更簡約的字體 */
+}
+
+/* 停車場資訊區域樣式 */
+.container {
+  max-width: 900px; /* 控制內容寬度 */
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.card-body {
+  background-color: #ffffff; /* 白色背景 */
+  color: #333333; /* 深色文字 */
+  border-radius: 10px; /* 柔和的圓角 */
+  padding: 20px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* 淡淡的陰影 */
+  line-height: 1.6; /* 增加行距讓文字更易閱讀 */
+}
+
+/* 停車場標題 */
+.card-title {
+  font-size: 1.6em;
+  font-weight: bold;
+  color: #2c3e50; /* 深色標題 */
+  display: flex;
+  align-items: center;
+}
+
+.card-title .fa-star,
+.card-title .fa-circle {
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+
+/* 標題與圖標之間間距 */
+.card-text {
+  margin: 10px 0;
+}
+
+/* 地點與連結顏色 */
+.card-text a {
+  color: #3498db; /* 使用亮藍色來強調連結 */
+  text-decoration: none;
+}
+
+.card-text a:hover {
+  color: #2980b9;
+}
+
+/* 停車場圖片區域樣式 */
+.carousel .slide img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+/* 總體樣式調整 */
+.col-lg-6 {
+  padding: 10px;
+}
+
+button.btn-primary {
+  background-color: #3498db; /* 使用亮藍色的按鈕 */
+  border: none;
+  color: #ffffff;
+  border-radius: 15px;
+  padding: 10px 20px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+button.btn-primary:hover {
+  background-color: #2980b9;
+}
 /* .datepicker {
   position: relative;
   z-index: 9999;
@@ -436,10 +510,42 @@ onMounted(async () => {
 label {
   color: #322f2f;
 }
-.content {
-  width: 450px;
+/* 預約、月租的標籤樣式 */
+.nav-pills .nav-link {
+  background-color: #333333; /* 深灰色背景 */
+  overflow: hidden;
+  padding-top: 13px;
+  margin-bottom: -50px;
+  color: #ffffff;
+  text-align: center;
+  border-radius: 30px;
+  width: 150px;
+  height: 100px;
+  line-height: 50px;
+  z-index: -1;
+}
+.nva-item {
+  overflow: hidden;
+}
+.nav-pills .nav-link.active {
+  background-color: #ffffff;
+  color: #333333;
+  z-index: -1;
+}
+
+/* 調整內容區域的陰影和圓角 */
+.tab-content {
+  background-color: #ffffff;
+  color: #333333;
+  padding: 20px;
+  border-radius: 0 15px 15px 15px;
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+}
+/* .content {
+  width: 300px;
   height: auto;
-  margin: 0 auto;
+  margin: 0 auto; 
   padding: 30px;
 }
 .nav-pills {
@@ -463,7 +569,7 @@ label {
 }
 .tab-content {
   position: absolute;
-  width: 450px;
+  width: 25%;
   height: auto;
   margin-top: -50px;
   background: #ece9e9;
@@ -479,5 +585,5 @@ label {
   width: 100px;
   margin: 0 auto;
   float: right;
-}
+} */
 </style>
