@@ -1,12 +1,15 @@
 <script setup>
 import { ref } from "vue";
+import { useUserStore } from "@/stores/userStore"; //要取Pinia
 
 const API_URL = "https://localhost:7077/api";
+const userStore = useUserStore();
+const userId = userStore.userId;
 const coupons = ref([]); //傳回的優惠券放此
 const couponFilter = ref("全部");
 
 const loadCoupons = async () => {
-  const response = await fetch(`${API_URL}/Coupons?userId=1`);
+  const response = await fetch(`${API_URL}/Coupons?userId=${userId}`);
   const datas = await response.json();
   coupons.value = datas;
 };
@@ -17,7 +20,7 @@ const filterCoupon = async () => {
     return;
   }
   const response = await fetch(
-    `${API_URL}/Coupons/filter?userId=1&filter=${couponFilter.value}`
+    `${API_URL}/Coupons/filter?userId=${userId}&filter=${couponFilter.value}`
   );
 
   const datas = await response.json();

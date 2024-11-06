@@ -1,18 +1,19 @@
 <script setup>
 import item from "isotope-layout/js/item";
 import { ref } from "vue";
+import { useUserStore } from "@/stores/userStore"; //要取Pinia
 
 const API_URL = "https://localhost:7077/api";
+const userStore = useUserStore();
+const userId = userStore.userId;
 
 // 一開始要載入的car
 const cars = ref([]);
 let originalCars = []; //存放原始資料
 const remind = ref("");
-//之後要改
-// const user = JSON.parse(localStorage.getItem("user")).userId;
 
 const loadLicensePlates = async () => {
-  const response = await fetch(`${API_URL}/Cars_?userId=1`);
+  const response = await fetch(`${API_URL}/Cars_?userId=${userId}`);
   const datas = await response.json();
   cars.value = datas.map((item) => ({
     ...item,
@@ -54,7 +55,7 @@ const sanitizeData = (car) => {
 };
 
 const saveCar = async () => {
-  const newCars = cars.value.filter((car) => car.isNew).map(sanitizeData); // 新增車牌，不含多餘屬性; //抓出新增的車牌
+  const newCars = cars.value.filter((car) => car.isNew).map(sanitizeData); // 新增的車牌，不含多餘屬性; //抓出新增的車牌
   const updatedCars = cars.value
     .filter((car, index) => {
       if (!car.isNew) {
@@ -65,15 +66,17 @@ const saveCar = async () => {
 
   //處理新增的車牌
   if (newCars.length > 0) {
-    const response = await fetch(`${API_URL}/Cars_?userId=${user}`, {
+    const response = await fetch(`${API_URL}/Cars_?userId=${userId}`, {
       method: "POST",
       body: JSON.stringify(newCars),
       headers: { "Content-Type": "application/json" },
     });
-    if (response.ok) {
-      alert("新增成功");
+    const result = await response.json(); // 解析 JSON 響應
+
+    if (result.success) {
+      alert(result.message);
     } else {
-      alert("新增失敗");
+      alert(result.message); //顯示錯誤訊息
     }
   }
   if (updatedCars.length > 0) {

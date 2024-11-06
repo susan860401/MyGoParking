@@ -1,26 +1,49 @@
 <script setup>
 import { scrollbarProps } from "element-plus";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+import { useUserStore } from "@/stores/userStore"; //要取Pinia
 
+const userStore = useUserStore();
+const userId = userStore.userId;
 const API_URL = "https://localhost:7077/api";
 const activePage = ref("current"); //目前在哪個頁面(當前合約還是歷史)
 const monthlyRentals = ref([]);
-const currentRental = ref([]);
+const filteredRentals = ref([]); // 儲存經過過濾的紀錄
+const currentRental = ref([]); //還沒到期的合約
+const licensePlate = ref([]); //儲存用戶的車牌
+const choseCar = ref("請選擇車牌");
+const choseDate = ref("");
+const search = ref(""); //搜尋行政區
 //用來判斷視窗大小決定顯示欄位
 const isPhoneSize = ref(false);
 const isSmallScreen = ref(false);
 const isMiddleScreen = ref(false);
 
-const loadMonthlyRental = async () => {
-  const response = await fetch(`${API_URL}/MonthlyRentals?userId=1`);
+//取得用戶的車牌
+const getLicensePlate = async () => {
+  const response = await fetch(
+    `${API_URL}/Reservations/GetUserCarPlate?userId=${userId}`
+  );
   const datas = await response.json();
-  monthlyRentals.value = datas;
-  const today = new Date();
-  currentRental.value = monthlyRentals.value.filter((rental) => {
-    return new Date(rental.endDate) > today;
-  });
-  console.log(currentRental.value.length);
+  licensePlate.value = datas.userCarPlate;
+  console.log(licensePlate);
 };
+
+const loadMonthlyRental = async () => {
+  try {
+    const response = await fetch(`${API_URL}/MonthlyRentals?userId=${userId}`);
+    const datas = await response.json();
+    monthlyRentals.value = datas;
+    filteredRentals.value = datas;
+    const today = new Date();
+    currentRental.value = monthlyRentals.value.filter((rental) => {
+      return new Date(rental.endDate) > today;
+    });
+  } catch (error) {
+    console.error("Failed to load monthly rentals", error);
+  }
+};
+
 //載入當前合約
 const loadCurrent = async () => {
   activePage.value = "current";
@@ -31,6 +54,34 @@ const loadHistory = async () => {
   activePage.value = "history";
   console.log("history");
 };
+
+//進階篩選
+const applyFilters = () => {
+  filteredRentals.value = monthlyRentals.value.filter((rental) => {
+    // 滿足條件的項目才會保留
+    let isMatch = true;
+
+    // 如果有選擇車牌，進行車牌篩選
+    if (choseCar.value != "請選擇車牌") {
+      isMatch = isMatch && rental.licensePlate == choseCar.value;
+    }
+
+    // 如果有選擇日期，亦進行日期篩選
+    if (choseDate.value) {
+      //只比對日期部分
+      const startDate = new Date(rental.startDate).toLocaleDateString();
+      const chosenDate = new Date(choseDate.value).toLocaleDateString();
+      isMatch = isMatch && startDate == chosenDate;
+    }
+    //如果有搜尋行政區
+    if (search.value) {
+      isMatch = isMatch && rental.district.includes(search.value);
+    }
+
+    return isMatch; // 滿足所有篩選條件的紀錄才保留
+  });
+};
+
 //格式化日期
 const formatDate = (date) => {
   const convertDate = new Date(date);
@@ -70,14 +121,16 @@ const checkScreenSize = () => {
   isSmallScreen.value = window.innerWidth >= 450 && window.innerWidth < 768;
   isMiddleScreen.value = window.innerWidth >= 768 && window.innerWidth < 1200;
 };
-
 loadMonthlyRental();
+onMounted(() => {
+  getLicensePlate();
+});
 </script>
 
 <template>
   <div>
     <div id="outside" class="container" data-aos="fade-up">
-      <div class="d-flex justify-content-between">
+      <div class="d-flex justify-content-between mb-3">
         <div>
           <button
             class="list me-2"
@@ -96,13 +149,42 @@ loadMonthlyRental();
         </div>
         <div>
           <select
+            @change="applyFilters"
+            v-model="choseCar"
             width="300px"
             class="form-select form-select-sm mb-2"
             aria-label=".form-select-sm example"
           >
-            <option selected>車牌1</option>
-            <option value="">車牌2</option>
+            <option value="請選擇車牌">請選擇車牌</option>
+            <option v-for="car in licensePlate" :value="car">{{ car }}</option>
           </select>
+        </div>
+      </div>
+      <div
+        v-if="activePage == 'history'"
+        class="d-flex flex-column flex-md-row justify-content-between mb-2"
+      >
+        <div class="mb-2 col-12 col-md-5">
+          <span>起始日期 </span>
+          <el-date-picker
+            @change="applyFilters"
+            v-model="choseDate"
+            type="date"
+            placeholder="Pick a day"
+          />
+        </div>
+
+        <!-- 搜尋行政區 -->
+        <div class="col-12 col-md-4">
+          <input
+            v-model="search"
+            @keyup="applyFilters"
+            type="text"
+            class="form-control"
+            aria-label="Sizing example input"
+            aria-describedby="inputGroup-sizing-sm"
+            placeholder="預訂停車場行政區(e.g., 三民區)"
+          />
         </div>
       </div>
 
@@ -324,14 +406,14 @@ loadMonthlyRental();
       <el-table
         class="mt-2"
         v-else-if="activePage == 'history'"
-        :data="monthlyRentals"
+        :data="filteredRentals"
         style="width: 100%"
         height="400"
       >
         <el-table-column
           prop="lotName"
           label="停車場名稱"
-          :width="isPhoneSize ? 120 : 150"
+          :min-width="isPhoneSize ? 120 : 150"
           :sortable="true"
           show-overflow-tooltip
           header-cell-class-name="custom-header"
@@ -341,13 +423,13 @@ loadMonthlyRental();
           v-if="!isPhoneSize"
           prop="licensePlate"
           label="車牌號碼"
-          width="105"
+          :min-width="105"
           :sortable="true"
         ></el-table-column>
         <el-table-column
           v-if="!isSmallScreen && !isPhoneSize"
           label="合約期間"
-          width="200"
+          :min-width="200"
           :sortable="true"
           ><template #default="scope">
             <div>
@@ -356,7 +438,7 @@ loadMonthlyRental();
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="方案名稱" width="120" :sortable="true">
+        <el-table-column label="方案名稱" :min-width="120" :sortable="true">
           <template #default="scope">
             <div>
               {{ getRentalPlan(scope.row.amount, scope.row.monRentalRate) }}
@@ -364,7 +446,7 @@ loadMonthlyRental();
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="月租費" width="100" :sortable="true"
+        <el-table-column label="月租費" :min-width="100" :sortable="true"
           ><template #default="scope">
             <div>
               {{
@@ -377,12 +459,12 @@ loadMonthlyRental();
         <el-table-column
           prop="amount"
           label="總額"
-          width="80"
+          :min-width="80"
           :sortable="true"
         ></el-table-column>
         <el-table-column
           label="狀態"
-          width="80"
+          :min-width="80"
           :sortable="true"
           align="center"
         >
@@ -398,7 +480,7 @@ loadMonthlyRental();
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="amount" label="" width="60">
+        <el-table-column prop="amount" label="" :min-width="60">
           <template #default="scope">
             <div @click="" class="seeDetail">
               <i class="fa-solid fa-magnifying-glass"></i>

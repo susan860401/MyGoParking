@@ -1,21 +1,26 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/userStore"; //要取Pinia
 
 const API_URL = "https://localhost:7077/api";
+const userStore = useUserStore();
+const userId = userStore.userId;
 const reservations = ref([]); //傳回的預訂資料放此
-const search = ref("");
+const search = ref(""); //搜尋關鍵字
+const period = ref("all"); //選擇篩選區段
 const router = useRouter();
-const completedRes = ref([]); //已完成的訂單
-const ongoingRes = ref([]); //還在進行的訂單
+const completedRes = ref([]); //已完成的訂單(用isFinish判斷，區分為上下區塊)
+const ongoingRes = ref([]); //還在進行的訂單(用isFinish判斷，區分為上下區塊)
 const isAllStatus = ref(true); //用來判斷如果是顯示全部的情況(才會顯示現正進行中區塊)
-const countAll = ref(0);
-const countComplete = ref(0);
-const countCancel = ref(0);
-const countOverdue = ref(0);
+const countAll = ref(0); //上方顯示全部預訂數字
+const countComplete = ref(0); //上方顯示已完成預訂數字
+const countCancel = ref(0); //上方顯示已取消預訂數字
+const countOverdue = ref(0); //上方顯示逾時預訂數字(違規)
+const isNoData = ref();
 
 const loadReservations = async () => {
-  const response = await fetch(`${API_URL}/Reservations?userId=1`);
+  const response = await fetch(`${API_URL}/Reservations?userId=${userId}`);
   const datas = await response.json();
   reservations.value = datas;
   //已完成的訂單
@@ -27,6 +32,9 @@ const loadReservations = async () => {
   ).length;
   countCancel.value = reservations.value.filter((res) => res.isCanceled).length;
   countOverdue.value = reservations.value.filter((res) => res.isOverdue).length;
+  if (ongoingRes.value.length == 0) {
+    isNoData.value = true; //判斷有無資料顯示佔位符
+  }
 };
 
 //切換觀看不同狀態的預訂紀錄
@@ -38,7 +46,7 @@ const filterByStatus = async (filter) => {
   } else {
     isAllStatus.value = false;
     const response = await fetch(
-      `${API_URL}/Reservations/filter?userId=1&filter=${filter}`
+      `${API_URL}/Reservations/filter?userId=${userId}&filter=${filter}`
     );
     const datas = await response.json();
     reservations.value = datas;
@@ -46,18 +54,49 @@ const filterByStatus = async (filter) => {
   }
 };
 
-//待改成以區域篩選
-const filterByLotName = async () => {
+//待改成以區域篩選(可能改前端篩選就好?)
+const filterByDistrict = async () => {
   if (search.value == "") {
-    loadReservations();
+    loadReservations(); //但其實要考慮可能有進階篩選問題
   } else {
     const response = await fetch(
-      `${API_URL}/Reservations/search/${search.value}?userId=1`
+      `${API_URL}/Reservations/search/?userId=${userId}&district=${search.value}`
     );
     const datas = await response.json();
     reservations.value = datas;
+    completedRes.value = datas.filter((res) => res.isFinish);
+    ongoingRes.value = datas.filter((res) => !res.isFinish);
   }
 };
+
+// 以預訂日期篩選預訂紀錄
+const changePeriod = () => {
+  const today = new Date();
+
+  if (period.value === "all") {
+    // 所有區間，這裡可以放置處理所有預訂的邏輯
+    loadReservations(); //但要考慮進階篩選..
+    return;
+  } else {
+    let filterDate;
+
+    if (period.value === "month") {
+      filterDate = new Date(today.setDate(today.getDate() - 30));
+    } else if (period.value === "month_3") {
+      filterDate = new Date(today.setMonth(today.getMonth() - 3));
+    } else if (period.value === "year") {
+      filterDate = new Date(today.setFullYear(today.getFullYear() - 1));
+    }
+
+    ongoingRes.value = ongoingRes.value.filter(
+      (res) => new Date(res.resTime) >= filterDate
+    );
+    completedRes.value = completedRes.value.filter(
+      (res) => new Date(res.resTime) >= filterDate
+    );
+  }
+};
+
 //格式化時間
 const formatTime = (time) => {
   const date = new Date(time);
@@ -78,6 +117,12 @@ const toRes = (res) => {
       // 傳遞選中的停車場名稱
     },
   });
+};
+
+//開啟地圖(導航)
+const openMap = (latitude, longitude) => {
+  const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+  window.location.href = url;
 };
 
 //取消預訂
@@ -132,13 +177,15 @@ onMounted(() => {
           <!-- 選擇預訂期間 -->
           <div class="col-md-3">
             <select
+              v-model="period"
+              @change="changePeriod"
               class="form-select form-select-sm mb-2"
               aria-label=".form-select-sm example"
             >
-              <option selected>所有預訂</option>
-              <option value="1">過去30天</option>
-              <option value="2">過去3個月</option>
-              <option value="3">過去1年</option>
+              <option value="all" selected>所有預訂</option>
+              <option value="month">過去30天</option>
+              <option value="month_3">過去3個月</option>
+              <option value="year">過去1年</option>
             </select>
           </div>
           <!-- 搜尋特定停車場 -->
@@ -146,12 +193,12 @@ onMounted(() => {
             <div class="input-group input-group-sm mb-3">
               <input
                 v-model="search"
-                @keyup="filterByLotName"
+                @keyup="filterByDistrict"
                 type="text"
                 class="form-control"
                 aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm"
-                placeholder="查詢停車場"
+                placeholder="預訂停車場行政區(e.g., 三民區)"
               />
             </div>
           </div>
@@ -163,7 +210,30 @@ onMounted(() => {
           data-aos-delay="100"
         >
           <!-- 現正進行中區塊:還未取消、還未overdue -->
-          <h2 v-if="isAllStatus">現正進行中</h2>
+          <i
+            ><h3 class="title" v-if="isAllStatus && !isNoData">
+              現正進行中
+            </h3></i
+          >
+          <!-- place holder -->
+          <div class="container mb-3 noDataArea" v-if="isNoData && isAllStatus">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="d-flex mb-2">
+                  <img
+                    src="/src/assets/images/parkinglot.png"
+                    alt="無預訂資料"
+                    class="img-fluid"
+                    style="width: 400px; height: 250px; object-fit: cover"
+                  />
+                </div>
+              </div>
+              <div class="col-md-6 d-flex flex-column justify-content-center">
+                <h2>無進行中預訂</h2>
+                <p>立即開始您的預訂，體驗我們的便捷服務！</p>
+              </div>
+            </div>
+          </div>
           <div
             v-if="isAllStatus"
             v-for="ongoing in ongoingRes"
@@ -187,10 +257,21 @@ onMounted(() => {
                   <p style="text-align: right">
                     {{ ongoing.licensePlate }}
                   </p>
-                  <h5 class="card-title">{{ ongoing.lotName }}</h5>
-
-                  <p>預訂時間：{{ formatTime(ongoing.resTime) }}</p>
-                  <p>預計入場時間：{{ formatTime(ongoing.startTime) }}</p>
+                  <p></p>
+                  <h5 class="card-title">
+                    {{ ongoing.lotName }}
+                  </h5>
+                  <p style="line-height: 30px">
+                    <strong>位置</strong> {{ ongoing.district }}
+                    {{ ongoing.location }}
+                  </p>
+                  <p class="mb-1">
+                    預訂時間： {{ formatTime(ongoing.resTime) }}
+                  </p>
+                  <p>
+                    預計入場時間：
+                    {{ formatTime(ongoing.startTime) }}
+                  </p>
                   <p v-if="ongoing.paymentStatus" class="text-success">
                     <i class="fa-regular fa-clock"></i>
                     最遲於 {{ formatTime(ongoing.validUntil) }} 入場
@@ -200,6 +281,12 @@ onMounted(() => {
                     請盡速繳費
                   </p>
                   <div style="text-align: right">
+                    <button
+                      @click="openMap(ongoing.latitude, ongoing.longitude)"
+                      class="btn btn-light"
+                    >
+                      <i class="fa-solid fa-location-crosshairs"></i> 開啟導航
+                    </button>
                     <button
                       @click="cancelRes(ongoing.resId)"
                       type="button"
@@ -213,7 +300,8 @@ onMounted(() => {
             </div>
           </div>
           <!-- 已完成區塊 -->
-          <h2 v-if="isAllStatus">歷史預訂</h2>
+
+          <i><h3 class="title" v-if="isAllStatus">歷史預訂</h3></i>
           <div
             v-for="complete in completedRes"
             :key="complete.resId"
@@ -237,8 +325,13 @@ onMounted(() => {
                     {{ complete.licensePlate }}
                   </p>
                   <h5 class="card-title">{{ complete.lotName }}</h5>
-
-                  <p>預訂時間：{{ formatTime(complete.resTime) }}</p>
+                  <p style="line-height: 30px">
+                    <strong>位置</strong> {{ complete.district }}
+                    {{ complete.location }}
+                  </p>
+                  <p class="mb-1">
+                    預訂時間：{{ formatTime(complete.resTime) }}
+                  </p>
                   <p>預計入場時間：{{ formatTime(complete.startTime) }}</p>
                   <small
                     v-if="
@@ -294,5 +387,23 @@ onMounted(() => {
 
 #nav li:hover {
   color: #fabc3f;
+}
+
+strong {
+  /* background-color: rgb(247, 238, 238); */
+  border: 1px solid lightgray;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.title {
+  padding: 2px 5px;
+  color: lightslategrey;
+  font-weight: normal;
+  background: linear-gradient(to right, #dfe9f3 0%, white 100%);
+  background-color: transparent;
+}
+
+.noDataArea {
 }
 </style>
