@@ -188,20 +188,14 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- <img id="noDataImg" src="/src/assets/images/Nodatas.webp" alt="No Data" /> -->
-
       <div
         v-if="activePage == 'current'"
         class="accordion mt-2"
         id="accordionPanelsStayOpenExample"
       >
         <!-- 至少要顯示一個 -->
-        <div class="accordion-item">
-          <h2
-            v-if="currentRental.length"
-            class="accordion-header"
-            id="panelsStayOpen-headingOne"
-          >
+        <div v-if="currentRental.length" class="accordion-item" >
+          <h2 class="accordion-header" id="panelsStayOpen-headingOne">
             <button
               class="accordion-button"
               type="button"
@@ -302,7 +296,11 @@ onMounted(() => {
             </div>
           </div>
         </div>
-        <div v-for="(current, index) in currentRental" class="accordion-item">
+        <div
+          v-if="currentRental.length > 1"
+          v-for="(current, index) in currentRental"
+          class="accordion-item"
+        >
           <h2
             v-if="index !== 0"
             class="accordion-header"
