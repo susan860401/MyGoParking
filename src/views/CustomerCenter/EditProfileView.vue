@@ -164,6 +164,7 @@ onMounted(loadUserInfo);
             type="password"
           /> -->
           <input
+            class="me-1"
             v-if="isEditingPsw"
             v-model="chanege.oldPassword"
             type="password"

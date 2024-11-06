@@ -1,10 +1,11 @@
 <script setup>
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
 import router from "@/router";
+import { ref } from "vue";
 import { useUserStore } from "@/stores/userStore";
 
 const API_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/login`;
-
+const API_FURL = `${import.meta.env.VITE_API_BASEURL}/Customers/forgot`;
 const userStore = useUserStore();
 
 const user = {
@@ -29,10 +30,40 @@ const send = async () => {
     } else if (datas.message === "無此帳號") {
       alert("無此帳號,請重新登入!!");
     } else {
-      alert("登入失敗,請重新登入!!");
+      console.log("非登入狀態");
+      //alert("登入失敗,請重新登入!!");
     }
   }
 };
+
+//忘記密碼
+const message = ref('');
+const error = ref('');
+
+const sendResetLink = async ()=>{
+      message.value = '';
+      error.value = '';
+
+      try {
+        const response = await fetch(API_FURL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: user.email }),
+        });
+
+        if (!response.ok) {
+          throw new Error('發送失敗，請稍後再試。');
+        }
+
+        const result = await response.json();
+        message.value = result.message || '重設密碼的連結已發送至您的 Email';
+      } catch (err) {
+        error.value = err.message || '發送過程中出錯';
+      }
+    };
+
 </script>
 
 <template>
@@ -96,7 +127,6 @@ const send = async () => {
                       class="form-control"
                       name="psw"
                       placeholder="請輸入密碼"
-                      required
                       v-model="user.password"
                       id="password"
                     />
@@ -118,15 +148,15 @@ const send = async () => {
                     >
                       <RouterLink
                         :to="{ name: 'signUp' }"
-                        class="link-secondary text-decoration-none"
-                        >註冊新帳號</RouterLink
-                      >
-                      <a>忘記密碼</a>
-                      
-                    </div>
-                  </div>
+                        class="link-secondary text-decoration-none">註冊新帳號
+                      </RouterLink>
+                      <button class="btn-none" :disabled="isLoading" @click="sendResetLink">忘記密碼</button>
+                    </div>                 
+                  </div>            
                 </div>
               </form>
+                  <p v-if="message">{{ message }}</p>
+                  <p v-if="error">{{ error }}</p>
             </div>
             <!-- End Quote Form -->
           </div>
@@ -138,4 +168,9 @@ const send = async () => {
 </template>
 
 <style lang="css" scoped>
+.btn-none{
+  border: 0;
+  background-color: #fff;
+  color: #4f4f4f;
+}
 </style>
