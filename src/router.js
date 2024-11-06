@@ -27,6 +27,7 @@ import TestConfirmView from "./views/ChargeConfirmView.vue";
 import ChargeView from "./views/ChargeView.vue";
 import ChargConfirmView from "./views/ChargeConfirmView.vue";
 import { useUserStore } from './stores/userStore';
+import TestRentView from "./views/TestRentView.vue";
 
 
 const routes = [
@@ -79,10 +80,16 @@ const routes = [
     path: "/ChargeView",
     component: ChargeView,
     name: "ChargeView",
-  }, {
+  },
+  {
     path: "/ChargeConfirmView",
     component: ChargConfirmView,
     name: "ChargeConfirmView",
+  },
+  {
+    path: "/TestRentView",
+    component: TestRentView,
+    name: "TestRentView",
   },
   {
     path: "/CustomerCenter",
