@@ -2,8 +2,8 @@
 import { ref, onMounted } from "vue";
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
 import axios from "axios";
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 // 初始化資料
 const amount = ref(0);
@@ -11,7 +11,7 @@ const lotName = ref("");
 const paymentStatus = ref("等待確認...");
 const isDisabled = ref(true);
 const buttonClass = ref("btn-secondary");
-const startTime = ref('');
+const startTime = ref("");
 
 // API 路徑
 const baseApiUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay`;
@@ -19,7 +19,9 @@ const baseApiUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay`;
 // 取得 sessionStorage 中的付款資料
 onMounted(() => {
   const storedInfo = JSON.parse(sessionStorage.getItem("paymentInfo"));
-  startTime.value = dayjs.utc(sessionStorage.getItem("startTime")).format('YYYY-MM-DD HH:mm');
+  startTime.value = dayjs
+    .utc(sessionStorage.getItem("startTime"))
+    .format("YYYY-MM-DD HH:mm");
   if (storedInfo) {
     amount.value = storedInfo.amount;
     lotName.value = storedInfo.lot;
@@ -69,11 +71,11 @@ async function confirmPayment() {
       paymentStatus.value = `交易狀態: ${check.data.message}`;
     }
 
-    setTimeout(() => (window.location.href = "/"), 3000);
+    setTimeout(() => (window.location.href = "/"), 500);
   } catch (error) {
     console.error("交易確認失敗:", error);
     paymentStatus.value = "交易狀態: 失敗，請稍後再試";
-    setTimeout(() => (window.location.href = "/"), 3000);
+    setTimeout(() => (window.location.href = "/"), 1000);
   } finally {
     isDisabled.value = false;
   }
@@ -95,18 +97,41 @@ async function confirmPayment() {
       </div>
       <div class="form-group mb-4">
         <label for="amount" class="form-label">預約訂金</label>
-        <input type="text" id="amount" class="form-control form-control-lg" :value="`${amount} TWD`" readonly />
+        <input
+          type="text"
+          id="amount"
+          class="form-control form-control-lg"
+          :value="`${amount} TWD`"
+          readonly
+        />
       </div>
       <div class="form-group mb-4">
         <label for="paymentStatus" class="form-label">交易狀態</label>
-        <input type="text" id="paymentStatus" class="form-control form-control-lg" :value="paymentStatus" readonly />
+        <input
+          type="text"
+          id="paymentStatus"
+          class="form-control form-control-lg"
+          :value="paymentStatus"
+          readonly
+        />
       </div>
       <div class="form-group mb-4">
         <label for="paymentStatus" class="form-label">入場時間</label>
-        <input type="text" id="paymentStatus" class="form-control form-control-lg" readonly :value="startTime" />
+        <input
+          type="text"
+          id="paymentStatus"
+          class="form-control form-control-lg"
+          readonly
+          :value="startTime"
+        />
       </div>
       <div class="text-center">
-        <button class="btn btn-lg mt-3" :class="[buttonClass]" @click.prevent="confirmPayment" :disabled="isDisabled">
+        <button
+          class="btn btn-lg mt-3"
+          :class="[buttonClass]"
+          @click.prevent="confirmPayment"
+          :disabled="isDisabled"
+        >
           確認支付
         </button>
       </div>
