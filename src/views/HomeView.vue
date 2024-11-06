@@ -28,7 +28,6 @@ onMounted(async () => {
   userStore.checkLoginStatus(); // 初始化時檢查登入狀態
   const user = localStorage.getItem("isLogin");
   const data = JSON.parse(user);
-  console.log(`登入狀態：${data}`);
   if (userStore.isLogin) {
     await router.push("/search");
   }

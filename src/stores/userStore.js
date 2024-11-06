@@ -8,12 +8,9 @@ export const useUserStore = defineStore(
     const isLogin = ref(false); // 初始登錄狀態
     const isRegisterSuccess = ref(false);
     const email = ref("");
-    // const token = ref("");
     // 用戶資訊
     const userId = ref(0);
     const username = ref("");
-    const password = ref("");
-    const salt = ref("");
     const phone = ref("");
     const licensePlate = ref("");
 
@@ -21,7 +18,6 @@ export const useUserStore = defineStore(
     const message = ref("");
 
     // const isCouponClaimed = ref(false);// 是否已領取優惠券
-
     // const isProfileComplete = computed(() => {
     //   username.value !== null && phone.value !== null;
     // });
@@ -37,8 +33,6 @@ export const useUserStore = defineStore(
       isLogin.value = false;
       userId.value = 0;
       username.value = "";
-      password.value = "";
-      salt.value = "";
       email.value = "";
       phone.value = "";
       licensePlate.value = "";
@@ -64,8 +58,6 @@ export const useUserStore = defineStore(
     const updateUser = (data) => {
       userId.value = data.userId ?? userId.value;
       username.value = data.username ?? username.value;
-      password.value = data.password ?? password.value;
-      salt.value = data.salt ?? salt.value;
       email.value = data.email ?? email.value;
       phone.value = data.phone ?? phone.value;
       licensePlate.value = data.licensePlate ?? licensePlate.value;
@@ -73,29 +65,12 @@ export const useUserStore = defineStore(
       message.value = data.message ?? message.value;
     };
 
-    // // 設定 Email
-    // const setEmail = (newEmail) => {
-    //   email.value = newEmail;
-    // };
-
-    // // 設定 Token
-    // const setToken = (newToken) => {
-    //   token.value = newToken;
-    // };
-
-    // // 清空 Email 和 Token
-    // const clear = () => {
-    //   email.value = "";
-    //   token.value = "";
-    // };
 
     return {
       isLogin,
       email,
       userId,
       username,
-      password,
-      salt,
       phone,
       licensePlate,
       exit,

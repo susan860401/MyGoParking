@@ -6,6 +6,7 @@ const userStore = useUserStore();
 
 const GET_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/info`;
 const PUT_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/id`;
+const PUT_PURL = `${import.meta.env.VITE_API_BASEURL}/Customers/password`;
 
 // Pinia store
 const user = {
@@ -48,12 +49,14 @@ const loadUserInfo = async () => {
   try {
     const response = await fetch(GET_TURL);
     if (!response.ok) {
-      throw new Error("讀取失敗");
+      console.log("讀取失敗")
+      // throw new Error("讀取失敗");
     }
     const data = await response.json();
     userStore.updateUser(data);
   } catch (error) {
-    alert("讀取失敗: " + error.message);
+    console.log("讀取失敗")
+    // alert("讀取失敗: " + error.message);
   }
 };
 
@@ -62,7 +65,7 @@ const toggleEdit = async () => {
   if (isEditing.value) {
     const userId = userStore.userId;
     const PUT_TURL = `${PUT_URL}${userId}`;
-
+    
     try {
       const response = await fetch(PUT_TURL, {
         method: "PUT",
@@ -81,15 +84,22 @@ const toggleEdit = async () => {
   isEditing.value = !isEditing.value; // 切換編輯模式
 };
 
+const chanege = ref({
+  oldPassword : "",
+  newPassword : ""
+})
+
+
+
 const toggleEditPsw = async () => {
   if (isEditingPsw.value) {
     const userId = userStore.userId;
-    const PUT_TURL = `${PUT_URL}${userId}`;
+    const PUT_PPURL = `${PUT_PURL}${userId}`;
 
     try {
-      const response = await fetch(PUT_TURL, {
+      const response = await fetch(PUT_PPURL, {
         method: "PUT",
-        body: JSON.stringify(userStore.$state),
+        body: JSON.stringify(chanege.value),
         headers: { "Content-Type": "application/json" },
       });
 
@@ -114,24 +124,24 @@ onMounted(loadUserInfo);
         <div class="container">
           <div class="form-group">
             <li>姓名</li>
-            <span v-if="!isEditing">{{ userStore.username }}</span>
-            <input v-if="isEditing" v-model="userStore.username" />
+            <span v-if="!isEditing">{{ userStore.username && userStore.username.trim() ? userStore.username : '尚未填寫姓名' }}</span>
+            <input v-if="isEditing" v-model="userStore.username"/>
           </div>
           <div class="form-group">
             <li class="">電話</li>
-            <span v-if="!isEditing">{{ userStore.phone }}</span>
-            <input v-if="isEditing" v-model="userStore.phone" />
+            <span v-if="!isEditing">{{ userStore.phone && userStore.phone.trim() ? userStore.phone : '尚未填寫電話' }}</span>
+            <input v-if="isEditing" v-model="userStore.phone"/>
           </div>
           <div class="form-group">
             <li>車牌</li>
-            <span v-if="!isEditing">{{ userStore.licensePlate }}</span>
-            <input v-if="isEditing" v-model="userStore.licensePlate" />
+            <span v-if="!isEditing">{{ userStore.licensePlate && userStore.licensePlate.trim() ? userStore.licensePlate : '尚未填寫車牌' }}</span>
+            <input v-if="isEditing" v-model="userStore.licensePlate"/>
           </div>
         </div>
         <div class="container col-12">
           <li>Email信箱</li>
-          <span v-if="!isEditing">{{ userStore.email }}</span>
-          <input v-if="isEditing" v-model="userStore.email" />
+          <span v-if="!isEditing">{{ userStore.email && userStore.email.trim() ? userStore.email : '尚未填寫email' }}</span>
+          <input v-if="isEditing" v-model="userStore.email"/>
         </div>
       </ul>
       <a href="#" class="button-17 me-3" @click="toggleEdit">{{
@@ -140,7 +150,7 @@ onMounted(loadUserInfo);
       <button type="button" class="button-17" @click="toggleCardB">
         更改密碼
       </button>
-      <!-- <button v-if="useUserStore.isProfileComplete && !userStore.isCouponClaimed" type="button" class="button-17 blinking-button" id="couBtn" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo" @click="claimCoupon" > <i class="fa-solid fa-gift me-2" style="color: #f3c212"></i>領取優惠券 </button> -->
+      <!-- <button type="button" class="button-17 blinking-button" id="couBtn" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo" @click="claimCoupon" > <i class="fa-solid fa-gift me-2" style="color: #f3c212"></i>領取優惠券 </button> -->
     </div>
   </div>
   <div v-if="isPsw" class="card">
@@ -148,13 +158,25 @@ onMounted(loadUserInfo);
       <ul v-if="user">
         <div class="container col-12">
           <li>密碼</li>
-          <span v-if="!isEditingPsw">請輸入密碼</span>
-          <span v-if="!isEditingPsw">{{ userStore.password }}</span>
-          <input
+          <span v-if="!isEditingPsw">請按更改密碼</span>
+          <!-- <span v-if="!isEditingPsw">{{ userStore.password }}</span> -->
+          <!-- <input
             v-if="isEditingPsw"
             v-model="userStore.password"
-            placeholder="請輸入新密碼"
             type="password"
+          /> -->
+          <input
+            class="me-1"
+            v-if="isEditingPsw"
+            v-model="chanege.oldPassword"
+            type="password"
+            placeholder="請輸入舊密碼"
+          />
+          <input
+            v-if="isEditingPsw"
+            v-model="chanege.newPassword"
+            type="password"
+            placeholder="請輸入新密碼"
           />
         </div>
       </ul>
@@ -184,7 +206,7 @@ onMounted(loadUserInfo);
     opacity: 0;
   }
   100% {
-    opacity: 1;
+    opacity: 2;
   }
 }
 
