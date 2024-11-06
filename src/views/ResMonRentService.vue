@@ -248,161 +248,176 @@ onMounted(async () => {
     <section>
       <div class="container mt-3">
         <div class="row">
-          <div class="col-lg-6">
+          <div class="col-lg-12">
             <div
               class="row"
-              style="border: 1px solid gray; border-radius: 10px"
+              style="
+                border: 1px solid gray;
+                border-radius: 10px;
+                background-color: #adadad;
+              "
             >
-              <div class="col-lg-12">
-                <Carousel :autoplay="2000" :wrapAround="true" class="p-0">
-                  <Slide
-                    v-for="(img, index) in lotsInfo?.lotImages"
-                    :key="index"
-                  >
-                    <img
-                      :src="img"
-                      class="card-img-top p-2"
-                      style="width: 550px; height: 300px"
-                      :alt="lotsInfo?.lotName"
-                    />
-                  </Slide>
-                  <template #addons>
-                    <Navigation />
-                    <Pagination />
-                  </template>
-                </Carousel>
-              </div>
-              <div class="col-lg-12">
-                <div class="card-body mb-3">
-                  <h5 class="card-title mb-2" style="font-weight: 700">
-                    {{ lotsInfo?.lotName
-                    }}<span
-                      style="color: #ff00ff"
-                      v-show="lotsInfo?.resDeposit > 0"
-                      ><i class="fa-solid fa-star"></i
-                    ></span>
-                    <span
-                      style="color: #d9b300"
-                      v-show="lotsInfo?.monRentalRate > 0"
-                      ><i class="fa-solid fa-circle"></i
-                    ></span>
-                  </h5>
-                  <p class="card-text">
-                    <a
-                      :href="`https://www.google.com/maps/search/?api=1&query=${lotsInfo?.latitude},${lotsInfo?.longitude}`"
-                      target="_blank"
-                      ><i class="fa-solid fa-map-location-dot fa-bounce"></i
-                    ></a>
-                    {{ lotsInfo?.location }}
-                  </p>
-                  <p class="card-text">收費標準：{{ lotsInfo?.rateRules }}</p>
-                  <p class="card-text">
-                    預約服務訂金:{{ lotsInfo?.resDeposit }}元
-                  </p>
-                  <p class="card-text">
-                    月租費: {{ lotsInfo?.monRentalRate }}元/月
-                  </p>
-                  <p class="card-text">
-                    總車位數：{{ lotsInfo?.smallCarSpace }}
-                  </p>
-                  <p class="card-text">電動車位數：{{ lotsInfo?.etcSpace }}</p>
-                  <p class="card-text">
-                    月租剩餘車位: {{ lotsInfo?.monRentalSpace }}
-                  </p>
-                  <p class="card-text">電話：{{ lotsInfo?.tel }}</p>
-                  <p class="card-text">
-                    <small class="text-muted"
-                      >剩餘車位：{{ lotsInfo?.validSpace }}</small
+              <div class="col-lg-6">
+                <div class="col-lg-12">
+                  <Carousel :autoplay="2000" :wrapAround="true" class="p-0">
+                    <Slide
+                      v-for="(img, index) in lotsInfo?.lotImages"
+                      :key="index"
                     >
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="content pt-0">
-              <!-- Nav pills -->
-              <ul class="nav nav-pills" role="tablist">
-                <li class="nav-item">
-                  <a class="nav-link active" data-bs-toggle="pill" href="#Res"
-                    >預約</a
-                  >
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" data-bs-toggle="pill" href="#Mon">月租</a>
-                </li>
-              </ul>
-
-              <!-- Tab panes -->
-              <div class="tab-content">
-                <div id="Res" class="container tab-pane active">
-                  <form>
-                    <div class="form-group">
-                      <label for="exampleFormControlInput1">車牌號碼</label>
-                      <select
-                        v-model="selectedCarPlate"
-                        class="form-control mb-2"
-                        id="exampleFormControlInput1"
-                      >
-                        <option value="">--請選擇車牌--</option>
-                        <option
-                          v-for="(car, index) in cars"
-                          :key="index"
-                          :value="car.licensePlate"
-                        >
-                          {{ car.licensePlate }}
-                        </option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label for="exampleInputPassword1">預約時間</label>
-                      <!-- 使用 VueDatePicker 並綁定 v-model -->
-                      <VueDatePicker
-                        v-model="date"
-                        id="exampleInputPassword1"
+                      <img
+                        :src="img"
+                        class="card-img-top p-2"
+                        style="width: 550px; height: 300px"
+                        :alt="lotsInfo?.lotName"
                       />
-                    </div>
-                    <button
-                      type="button"
-                      @click="submitRes"
-                      class="btn btn-primary mt-3"
-                    >
-                      送出
-                    </button>
-                  </form>
+                    </Slide>
+                    <template #addons>
+                      <Navigation />
+                      <Pagination />
+                    </template>
+                  </Carousel>
                 </div>
-                <div id="Mon" class="container tab-pane fade">
-                  <form>
-                    <div class="form-group">
-                      <label for="InputName">車牌號碼</label>
-                      <select
-                        v-model="selectedCarPlateforMon"
-                        class="form-control mb-2"
-                        id="InputName"
+                <div class="col-lg-12">
+                  <div class="card-body mb-3 text-white">
+                    <h5 class="card-title mb-2" style="font-weight: 700">
+                      {{ lotsInfo?.lotName
+                      }}<span
+                        style="color: #ff00ff"
+                        v-show="lotsInfo?.resDeposit > 0"
+                        ><i class="fa-solid fa-star"></i
+                      ></span>
+                      <span
+                        style="color: #d9b300"
+                        v-show="lotsInfo?.monRentalRate > 0"
+                        ><i class="fa-solid fa-circle"></i
+                      ></span>
+                    </h5>
+                    <p class="card-text">
+                      <a
+                        :href="`https://www.google.com/maps/search/?api=1&query=${lotsInfo?.latitude},${lotsInfo?.longitude}`"
+                        target="_blank"
+                        ><i class="fa-solid fa-map-location-dot fa-bounce"></i
+                      ></a>
+                      {{ lotsInfo?.location }}
+                    </p>
+                    <p class="card-text">收費標準：{{ lotsInfo?.rateRules }}</p>
+                    <p class="card-text">
+                      預約服務訂金:{{ lotsInfo?.resDeposit }}元
+                    </p>
+                    <p class="card-text">
+                      月租費: {{ lotsInfo?.monRentalRate }}元/月
+                    </p>
+                    <p class="card-text">
+                      總車位數：{{ lotsInfo?.smallCarSpace }}
+                    </p>
+                    <p class="card-text">
+                      電動車位數：{{ lotsInfo?.etcSpace }}
+                    </p>
+                    <p class="card-text">
+                      月租剩餘車位: {{ lotsInfo?.monRentalSpace }}
+                    </p>
+                    <p class="card-text">電話：{{ lotsInfo?.tel }}</p>
+                    <p class="card-text">
+                      <small class="text-muted"
+                        >剩餘車位：{{ lotsInfo?.validSpace }}</small
                       >
-                        <option value="">--請選擇車牌--</option>
-                        <option
-                          v-for="(car, index) in carsForMon"
-                          :key="index"
-                          :value="car.licensePlate"
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="col-lg-6 d-flex align-items-center justify-content-center"
+              >
+                <div class="content">
+                  <!-- Nav pills -->
+                  <ul class="nav nav-pills" role="tablist">
+                    <li class="nav-item">
+                      <a
+                        class="nav-link active"
+                        data-bs-toggle="pill"
+                        href="#Res"
+                        >預約</a
+                      >
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" data-bs-toggle="pill" href="#Mon"
+                        >月租</a
+                      >
+                    </li>
+                  </ul>
+
+                  <!-- Tab panes -->
+                  <div class="tab-content">
+                    <div id="Res" class="container tab-pane active">
+                      <form>
+                        <div class="form-group">
+                          <label for="exampleFormControlInput1">車牌號碼</label>
+                          <select
+                            v-model="selectedCarPlate"
+                            class="form-control mb-2"
+                            id="exampleFormControlInput1"
+                          >
+                            <option value="">--請選擇車牌--</option>
+                            <option
+                              v-for="(car, index) in cars"
+                              :key="index"
+                              :value="car.licensePlate"
+                            >
+                              {{ car.licensePlate }}
+                            </option>
+                          </select>
+                        </div>
+                        <div class="form-group">
+                          <label for="exampleInputPassword1">預約時間</label>
+                          <!-- 使用 VueDatePicker 並綁定 v-model -->
+                          <VueDatePicker
+                            v-model="date"
+                            id="exampleInputPassword1"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          @click="submitRes"
+                          class="btn btn-primary mt-3"
                         >
-                          {{ car.licensePlate }}
-                        </option>
-                      </select>
-                      <div class="form-group">
-                        <label for="MonTime">預約時間</label>
-                        <!-- 使用 VueDatePicker 並綁定 v-model -->
-                        <VueDatePicker v-model="dateMon" id="MonTime" />
-                      </div>
+                          送出
+                        </button>
+                      </form>
                     </div>
-                    <button
-                      type="button"
-                      class="btn btn-primary mt-3"
-                      @click="GoToMonPay"
-                    >
-                      送出
-                    </button>
-                  </form>
+                    <div id="Mon" class="container tab-pane fade">
+                      <form>
+                        <div class="form-group">
+                          <label for="InputName">車牌號碼</label>
+                          <select
+                            v-model="selectedCarPlateforMon"
+                            class="form-control mb-2"
+                            id="InputName"
+                          >
+                            <option value="">--請選擇車牌--</option>
+                            <option
+                              v-for="(car, index) in carsForMon"
+                              :key="index"
+                              :value="car.licensePlate"
+                            >
+                              {{ car.licensePlate }}
+                            </option>
+                          </select>
+                          <div class="form-group">
+                            <label for="MonTime">預約時間</label>
+                            <!-- 使用 VueDatePicker 並綁定 v-model -->
+                            <VueDatePicker v-model="dateMon" id="MonTime" />
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          class="btn btn-primary mt-3"
+                          @click="GoToMonPay"
+                        >
+                          送出
+                        </button>
+                      </form>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -414,12 +429,12 @@ onMounted(async () => {
 </template>
 
 <style lang="css" scoped>
-.datepicker {
+/* .datepicker {
   position: relative;
   z-index: 9999;
-}
+} */
 label {
-  color: #fff;
+  color: #322f2f;
 }
 .content {
   width: 450px;
@@ -437,22 +452,22 @@ label {
   font-weight: bold;
   padding-top: 13px;
   text-align: center;
-  background: #939399;
+  background: #222223;
   color: #fff;
   border-radius: 30px;
   height: 100px;
 }
 .nav-pills .nav-link.active {
-  background: #000;
-  color: #fff;
+  background: #ece9e9;
+  color: #322f2f;
 }
 .tab-content {
   position: absolute;
   width: 450px;
   height: auto;
   margin-top: -50px;
-  background: #000;
-  color: #000;
+  background: #ece9e9;
+  color: #322f2f;
   border-radius: 30px;
   z-index: 1000;
   box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.4);
