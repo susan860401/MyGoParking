@@ -128,367 +128,363 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <div id="outside" class="container" data-aos="fade-up">
-      <div class="d-flex justify-content-between mb-3">
-        <div>
-          <button
-            class="list me-2"
-            @click="loadCurrent"
-            :class="{ active: activePage == 'current' }"
-          >
-            <i class="fa-solid fa-paste"></i> 當前合約
-          </button>
-          <button
-            class="list"
-            @click="loadHistory"
-            :class="{ active: activePage == 'history' }"
-          >
-            <i class="fa-solid fa-clock-rotate-left"></i> 歷史合約
-          </button>
-        </div>
-        <div>
-          <select
-            @change="applyFilters"
-            v-model="choseCar"
-            width="300px"
-            class="form-select form-select-sm mb-2"
-            aria-label=".form-select-sm example"
-          >
-            <option value="請選擇車牌">請選擇車牌</option>
-            <option v-for="car in licensePlate" :value="car">{{ car }}</option>
-          </select>
-        </div>
+  <div id="outside" class="container" data-aos="fade-up">
+    <div class="d-flex justify-content-between mb-3">
+      <div>
+        <button
+          class="list me-2"
+          @click="loadCurrent"
+          :class="{ active: activePage == 'current' }"
+        >
+          <i class="fa-solid fa-paste"></i> 當前合約
+        </button>
+        <button
+          class="list"
+          @click="loadHistory"
+          :class="{ active: activePage == 'history' }"
+        >
+          <i class="fa-solid fa-clock-rotate-left"></i> 歷史合約
+        </button>
       </div>
-      <div
-        v-if="activePage == 'history'"
-        class="d-flex flex-column flex-md-row justify-content-between mb-2"
-      >
-        <div class="mb-2 col-12 col-md-5">
-          <span>起始日期 </span>
-          <el-date-picker
-            @change="applyFilters"
-            v-model="choseDate"
-            type="date"
-            placeholder="Pick a day"
-          />
-        </div>
-
-        <!-- 搜尋行政區 -->
-        <div class="col-12 col-md-4">
-          <input
-            v-model="search"
-            @keyup="applyFilters"
-            type="text"
-            class="form-control"
-            aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-sm"
-            placeholder="預訂停車場行政區(e.g., 三民區)"
-          />
-        </div>
+      <div>
+        <select
+          @change="applyFilters"
+          v-model="choseCar"
+          width="300px"
+          class="form-select form-select-sm mb-2"
+          aria-label=".form-select-sm example"
+        >
+          <option value="請選擇車牌">請選擇車牌</option>
+          <option v-for="car in licensePlate" :value="car">{{ car }}</option>
+        </select>
+      </div>
+    </div>
+    <div
+      v-if="activePage == 'history'"
+      class="d-flex flex-column flex-md-row justify-content-between mb-2"
+    >
+      <div class="mb-2 col-12 col-md-5">
+        <span>起始日期 </span>
+        <el-date-picker
+          @change="applyFilters"
+          v-model="choseDate"
+          type="date"
+          placeholder="Pick a day"
+        />
       </div>
 
-      <!-- <img id="noDataImg" src="/src/assets/images/Nodatas.webp" alt="No Data" /> -->
+      <!-- 搜尋行政區 -->
+      <div class="col-12 col-md-4">
+        <input
+          v-model="search"
+          @keyup="applyFilters"
+          type="text"
+          class="form-control"
+          aria-label="Sizing example input"
+          aria-describedby="inputGroup-sizing-sm"
+          placeholder="預訂停車場行政區(e.g., 三民區)"
+        />
+      </div>
+    </div>
 
-      <div
-        v-if="activePage == 'current'"
-        class="accordion mt-2"
-        id="accordionPanelsStayOpenExample"
-      >
-        <!-- 至少要顯示一個 -->
-        <div class="accordion-item">
-          <h2
-            v-if="currentRental.length"
-            class="accordion-header"
-            id="panelsStayOpen-headingOne"
+    <!-- <img id="noDataImg" src="/src/assets/images/Nodatas.webp" alt="No Data" /> -->
+
+    <div
+      v-if="activePage == 'current'"
+      class="accordion mt-2"
+      id="accordionPanelsStayOpenExample"
+    >
+      <!-- 至少要顯示一個 -->
+      <div class="accordion-item">
+        <h2
+          v-if="currentRental.length"
+          class="accordion-header"
+          id="panelsStayOpen-headingOne"
+        >
+          <button
+            class="accordion-button"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#panelsStayOpen-collapseOne"
+            aria-expanded="true"
+            aria-controls="panelsStayOpen-collapseOne"
           >
-            <button
-              class="accordion-button"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#panelsStayOpen-collapseOne"
-              aria-expanded="true"
-              aria-controls="panelsStayOpen-collapseOne"
+            #{{ currentRental[0].renId }}
+            {{ currentRental[0].lotName }}
+            <span style="font-size: 14px">
+              &nbsp (合約將於
+              {{ formatDate(currentRental[0].endDate) }} 終止)</span
             >
-              #{{ currentRental[0].renId }}
-              {{ currentRental[0].lotName }}
-              <span style="font-size: 14px">
-                &nbsp (合約將於
-                {{ formatDate(currentRental[0].endDate) }} 終止)</span
-              >
-            </button>
-          </h2>
+          </button>
+        </h2>
 
-          <div
-            id="panelsStayOpen-collapseOne"
-            class="accordion-collapse collapse show"
-            aria-labelledby="panelsStayOpen-headingOne"
-          >
-            <div class="accordion-body">
-              <div class="row">
-                <div class="col-md-6 mb-2">
-                  <img
-                    class="rounded img-fluid"
-                    :src="`https://maps.googleapis.com/maps/api/staticmap?center=${currentRental[0].latitude},${currentRental[0].longitude}&zoom=18&size=600x300&markers=color:red%7Clabel:P%7C${currentRental[0].latitude},${currentRental[0].longitude}&key=AIzaSyALBHIW2HQWkmhCK-VXqGIoTVttRvMTtXo`"
-                    alt="Map of {{ currentRental[0].lotName }}"
-                    style="width: 100%; height: 100%"
-                  />
-                </div>
-                <div class="col-md-6">
-                  <div>
-                    <p class="fw-bold mb-1" style="font-size: 20px">月租方案</p>
-                    <div
-                      class="fw-bold"
-                      style="
-                        font-size: 20px;
-                        background-color: aliceblue;
-                        padding: 5px;
-                      "
-                    >
-                      {{
+        <div
+          id="panelsStayOpen-collapseOne"
+          class="accordion-collapse collapse show"
+          aria-labelledby="panelsStayOpen-headingOne"
+        >
+          <div class="accordion-body">
+            <div class="row">
+              <div class="col-md-6 mb-2">
+                <img
+                  class="rounded img-fluid"
+                  :src="`https://maps.googleapis.com/maps/api/staticmap?center=${currentRental[0].latitude},${currentRental[0].longitude}&zoom=18&size=600x300&markers=color:red%7Clabel:P%7C${currentRental[0].latitude},${currentRental[0].longitude}&key=AIzaSyALBHIW2HQWkmhCK-VXqGIoTVttRvMTtXo`"
+                  alt="Map of {{ currentRental[0].lotName }}"
+                  style="width: 100%; height: 100%"
+                />
+              </div>
+              <div class="col-md-6">
+                <div>
+                  <p class="fw-bold mb-1" style="font-size: 20px">月租方案</p>
+                  <div
+                    class="fw-bold"
+                    style="
+                      font-size: 20px;
+                      background-color: aliceblue;
+                      padding: 5px;
+                    "
+                  >
+                    {{
+                      getRentalPlan(
+                        currentRental[0].amount,
+                        currentRental[0].monRentalRate
+                      )
+                    }}個月方案
+                    <span
+                      style="font-size: 16px"
+                      v-if="
                         getRentalPlan(
                           currentRental[0].amount,
                           currentRental[0].monRentalRate
-                        )
-                      }}個月方案
-                      <span
-                        style="font-size: 16px"
-                        v-if="
-                          getRentalPlan(
-                            currentRental[0].amount,
-                            currentRental[0].monRentalRate
-                          ) !== 1
-                        "
-                        >({{
-                          Rentalplan[
-                            getRentalPlan(
-                              currentRental[0].amount,
-                              currentRental[0].monRentalRate
-                            )
-                          ]
-                        }})</span
-                      >
-                      <p>
-                        合約總額 {{ currentRental[0].amount }} (NT$
-                        {{
-                          currentRental[0].amount /
+                        ) !== 1
+                      "
+                      >({{
+                        Rentalplan[
                           getRentalPlan(
                             currentRental[0].amount,
                             currentRental[0].monRentalRate
                           )
-                        }}/月)
-                      </p>
-                    </div>
-                  </div>
-                  <hr />
-                  <p>
-                    <strong>合約期間</strong>
-                    {{ formatDate(currentRental[0].startDate) }} 至
-                    {{ formatDate(currentRental[0].endDate) }}
-                  </p>
-
-                  <p>
-                    <strong>車牌號碼</strong>
-                    {{ currentRental[0].licensePlate }}
-                  </p>
-                  <p>
-                    <strong>停車場地址</strong>
-                    {{ currentRental[0].district }}
-                    {{ currentRental[0].location }}
-                  </p>
-                  <!-- 價格方案 -->
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div v-for="(current, index) in currentRental" class="accordion-item">
-          <h2
-            v-if="index !== 0"
-            class="accordion-header"
-            :id="'panelsStayOpen-headingindex' + index"
-          >
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              :data-bs-target="'#panelsStayOpen-collapse' + index"
-              aria-expanded="false"
-              :aria-controls="'panelsStayOpen-collapse' + index"
-            >
-              #{{ current.renId }}
-              {{ current.lotName }}
-              <span style="font-size: 14px">
-                &nbsp (合約將於
-                {{ formatDate(current.endDate) }} 終止)</span
-              >
-            </button>
-          </h2>
-          <div
-            v-if="index !== 0"
-            :id="'panelsStayOpen-collapse' + index"
-            class="accordion-collapse collapse"
-            :aria-labelledby="'panelsStayOpen-heading' + index"
-          >
-            <div class="accordion-body">
-              <div class="row">
-                <div class="col-md-6 mb-2">
-                  <img
-                    class="rounded img-fluid"
-                    :src="`https://maps.googleapis.com/maps/api/staticmap?center=${current.latitude},${current.longitude}&zoom=18&size=600x300&markers=color:red%7Clabel:P%7C${current.latitude},${current.longitude}&key=AIzaSyALBHIW2HQWkmhCK-VXqGIoTVttRvMTtXo`"
-                    alt="Map of {{ current.lotName }}"
-                    style="width: 100%; height: 100%"
-                  />
-                </div>
-                <div class="col-md-6">
-                  <div>
-                    <p class="fw-bold mb-1" style="font-size: 20px">月租方案</p>
-                    <div
-                      class="fw-bold"
-                      style="
-                        font-size: 20px;
-                        background-color: aliceblue;
-                        padding: 5px;
-                      "
+                        ]
+                      }})</span
                     >
+                    <p>
+                      合約總額 {{ currentRental[0].amount }} (NT$
                       {{
-                        getRentalPlan(current.amount, current.monRentalRate)
-                      }}個月方案
-                      <span
-                        style="font-size: 16px"
-                        v-if="
-                          getRentalPlan(
-                            current.amount,
-                            current.monRentalRate
-                          ) !== 1
-                        "
-                        >({{
-                          Rentalplan[
-                            getRentalPlan(current.amount, current.monRentalRate)
-                          ]
-                        }})</span
-                      >
-                      <p>
-                        合約總額 {{ current.amount }} (NT$
-                        {{
-                          current.amount /
-                          getRentalPlan(current.amount, current.monRentalRate)
-                        }}/月)
-                      </p>
-                    </div>
+                        currentRental[0].amount /
+                        getRentalPlan(
+                          currentRental[0].amount,
+                          currentRental[0].monRentalRate
+                        )
+                      }}/月)
+                    </p>
                   </div>
-                  <hr />
-                  <p>
-                    <strong>合約期間</strong>
-                    {{ formatDate(current.startDate) }} 至
-                    {{ formatDate(current.endDate) }}
-                  </p>
-
-                  <p>
-                    <strong>車牌號碼</strong>
-                    {{ current.licensePlate }}
-                  </p>
-                  <p>
-                    <strong>停車場地址</strong>
-                    {{ current.district }}
-                    {{ current.location }}
-                  </p>
-                  <!-- 價格方案 -->
                 </div>
+                <hr />
+                <p>
+                  <strong>合約期間</strong>
+                  {{ formatDate(currentRental[0].startDate) }} 至
+                  {{ formatDate(currentRental[0].endDate) }}
+                </p>
+
+                <p>
+                  <strong>車牌號碼</strong>
+                  {{ currentRental[0].licensePlate }}
+                </p>
+                <p>
+                  <strong>停車場地址</strong>
+                  {{ currentRental[0].district }}
+                  {{ currentRental[0].location }}
+                </p>
+                <!-- 價格方案 -->
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- 表格區 選擇歷史合約才會載入-->
-      <!-- 屬性說明:show-overflow-tooltip-欄位超出寬度會顯示提示 -->
-      <el-table
-        class="mt-2"
-        v-else-if="activePage == 'history'"
-        :data="filteredRentals"
-        style="width: 100%"
-        height="400"
-      >
-        <el-table-column
-          prop="lotName"
-          label="停車場名稱"
-          :min-width="isPhoneSize ? 120 : 150"
-          :sortable="true"
-          show-overflow-tooltip
-          header-cell-class-name="custom-header"
-        ></el-table-column>
-
-        <el-table-column
-          v-if="!isPhoneSize"
-          prop="licensePlate"
-          label="車牌號碼"
-          :min-width="105"
-          :sortable="true"
-        ></el-table-column>
-        <el-table-column
-          v-if="!isSmallScreen && !isPhoneSize"
-          label="合約期間"
-          :min-width="200"
-          :sortable="true"
-          ><template #default="scope">
-            <div>
-              {{ formatDate(scope.row.startDate) }} 至
-              {{ formatDate(scope.row.endDate) }}
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="方案名稱" :min-width="120" :sortable="true">
-          <template #default="scope">
-            <div>
-              {{ getRentalPlan(scope.row.amount, scope.row.monRentalRate) }}
-              個月方案
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="月租費" :min-width="100" :sortable="true"
-          ><template #default="scope">
-            <div>
-              {{
-                scope.row.amount /
-                getRentalPlan(scope.row.amount, scope.row.monRentalRate)
-              }}
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="amount"
-          label="總額"
-          :min-width="80"
-          :sortable="true"
-        ></el-table-column>
-        <el-table-column
-          label="狀態"
-          :min-width="80"
-          :sortable="true"
-          align="center"
+      <div v-for="(current, index) in currentRental" class="accordion-item">
+        <h2
+          v-if="index !== 0"
+          class="accordion-header"
+          :id="'panelsStayOpen-headingindex' + index"
         >
-          <template #default="scope">
-            <div
-              :class="
-                getRentalStatus(scope.row.endDate) == 'Active'
-                  ? 'ongoing'
-                  : 'expired'
-              "
+          <button
+            class="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            :data-bs-target="'#panelsStayOpen-collapse' + index"
+            aria-expanded="false"
+            :aria-controls="'panelsStayOpen-collapse' + index"
+          >
+            #{{ current.renId }}
+            {{ current.lotName }}
+            <span style="font-size: 14px">
+              &nbsp (合約將於
+              {{ formatDate(current.endDate) }} 終止)</span
             >
-              {{ getRentalStatus(scope.row.endDate) }}
+          </button>
+        </h2>
+        <div
+          v-if="index !== 0"
+          :id="'panelsStayOpen-collapse' + index"
+          class="accordion-collapse collapse"
+          :aria-labelledby="'panelsStayOpen-heading' + index"
+        >
+          <div class="accordion-body">
+            <div class="row">
+              <div class="col-md-6 mb-2">
+                <img
+                  class="rounded img-fluid"
+                  :src="`https://maps.googleapis.com/maps/api/staticmap?center=${current.latitude},${current.longitude}&zoom=18&size=600x300&markers=color:red%7Clabel:P%7C${current.latitude},${current.longitude}&key=AIzaSyALBHIW2HQWkmhCK-VXqGIoTVttRvMTtXo`"
+                  alt="Map of {{ current.lotName }}"
+                  style="width: 100%; height: 100%"
+                />
+              </div>
+              <div class="col-md-6">
+                <div>
+                  <p class="fw-bold mb-1" style="font-size: 20px">月租方案</p>
+                  <div
+                    class="fw-bold"
+                    style="
+                      font-size: 20px;
+                      background-color: aliceblue;
+                      padding: 5px;
+                    "
+                  >
+                    {{
+                      getRentalPlan(current.amount, current.monRentalRate)
+                    }}個月方案
+                    <span
+                      style="font-size: 16px"
+                      v-if="
+                        getRentalPlan(current.amount, current.monRentalRate) !==
+                        1
+                      "
+                      >({{
+                        Rentalplan[
+                          getRentalPlan(current.amount, current.monRentalRate)
+                        ]
+                      }})</span
+                    >
+                    <p>
+                      合約總額 {{ current.amount }} (NT$
+                      {{
+                        current.amount /
+                        getRentalPlan(current.amount, current.monRentalRate)
+                      }}/月)
+                    </p>
+                  </div>
+                </div>
+                <hr />
+                <p>
+                  <strong>合約期間</strong>
+                  {{ formatDate(current.startDate) }} 至
+                  {{ formatDate(current.endDate) }}
+                </p>
+
+                <p>
+                  <strong>車牌號碼</strong>
+                  {{ current.licensePlate }}
+                </p>
+                <p>
+                  <strong>停車場地址</strong>
+                  {{ current.district }}
+                  {{ current.location }}
+                </p>
+                <!-- 價格方案 -->
+              </div>
             </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="amount" label="" :min-width="60">
-          <template #default="scope">
-            <div @click="" class="seeDetail">
-              <i class="fa-solid fa-magnifying-glass"></i>
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- 表格區 選擇歷史合約才會載入-->
+    <!-- 屬性說明:show-overflow-tooltip-欄位超出寬度會顯示提示 -->
+    <el-table
+      class="mt-2"
+      v-else-if="activePage == 'history'"
+      :data="filteredRentals"
+      style="width: 100%"
+      height="400"
+    >
+      <el-table-column
+        prop="lotName"
+        label="停車場名稱"
+        :min-width="isPhoneSize ? 120 : 150"
+        :sortable="true"
+        show-overflow-tooltip
+        header-cell-class-name="custom-header"
+      ></el-table-column>
+
+      <el-table-column
+        v-if="!isPhoneSize"
+        prop="licensePlate"
+        label="車牌號碼"
+        :min-width="105"
+        :sortable="true"
+      ></el-table-column>
+      <el-table-column
+        v-if="!isSmallScreen && !isPhoneSize"
+        label="合約期間"
+        :min-width="200"
+        :sortable="true"
+        ><template #default="scope">
+          <div>
+            {{ formatDate(scope.row.startDate) }} 至
+            {{ formatDate(scope.row.endDate) }}
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="方案名稱" :min-width="120" :sortable="true">
+        <template #default="scope">
+          <div>
+            {{ getRentalPlan(scope.row.amount, scope.row.monRentalRate) }}
+            個月方案
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="月租費" :min-width="100" :sortable="true"
+        ><template #default="scope">
+          <div>
+            {{
+              scope.row.amount /
+              getRentalPlan(scope.row.amount, scope.row.monRentalRate)
+            }}
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="amount"
+        label="總額"
+        :min-width="80"
+        :sortable="true"
+      ></el-table-column>
+      <el-table-column
+        label="狀態"
+        :min-width="80"
+        :sortable="true"
+        align="center"
+      >
+        <template #default="scope">
+          <div
+            :class="
+              getRentalStatus(scope.row.endDate) == 'Active'
+                ? 'ongoing'
+                : 'expired'
+            "
+          >
+            {{ getRentalStatus(scope.row.endDate) }}
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="amount" label="" :min-width="60">
+        <template #default="scope">
+          <div @click="" class="seeDetail">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+        </template>
+      </el-table-column>
+    </el-table>
   </div>
 </template>
 

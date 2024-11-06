@@ -100,70 +100,68 @@ loadLicensePlates();
 </script>
 
 <template>
-  <div>
-    <div id="outside" class="container p-3 bg-light">
-      <h4 class="mb-3">車牌設定</h4>
-      <div class="mb-2">
-        <p>
-          <i class="fa-solid fa-1"></i>
-          <strong> 正確性：</strong
-          >目前系統不支持車牌的修改或刪除，請確保輸入的車牌號碼正確。
-        </p>
-        <p>
-          <i class="fa-solid fa-2"></i>
-          <strong> 登記限制：</strong>每位用戶至多登記 5
-          個車牌，以確保系統的穩定性和公平性
-        </p>
-        <p>
-          <i class="fa-solid fa-3"></i>
-          <strong> 聯絡客服：</strong>
-          如果在登記過程中遇到任何問題，請隨時聯絡客服團隊獲取幫助
-        </p>
-      </div>
-      <!-- 標題 -->
-      <button @click="addCar" class="button-55 mb-2" role="button">
-        點我新增
-      </button>
-      <small v-if="remind" class="text-danger"> {{ remind }}</small>
+  <div id="outside" class="container p-3 bg-light">
+    <h4 class="mb-3">車牌設定</h4>
+    <div class="mb-2">
+      <p>
+        <i class="fa-solid fa-1"></i>
+        <strong> 正確性：</strong
+        >目前系統不支持車牌的修改或刪除，請確保輸入的車牌號碼正確。
+      </p>
+      <p>
+        <i class="fa-solid fa-2"></i>
+        <strong> 登記限制：</strong>每位用戶至多登記 5
+        個車牌，以確保系統的穩定性和公平性
+      </p>
+      <p>
+        <i class="fa-solid fa-3"></i>
+        <strong> 聯絡客服：</strong>
+        如果在登記過程中遇到任何問題，請隨時聯絡客服團隊獲取幫助
+      </p>
+    </div>
+    <!-- 標題 -->
+    <button @click="addCar" class="button-55 mb-2" role="button">
+      點我新增
+    </button>
+    <small v-if="remind" class="text-danger"> {{ remind }}</small>
 
-      <div class="row d-flex justify-content-center">
-        <div class="col-md-4">
-          <label class="form-label">車牌號碼</label>
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">狀態</label>
-        </div>
+    <div class="row d-flex justify-content-center">
+      <div class="col-md-4">
+        <label class="form-label">車牌號碼</label>
       </div>
-      <!-- 車牌資訊區 -->
-      <div
-        v-for="car in cars"
-        :key="car.carId"
-        class="row d-flex justify-content-center mb-2"
-      >
-        <div class="enterPlate col-md-4 mb-1">
-          <input
-            v-model="car.licensePlate"
-            class="form-control"
-            type="text"
-            :disabled="!car.editable"
-          />
-        </div>
-        <div class="col-md-3">
-          <select v-model="car.isActive" class="form-select">
-            <option :value="true">可用</option>
-            <option :value="false">停用</option>
-          </select>
-        </div>
+      <div class="col-md-3">
+        <label class="form-label">狀態</label>
       </div>
-      <div class="row d-flex justify-content-end mt-4">
-        <div class="col-3">
-          <button @click="loadLicensePlates" class="button-6" role="button">
-            取消
-          </button>
-        </div>
-        <div class="col-3">
-          <button @click="saveCar" class="button-6" role="button">儲存</button>
-        </div>
+    </div>
+    <!-- 車牌資訊區 -->
+    <div
+      v-for="car in cars"
+      :key="car.carId"
+      class="row d-flex justify-content-center mb-2"
+    >
+      <div class="enterPlate col-md-4 mb-1">
+        <input
+          v-model="car.licensePlate"
+          class="form-control"
+          type="text"
+          :disabled="!car.editable"
+        />
+      </div>
+      <div class="col-md-3">
+        <select v-model="car.isActive" class="form-select">
+          <option :value="true">可用</option>
+          <option :value="false">停用</option>
+        </select>
+      </div>
+    </div>
+    <div class="row d-flex justify-content-end mt-4">
+      <div class="col-3">
+        <button @click="loadLicensePlates" class="button-6" role="button">
+          取消
+        </button>
+      </div>
+      <div class="col-3">
+        <button @click="saveCar" class="button-6" role="button">儲存</button>
       </div>
     </div>
   </div>

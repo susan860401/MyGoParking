@@ -95,115 +95,113 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <div class="container" id="outside">
-      <div class="row">
-        <div class="col-12 col-md-4 ps-0">
-          <!-- 設定寬度 -->
-        </div>
+  <div class="container" id="outside">
+    <div class="row">
+      <div class="col-12 col-md-4 ps-0">
+        <!-- 設定寬度 -->
       </div>
+    </div>
 
-      <!----- 篩選區塊 ----->
-      <!-- 篩選入場日期 -->
-      <div class="mb-2">
-        <span>入場日期 </span>
-        <el-date-picker
-          @change="applyFilters"
-          v-model="choseDate"
-          type="date"
-          placeholder="Pick a day"
+    <!----- 篩選區塊 ----->
+    <!-- 篩選入場日期 -->
+    <div class="mb-2">
+      <span>入場日期 </span>
+      <el-date-picker
+        @change="applyFilters"
+        v-model="choseDate"
+        type="date"
+        placeholder="Pick a day"
+      />
+    </div>
+    <div class="row mb-2">
+      <!-- 搜尋行政區 -->
+      <div class="col-md-8 mb-2">
+        <input
+          v-model="search"
+          @keyup="applyFilters"
+          type="text"
+          class="form-control"
+          aria-label="Sizing example input"
+          aria-describedby="inputGroup-sizing-sm"
+          placeholder="預訂停車場行政區(e.g., 三民區)"
         />
       </div>
-      <div class="row mb-2">
-        <!-- 搜尋行政區 -->
-        <div class="col-md-8 mb-2">
-          <input
-            v-model="search"
-            @keyup="applyFilters"
-            type="text"
-            class="form-control"
-            aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-sm"
-            placeholder="預訂停車場行政區(e.g., 三民區)"
-          />
-        </div>
-        <!-- 選擇車牌 -->
-        <div class="col-md-4">
-          <select
-            @change="applyFilters"
-            v-model="choseCar"
-            width="300px"
-            class="form-select form-select-sm mb-2"
-            aria-label=".form-select-sm example"
-          >
-            <option value="請選擇車牌">請選擇車牌</option>
-            <option v-for="car in licensePlate" :value="car">{{ car }}</option>
-          </select>
-        </div>
+      <!-- 選擇車牌 -->
+      <div class="col-md-4">
+        <select
+          @change="applyFilters"
+          v-model="choseCar"
+          width="300px"
+          class="form-select form-select-sm mb-2"
+          aria-label=".form-select-sm example"
+        >
+          <option value="請選擇車牌">請選擇車牌</option>
+          <option v-for="car in licensePlate" :value="car">{{ car }}</option>
+        </select>
       </div>
-
-      <!-- 表格區 -->
-      <!-- 屬性說明:show-overflow-tooltip-欄位超出寬度會顯示提示 -->
-      <el-table :data="filteredRecords" height="400">
-        <el-table-column
-          prop="lotName"
-          label="停車場名稱"
-          :min-width="isPhoneSize ? 120 : 150"
-          :sortable="true"
-          show-overflow-tooltip
-          header-cell-class-name="custom-header"
-        ></el-table-column>
-
-        <el-table-column
-          v-if="!isPhoneSize"
-          prop="licensePlate"
-          label="車牌號碼"
-          :min-width="105"
-          :sortable="true"
-        ></el-table-column>
-        <el-table-column
-          v-if="!isSmallScreen && !isPhoneSize"
-          label="入場時間"
-          :min-width="150"
-          :sortable="true"
-          ><template #default="scope">
-            <div>
-              {{ formatTime(scope.row.entryTime) }}
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column
-          v-if="!isMiddleScreen && !isSmallScreen && !isPhoneSize"
-          label="離場時間"
-          :min-width="150"
-          :sortable="true"
-          ><template #default="scope">
-            <div>
-              {{ formatTime(scope.row.exitTime) }}
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="totalMins"
-          label="時長(分)"
-          :min-width="100"
-          :sortable="true"
-        ></el-table-column>
-        <el-table-column
-          prop="amount"
-          label="金額"
-          :min-width="80"
-          :sortable="true"
-        ></el-table-column>
-        <el-table-column prop="amount" label="" width="60">
-          <template #default="scope">
-            <div @click="viewDetails(scope.row.entryexitId)" class="seeDetail">
-              <i class="fa-solid fa-magnifying-glass"></i>
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
     </div>
+
+    <!-- 表格區 -->
+    <!-- 屬性說明:show-overflow-tooltip-欄位超出寬度會顯示提示 -->
+    <el-table :data="filteredRecords" height="400">
+      <el-table-column
+        prop="lotName"
+        label="停車場名稱"
+        :min-width="isPhoneSize ? 120 : 150"
+        :sortable="true"
+        show-overflow-tooltip
+        header-cell-class-name="custom-header"
+      ></el-table-column>
+
+      <el-table-column
+        v-if="!isPhoneSize"
+        prop="licensePlate"
+        label="車牌號碼"
+        :min-width="105"
+        :sortable="true"
+      ></el-table-column>
+      <el-table-column
+        v-if="!isSmallScreen && !isPhoneSize"
+        label="入場時間"
+        :min-width="150"
+        :sortable="true"
+        ><template #default="scope">
+          <div>
+            {{ formatTime(scope.row.entryTime) }}
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        v-if="!isMiddleScreen && !isSmallScreen && !isPhoneSize"
+        label="離場時間"
+        :min-width="150"
+        :sortable="true"
+        ><template #default="scope">
+          <div>
+            {{ formatTime(scope.row.exitTime) }}
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="totalMins"
+        label="時長(分)"
+        :min-width="100"
+        :sortable="true"
+      ></el-table-column>
+      <el-table-column
+        prop="amount"
+        label="金額"
+        :min-width="80"
+        :sortable="true"
+      ></el-table-column>
+      <el-table-column prop="amount" label="" width="60">
+        <template #default="scope">
+          <div @click="viewDetails(scope.row.entryexitId)" class="seeDetail">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+        </template>
+      </el-table-column>
+    </el-table>
   </div>
 </template>
 

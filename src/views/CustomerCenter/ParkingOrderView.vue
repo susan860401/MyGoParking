@@ -150,215 +150,205 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <!-- ======= Features Section ======= -->
+  <!-- ======= Features Section ======= -->
 
-    <div id="outside" class="container" data-aos="fade-up">
-      <ul id="nav" class="d-flex justify-content-around">
-        <li @click="filterByStatus('all')" class="text-center">
-          全部 <small style="color: gray">({{ countAll }})</small>
-        </li>
-        <li @click="filterByStatus('isCompleted')" class="text-center">
-          已完成
-          <small style="color: gray">({{ countComplete }})</small>
-        </li>
-        <li @click="filterByStatus('isCanceled')" class="text-center">
-          已取消
-          <small style="color: gray">({{ countCancel }})</small>
-        </li>
-        <li @click="filterByStatus('isOverDue')" class="text-center">
-          逾時紀錄
-          <small style="color: gray">({{ countOverdue }})</small>
-        </li>
-      </ul>
+  <div id="outside" class="container" data-aos="fade-up">
+    <ul id="nav" class="d-flex justify-content-around">
+      <li @click="filterByStatus('all')" class="text-center">
+        全部 <small style="color: gray">({{ countAll }})</small>
+      </li>
+      <li @click="filterByStatus('isCompleted')" class="text-center">
+        已完成
+        <small style="color: gray">({{ countComplete }})</small>
+      </li>
+      <li @click="filterByStatus('isCanceled')" class="text-center">
+        已取消
+        <small style="color: gray">({{ countCancel }})</small>
+      </li>
+      <li @click="filterByStatus('isOverDue')" class="text-center">
+        逾時紀錄
+        <small style="color: gray">({{ countOverdue }})</small>
+      </li>
+    </ul>
 
+    <div class="row">
       <div class="row">
-        <div class="row">
-          <!-- 選擇預訂期間 -->
-          <div class="col-md-3">
-            <select
-              v-model="period"
-              @change="changePeriod"
-              class="form-select form-select-sm mb-2"
-              aria-label=".form-select-sm example"
-            >
-              <option value="all" selected>所有預訂</option>
-              <option value="month">過去30天</option>
-              <option value="month_3">過去3個月</option>
-              <option value="year">過去1年</option>
-            </select>
+        <!-- 選擇預訂期間 -->
+        <div class="col-md-3">
+          <select
+            v-model="period"
+            @change="changePeriod"
+            class="form-select form-select-sm mb-2"
+            aria-label=".form-select-sm example"
+          >
+            <option value="all" selected>所有預訂</option>
+            <option value="month">過去30天</option>
+            <option value="month_3">過去3個月</option>
+            <option value="year">過去1年</option>
+          </select>
+        </div>
+        <!-- 搜尋特定停車場 -->
+        <div class="col-md-3 ms-auto">
+          <div class="input-group input-group-sm mb-3">
+            <input
+              v-model="search"
+              @keyup="filterByDistrict"
+              type="text"
+              class="form-control"
+              aria-label="Sizing example input"
+              aria-describedby="inputGroup-sizing-sm"
+              placeholder="預訂停車場行政區(e.g., 三民區)"
+            />
           </div>
-          <!-- 搜尋特定停車場 -->
-          <div class="col-md-3 ms-auto">
-            <div class="input-group input-group-sm mb-3">
-              <input
-                v-model="search"
-                @keyup="filterByDistrict"
-                type="text"
-                class="form-control"
-                aria-label="Sizing example input"
-                aria-describedby="inputGroup-sizing-sm"
-                placeholder="預訂停車場行政區(e.g., 三民區)"
-              />
+        </div>
+      </div>
+
+      <div
+        class="order-2 order-lg-1 mt-3 mt-lg-0 d-flex flex-column justify-content-center"
+        data-aos="fade-up"
+        data-aos-delay="100"
+      >
+        <!-- 現正進行中區塊:還未取消、還未overdue -->
+        <i><h3 class="title" v-if="isAllStatus && !isNoData">現正進行中</h3></i>
+        <!-- place holder -->
+        <div class="container mb-3 noDataArea" v-if="isNoData && isAllStatus">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="d-flex mb-2">
+                <img
+                  src="/src/assets/images/parkinglot.png"
+                  alt="無預訂資料"
+                  class="img-fluid"
+                  style="width: 400px; height: 250px; object-fit: cover"
+                />
+              </div>
+            </div>
+            <div class="col-md-6 d-flex flex-column justify-content-center">
+              <h2>無進行中預訂</h2>
+              <p>立即開始您的預訂，體驗我們的便捷服務！</p>
             </div>
           </div>
         </div>
-
         <div
-          class="order-2 order-lg-1 mt-3 mt-lg-0 d-flex flex-column justify-content-center"
-          data-aos="fade-up"
-          data-aos-delay="100"
+          v-if="isAllStatus"
+          v-for="ongoing in ongoingRes"
+          :key="ongoing.resId"
+          class="card mb-3"
         >
-          <!-- 現正進行中區塊:還未取消、還未overdue -->
-          <i
-            ><h3 class="title" v-if="isAllStatus && !isNoData">
-              現正進行中
-            </h3></i
-          >
-          <!-- place holder -->
-          <div class="container mb-3 noDataArea" v-if="isNoData && isAllStatus">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="d-flex mb-2">
-                  <img
-                    src="/src/assets/images/parkinglot.png"
-                    alt="無預訂資料"
-                    class="img-fluid"
-                    style="width: 400px; height: 250px; object-fit: cover"
-                  />
-                </div>
-              </div>
-              <div class="col-md-6 d-flex flex-column justify-content-center">
-                <h2>無進行中預訂</h2>
-                <p>立即開始您的預訂，體驗我們的便捷服務！</p>
-              </div>
-            </div>
-          </div>
-          <div
-            v-if="isAllStatus"
-            v-for="ongoing in ongoingRes"
-            :key="ongoing.resId"
-            class="card mb-3"
-          >
-            <div class="row g-0">
-              <!-- 地圖區塊 -->
-              <div class="col-md-6 p-2 img-container">
-                <img
-                  class="rounded img-fluid"
-                  :src="`https://maps.googleapis.com/maps/api/staticmap?center=${ongoing.latitude},${ongoing.longitude}&zoom=18&size=600x300&markers=color:red%7Clabel:P%7C${ongoing.latitude},${ongoing.longitude}&key=AIzaSyALBHIW2HQWkmhCK-VXqGIoTVttRvMTtXo`"
-                  alt="Map of {{ ongoing.lotName }}"
-                  style="width: 100%; height: 100%"
-                />
+          <div class="row g-0">
+            <!-- 地圖區塊 -->
+            <div class="col-md-6 p-2 img-container">
+              <img
+                class="rounded img-fluid"
+                :src="`https://maps.googleapis.com/maps/api/staticmap?center=${ongoing.latitude},${ongoing.longitude}&zoom=18&size=600x300&markers=color:red%7Clabel:P%7C${ongoing.latitude},${ongoing.longitude}&key=AIzaSyALBHIW2HQWkmhCK-VXqGIoTVttRvMTtXo`"
+                alt="Map of {{ ongoing.lotName }}"
+                style="width: 100%; height: 100%"
+              />
 
-                <!-- <img src="..." class="img-fluid rounded-start" alt="..." /> -->
-              </div>
-              <div class="col-md-6">
-                <div class="card-body">
-                  <p style="text-align: right">
-                    {{ ongoing.licensePlate }}
-                  </p>
-                  <p></p>
-                  <h5 class="card-title">
-                    {{ ongoing.lotName }}
-                  </h5>
-                  <p style="line-height: 30px">
-                    <strong>位置</strong> {{ ongoing.district }}
-                    {{ ongoing.location }}
-                  </p>
-                  <p class="mb-1">
-                    預訂時間： {{ formatTime(ongoing.resTime) }}
-                  </p>
-                  <p>
-                    預計入場時間：
-                    {{ formatTime(ongoing.startTime) }}
-                  </p>
-                  <p v-if="ongoing.paymentStatus" class="text-success">
-                    <i class="fa-regular fa-clock"></i>
-                    最遲於 {{ formatTime(ongoing.validUntil) }} 入場
-                  </p>
-                  <p v-else-if="!ongoing.paymentStatus" class="text-danger">
-                    <i class="fa-solid fa-circle-exclamation"></i>
-                    請盡速繳費
-                  </p>
-                  <div style="text-align: right">
-                    <button
-                      @click="openMap(ongoing.latitude, ongoing.longitude)"
-                      class="btn btn-light"
-                    >
-                      <i class="fa-solid fa-location-crosshairs"></i> 開啟導航
-                    </button>
-                    <button
-                      @click="cancelRes(ongoing.resId)"
-                      type="button"
-                      class="btn btn-light"
-                    >
-                      <i class="fa-regular fa-calendar"></i> 取消預訂
-                    </button>
-                  </div>
+              <!-- <img src="..." class="img-fluid rounded-start" alt="..." /> -->
+            </div>
+            <div class="col-md-6">
+              <div class="card-body">
+                <p style="text-align: right">
+                  {{ ongoing.licensePlate }}
+                </p>
+                <p></p>
+                <h5 class="card-title">
+                  {{ ongoing.lotName }}
+                </h5>
+                <p style="line-height: 30px">
+                  <strong>位置</strong> {{ ongoing.district }}
+                  {{ ongoing.location }}
+                </p>
+                <p class="mb-1">預訂時間： {{ formatTime(ongoing.resTime) }}</p>
+                <p>
+                  預計入場時間：
+                  {{ formatTime(ongoing.startTime) }}
+                </p>
+                <p v-if="ongoing.paymentStatus" class="text-success">
+                  <i class="fa-regular fa-clock"></i>
+                  最遲於 {{ formatTime(ongoing.validUntil) }} 入場
+                </p>
+                <p v-else-if="!ongoing.paymentStatus" class="text-danger">
+                  <i class="fa-solid fa-circle-exclamation"></i>
+                  請盡速繳費
+                </p>
+                <div style="text-align: right">
+                  <button
+                    @click="openMap(ongoing.latitude, ongoing.longitude)"
+                    class="btn btn-light"
+                  >
+                    <i class="fa-solid fa-location-crosshairs"></i> 開啟導航
+                  </button>
+                  <button
+                    @click="cancelRes(ongoing.resId)"
+                    type="button"
+                    class="btn btn-light"
+                  >
+                    <i class="fa-regular fa-calendar"></i> 取消預訂
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-          <!-- 已完成區塊 -->
+        </div>
+        <!-- 已完成區塊 -->
 
-          <i><h3 class="title" v-if="isAllStatus">歷史預訂</h3></i>
-          <div
-            v-for="complete in completedRes"
-            :key="complete.resId"
-            class="card mb-3"
-          >
-            <div class="row g-0">
-              <!-- 地圖區塊 -->
-              <div class="col-md-6 p-2 img-container">
-                <img
-                  class="rounded img-fluid"
-                  :src="`https://maps.googleapis.com/maps/api/staticmap?center=${complete.latitude},${complete.longitude}&zoom=18&size=600x300&markers=color:red%7Clabel:P%7C${complete.latitude},${complete.longitude}&key=AIzaSyALBHIW2HQWkmhCK-VXqGIoTVttRvMTtXo`"
-                  alt="Map of {{ complete.lotName }}"
-                  style="width: 100%; height: 100%"
-                />
+        <i><h3 class="title" v-if="isAllStatus">歷史預訂</h3></i>
+        <div
+          v-for="complete in completedRes"
+          :key="complete.resId"
+          class="card mb-3"
+        >
+          <div class="row g-0">
+            <!-- 地圖區塊 -->
+            <div class="col-md-6 p-2 img-container">
+              <img
+                class="rounded img-fluid"
+                :src="`https://maps.googleapis.com/maps/api/staticmap?center=${complete.latitude},${complete.longitude}&zoom=18&size=600x300&markers=color:red%7Clabel:P%7C${complete.latitude},${complete.longitude}&key=AIzaSyALBHIW2HQWkmhCK-VXqGIoTVttRvMTtXo`"
+                alt="Map of {{ complete.lotName }}"
+                style="width: 100%; height: 100%"
+              />
 
-                <!-- <img src="..." class="img-fluid rounded-start" alt="..." /> -->
-              </div>
-              <div class="col-md-6">
-                <div class="card-body">
-                  <p style="text-align: right">
-                    {{ complete.licensePlate }}
-                  </p>
-                  <h5 class="card-title">{{ complete.lotName }}</h5>
-                  <p style="line-height: 30px">
-                    <strong>位置</strong> {{ complete.district }}
-                    {{ complete.location }}
-                  </p>
-                  <p class="mb-1">
-                    預訂時間：{{ formatTime(complete.resTime) }}
-                  </p>
-                  <p>預計入場時間：{{ formatTime(complete.startTime) }}</p>
-                  <small
-                    v-if="
-                      complete.isFinish &&
-                      complete.isOverdue == false &&
-                      !complete.isCanceled
-                    "
-                    class="text-success"
-                    ><i class="fa-regular fa-circle-check"></i> 已完成</small
-                  >
-                  <small v-else-if="complete.isCanceled" class="text-secondary"
-                    ><i class="fa-solid fa-xmark"></i> 已取消</small
-                  >
-                  <small v-else-if="complete.isOverdue" class="text-danger"
-                    ><i class="fa-solid fa-triangle-exclamation"></i>
-                    逾時未進場</small
-                  >
+              <!-- <img src="..." class="img-fluid rounded-start" alt="..." /> -->
+            </div>
+            <div class="col-md-6">
+              <div class="card-body">
+                <p style="text-align: right">
+                  {{ complete.licensePlate }}
+                </p>
+                <h5 class="card-title">{{ complete.lotName }}</h5>
+                <p style="line-height: 30px">
+                  <strong>位置</strong> {{ complete.district }}
+                  {{ complete.location }}
+                </p>
+                <p class="mb-1">預訂時間：{{ formatTime(complete.resTime) }}</p>
+                <p>預計入場時間：{{ formatTime(complete.startTime) }}</p>
+                <small
+                  v-if="
+                    complete.isFinish &&
+                    complete.isOverdue == false &&
+                    !complete.isCanceled
+                  "
+                  class="text-success"
+                  ><i class="fa-regular fa-circle-check"></i> 已完成</small
+                >
+                <small v-else-if="complete.isCanceled" class="text-secondary"
+                  ><i class="fa-solid fa-xmark"></i> 已取消</small
+                >
+                <small v-else-if="complete.isOverdue" class="text-danger"
+                  ><i class="fa-solid fa-triangle-exclamation"></i>
+                  逾時未進場</small
+                >
 
-                  <div style="text-align: right">
-                    <button
-                      @click="toRes(complete)"
-                      type="button"
-                      class="btn btn-light"
-                    >
-                      <i class="fa-regular fa-calendar"></i> 重新預訂
-                    </button>
-                  </div>
+                <div style="text-align: right">
+                  <button
+                    @click="toRes(complete)"
+                    type="button"
+                    class="btn btn-light"
+                  >
+                    <i class="fa-regular fa-calendar"></i> 重新預訂
+                  </button>
                 </div>
               </div>
             </div>
@@ -402,8 +392,5 @@ strong {
   font-weight: normal;
   background: linear-gradient(to right, #dfe9f3 0%, white 100%);
   background-color: transparent;
-}
-
-.noDataArea {
 }
 </style>

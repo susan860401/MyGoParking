@@ -6,7 +6,7 @@ const baseUrl = `${import.meta.env.VITE_API_BASEURL}/LinePay/`;
 const MylotId = ref(0);
 const MycarId = ref(0);
 const MyAmount = ref(0);
-const startTime = ref('');
+const startTime = ref("");
 const lotInfo = reactive({
   lotName: "",
   lotType: "",
@@ -114,58 +114,61 @@ async function requestPayment() {
 </script>
 
 <template>
-  <div>
-    <main id="main">
-      <BreadcrumbsComponent backgroundImage="/03.jpg" :breadcrumbs="[
+  <main id="main">
+    <BreadcrumbsComponent
+      backgroundImage="/03.jpg"
+      :breadcrumbs="[
         { name: 'Home', link: '/' },
         { name: 'GoParkingMap', link: '/search' },
-      ]">
-        <template #title>
-          <!-- 插入到 title 插槽 -->
-          <h2>Reservation & MonthlyRental</h2>
-        </template>
-        <template #page>
-          <!-- 插入到 page 插槽 -->
-          預約服務
-        </template>
-      </BreadcrumbsComponent>
+      ]"
+    >
+      <template #title>
+        <!-- 插入到 title 插槽 -->
+        <h2>Reservation & MonthlyRental</h2>
+      </template>
+      <template #page>
+        <!-- 插入到 page 插槽 -->
+        預約服務
+      </template>
+    </BreadcrumbsComponent>
 
-      <div class="container py-5">
-        <h2 class="text-center mb-3">請確認您的預約停車場</h2>
-        <p class="text-center text-muted">為了您的權益，請閱讀使用規則</p>
+    <div class="container py-5">
+      <h2 class="text-center mb-3">請確認您的預約停車場</h2>
+      <p class="text-center text-muted">為了您的權益，請閱讀使用規則</p>
 
-        <div class="tab-content">
-          <div class="tab-pane show active">
-            <div class="text-left p-4 bg-white rounded shadow">
-              <div class="row">
-                <div class="col-md-5 p-3 img-container">
-                  <img :src="mapUrl" alt="Map of {{ lotInfo.lotName }}" class="rounded img-fluid"
-                    style="width: 100%; height: 100%" />
-                </div>
-                <div class="col-md-7 p-3 mt-2">
-                  <h1>{{ lotInfo.lotName }}</h1>
-                  <p><strong>停車地址：</strong>{{ lotInfo.lotLocation }}</p>
-                  <p>
-                    <strong>停車費用：</strong>{{ lotInfo.lotWeek }} 元/小時
-                  </p>
-                  <p><strong>停車場類型：</strong>{{ lotInfo.lotType }}</p>
-                  <p><strong>剩餘車位：</strong>{{ lotInfo.lotValid }}</p>
-                  <p><strong>聯絡電話：</strong>{{ lotInfo.lotTel }}</p>
-                  <p><strong>預約訂金:</strong> {{ lotInfo.lotResDeposit }}</p>
-                </div>
+      <div class="tab-content">
+        <div class="tab-pane show active">
+          <div class="text-left p-4 bg-white rounded shadow">
+            <div class="row">
+              <div class="col-md-5 p-3 img-container">
+                <img
+                  :src="mapUrl"
+                  alt="Map of {{ lotInfo.lotName }}"
+                  class="rounded img-fluid"
+                  style="width: 100%; height: 100%"
+                />
+              </div>
+              <div class="col-md-7 p-3 mt-2">
+                <h1>{{ lotInfo.lotName }}</h1>
+                <p><strong>停車地址：</strong>{{ lotInfo.lotLocation }}</p>
+                <p><strong>停車費用：</strong>{{ lotInfo.lotWeek }} 元/小時</p>
+                <p><strong>停車場類型：</strong>{{ lotInfo.lotType }}</p>
+                <p><strong>剩餘車位：</strong>{{ lotInfo.lotValid }}</p>
+                <p><strong>聯絡電話：</strong>{{ lotInfo.lotTel }}</p>
+                <p><strong>預約訂金:</strong> {{ lotInfo.lotResDeposit }}</p>
               </div>
             </div>
           </div>
         </div>
-
-        <div class="text-center mt-4">
-          <button class="btn btn-warning btn-lg" @click="requestPayment">
-            立即付款
-          </button>
-        </div>
       </div>
-    </main>
-  </div>
+
+      <div class="text-center mt-4">
+        <button class="btn btn-warning btn-lg" @click="requestPayment">
+          立即付款
+        </button>
+      </div>
+    </div>
+  </main>
 </template>
 
 <style scoped></style>

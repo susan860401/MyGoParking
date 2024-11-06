@@ -27,8 +27,8 @@ const markerMap = ref(new Map()); // 用於存儲每個停車場的標記
 
 // 使用的定位圖標
 var locationIcon = L.icon({
-  iconUrl: "Location.png",
-  iconSize: [38, 40],
+  iconUrl: "/location.gif",
+  iconSize: [50, 65],
   iconAnchor: [19, 35],
   popupAnchor: [0, -35],
 });
@@ -73,10 +73,9 @@ const SearchHandler = async (searchQuery) => {
         map.value.removeLayer(userLocationMarker.value);
         userLocationMarker.value = null;
       }
-
-      const marker = L.marker([lat, lon], { icon: locationIcon })
-        .bindPopup(`位置：${searchQuery}`)
-        .openPopup();
+      const marker = L.marker([lat, lon], { icon: locationIcon }).bindPopup(
+        `位置：${searchQuery}`
+      );
       searchMarkerGroup.value.addLayer(marker);
       map.value.setView([lat, lon], 15);
       updateUrlQuery(searchQuery);
@@ -144,6 +143,7 @@ const AddMarkerToMap = async () => {
     map.value.removeLayer(markerClusterGroup.value);
   }
   // 創建 MarkerClusterGroup
+  //markerClusterGroup.value.clearLayers(); // 清除舊的標記
   markerClusterGroup.value = L.markerClusterGroup();
   markerMap.value.clear(); // 每次都清空舊的 markerMap
 
@@ -192,26 +192,6 @@ const AddMarkerToMap = async () => {
           cardElement.classList.add("active-card");
         }
       });
-      // 為每個 marker 綁定 popup，顯示停車場相關資訊  => 問老師
-      //   const popupContent = `
-      //     <div>
-      //       <h4>${lot.lotName}</h4>
-      //       <p>可用車位: ${lot.validSpace}</p>
-      //       <p>地址: ${lot.location}</p>
-      //       <p>平日費率: ${lot.weekdayRate}元/小時</p>
-      //       <p>假日費率: ${lot.holidayRate}元/小時</p>
-      //     </div>
-      //   `;
-
-      //   const popup = L.popup()
-      //     .setLatLng([lot.latitude, lot.longitude])
-      //     .setContent(popupContent);
-      //   // 解除舊的 popup 綁定
-      //   if (marker.getPopup()) {
-      //     marker.unbindPopup();
-      //   }
-      //   marker.bindPopup(popup).openPopup();
-
       markerClusterGroup.value.addLayer(marker);
       // 將 marker 存入 markerMap，使用 lotId 進行關聯
       markerMap.value.set(lot.lotId, marker);
@@ -260,7 +240,14 @@ watch(
     }
   }
 );
-watch(displayedParkingLots, AddMarkerToMap);
+watch(displayedParkingLots, () => {
+  if (map.value) {
+    // 確保地圖已經初始化
+    AddMarkerToMap();
+  } else {
+    console.warn("地圖尚未初始化，無法添加標記");
+  }
+});
 
 // 掛載時檢查有沒有來自首頁的字串
 onMounted(async () => {
@@ -295,102 +282,98 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div>
-    <main id="main">
-      <!-- 麵包屑 -->
-      <BreadcrumbsComponent
-        backgroundImage="/homePage.jpg"
-        :breadcrumbs="[{ name: 'home', link: '/' }]"
-      >
-        <template #title>
-          <!-- 插入到 title 插槽 -->
-          <h2>Search Parking</h2>
-        </template>
-        <template #page>
-          <!-- 插入到 page 插槽 -->
-          查找停車位
-        </template>
-      </BreadcrumbsComponent>
+  <main id="main">
+    <!-- 麵包屑 -->
+    <BreadcrumbsComponent
+      backgroundImage="/homePage.jpg"
+      :breadcrumbs="[{ name: 'home', link: '/' }]"
+    >
+      <template #title>
+        <!-- 插入到 title 插槽 -->
+        <h2>Search Parking</h2>
+      </template>
+      <template #page>
+        <!-- 插入到 page 插槽 -->
+        查找停車位
+      </template>
+    </BreadcrumbsComponent>
 
-      <!-- ======= Map Section ======= -->
-      <section id="about" class="about">
-        <div class="row ms-2 me-2" data-aos="fade-up">
-          <div class="col-md-4">
-            <div class="row">
-              <div class="col-md-12">
-                <h3>MyGo Parking</h3>
-                <div style="width: 100%">
-                  <SearchInputComponent
-                    @search="SearchHandler"
-                  ></SearchInputComponent>
-                </div>
+    <!-- ======= Map Section ======= -->
+    <section id="about" class="about">
+      <div class="row ms-2 me-2" data-aos="fade-up">
+        <div class="col-md-4">
+          <div class="row">
+            <div class="col-md-12">
+              <h3>MyGo Parking</h3>
+              <div style="width: 100%">
+                <SearchInputComponent
+                  @search="SearchHandler"
+                ></SearchInputComponent>
               </div>
-              <div class="col-md-12">
-                <div class="container">
-                  <div class="row">
-                    <div class="col-md-12">
-                      <div v-if="isLoading" class="map-loading-overlay">
-                        <img src="/Hourglass.gif" alt="loading" />
-                        <div class="spinner"></div>
-                      </div>
-                      <!-- 停車場資訊卡片 -->
+            </div>
+            <div class="col-md-12">
+              <div class="container">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div v-if="isLoading" class="map-loading-overlay">
+                      <img src="/Hourglass.gif" alt="loading" />
+                      <div class="spinner"></div>
+                    </div>
+                    <!-- 停車場資訊卡片 -->
+                    <div
+                      class="container mt-3"
+                      style="overflow-y: auto; max-height: 550px"
+                    >
                       <div
-                        class="container mt-3"
-                        style="overflow-y: auto; max-height: 550px"
+                        v-for="(lot, index) in displayedParkingLots.slice(
+                          0,
+                          30
+                        )"
+                        :key="index"
+                        :data-lot-id="lot.lotId"
+                        :ref="'parkingLotCard-' + index"
+                        class="card mb-4"
+                        @mouseover="focusOnMarker(lot.lotId)"
+                        @click="ResMon(lot)"
                       >
-                        <div
-                          v-for="(lot, index) in displayedParkingLots.slice(
-                            0,
-                            30
-                          )"
-                          :key="index"
-                          :data-lot-id="lot.lotId"
-                          :ref="'parkingLotCard-' + index"
-                          class="card mb-4"
-                          @mouseover="focusOnMarker(lot.lotId)"
-                          @click="ResMon(lot)"
-                        >
-                          <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                              <h3 class="card-title d-flex">
-                                {{ lot.lotName }}
-                                <span style="color: #ff00ff" v-if="lot.deposit"
-                                  ><i class="fa-solid fa-star"></i
-                                ></span>
-                                <span
-                                  style="color: #d9b300"
-                                  v-if="lot.monRentalRate"
-                                  ><i class="fa-solid fa-circle"></i
-                                ></span>
-                              </h3>
-                              <div
-                                class="d-flex text-center"
-                                style="width: 80px; height: 25px"
-                              >
-                                <img style="width: 20px" src="/Walk.gif" />
-                                <span style="font-size: 15px; color: blue"
-                                  >{{ lot.distance.toFixed(2) }}km</span
-                                >
-                              </div>
-                            </div>
-                            <p style="font-weight: 700">
-                              剩餘車位：<span style="color: chocolate">{{
-                                lot.validSpace
-                              }}</span>
-                            </p>
-                            <div class="d-flex justify-content-between">
-                              <p style="font-weight: 700">
-                                費用：
-                                <span style="color: red">
-                                  {{ lot.weekdayRate }}
-                                </span>
-                              </p>
-                              <span v-if="lot.isETC" class="ms-2"
-                                ><i
-                                  class="fa-solid fa-charging-station fa-beat-fade"
-                                ></i
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between">
+                            <h3 class="card-title d-flex">
+                              {{ lot.lotName }}
+                              <span style="color: #ff00ff" v-if="lot.deposit"
+                                ><i class="fa-solid fa-star"></i
                               ></span>
+                              <span
+                                style="color: #d9b300"
+                                v-if="lot.monRentalRate"
+                                ><i class="fa-solid fa-circle"></i
+                              ></span>
+                            </h3>
+                            <div
+                              class="d-flex text-center"
+                              style="width: 80px; height: 25px"
+                            >
+                              <img style="width: 20px" src="/Walk.gif" />
+                              <span style="font-size: 15px; color: blue"
+                                >{{ lot.distance.toFixed(2) }}km</span
+                              >
                             </div>
+                          </div>
+                          <p style="font-weight: 700">
+                            剩餘車位：<span style="color: chocolate">{{
+                              lot.validSpace
+                            }}</span>
+                          </p>
+                          <div class="d-flex justify-content-between">
+                            <p style="font-weight: 700">
+                              費用：
+                              <span style="color: red">
+                                {{ lot.weekdayRate }}
+                              </span>
+                            </p>
+                            <span v-if="lot.isETC" class="ms-2"
+                              ><i class="fa-solid fa-charging-station"></i
+                            ></span>
                           </div>
                         </div>
                       </div>
@@ -400,26 +383,30 @@ onBeforeUnmount(() => {
               </div>
             </div>
           </div>
-          <div class="col-md-8">
-            <div id="map"></div>
-            <div class="mt-2 d-flex">
-              <p>
-                <span style="color: #ff00ff"
-                  ><i class="fa-solid fa-star"></i></span
-                >: 該停車場支援預約服務。
-              </p>
-              <p>
-                <span style="color: #d9b300"
-                  ><i class="fa-solid fa-circle"></i></span
-                >: 該停車場支援月租服務。
-              </p>
-            </div>
+        </div>
+        <div class="col-md-8">
+          <div id="map"></div>
+          <div class="mt-2 d-flex">
+            <p>
+              <span style="color: #ff00ff"
+                ><i class="fa-solid fa-star"></i></span
+              >: 該停車場支援預約服務。
+            </p>
+            <p>
+              <span style="color: #d9b300"
+                ><i class="fa-solid fa-circle"></i></span
+              >: 該停車場支援月租服務。
+            </p>
+            <p>
+              <span><i class="fa-solid fa-charging-station"></i></span>:
+              該停車場支援充電樁
+            </p>
           </div>
         </div>
-      </section>
-      <!-- End About Section -->
-    </main>
-  </div>
+      </div>
+    </section>
+    <!-- End About Section -->
+  </main>
 </template>
 
 <style scoped>
@@ -464,5 +451,10 @@ onBeforeUnmount(() => {
 .active-card {
   border: 2px solid #b3b0ad; /* 邊框顏色改為橙色 */
   box-shadow: 0 0 15px rgba(85, 83, 80, 0.8); /* 卡片高亮效果 */
+}
+@media screen and (max-width: 768px) {
+  #map {
+    display: none;
+  }
 }
 </style>
