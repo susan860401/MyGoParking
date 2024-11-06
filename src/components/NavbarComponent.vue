@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { ref, watch } from "vue";
 import { useUserStore } from "@/stores/userStore";
 import { useCouponStore } from "@/stores/couponStore";
@@ -12,6 +12,7 @@ let timeout;
 //優惠視窗更新用
 
 const userStore = useUserStore();
+const route = useRoute();
 const couponStore = useCouponStore();
 const BASE_URL = import.meta.env.VITE_API_BASEURL;
 const GET_TURL = `${BASE_URL}/Customers/id`;
@@ -53,7 +54,7 @@ const handleBlur = (event) => {
   const relatedTarget = event.relatedTarget;
   // console.log(relatedTarget)
   if (!relatedTarget) {
-    console.log("blur",isSearch_barOpen.value)
+    console.log("blur", isSearch_barOpen.value);
     isSearch_barOpen.value = false;
   }
 };
@@ -65,7 +66,7 @@ const enable_Search_bar = () => {
     // 在猶豫按下去跳轉後這邊要關起來還是保持開著
     isSearch_barOpen.value = false;
   } else {
-    console.log("Focus",isSearch_barOpen.value)
+    console.log("Focus", isSearch_barOpen.value);
     searchInput.value.focus();
     isSearch_barOpen.value = true;
   }
@@ -101,16 +102,18 @@ const autoClose = () => {
 const updateMemberInfo = async () => {
   const userId = userStore.userId;
   const PUTT_TURL = `${GET_TURL}${userId}`;
+  const pwd = route.query.pwd;
 
   const renew = {
     userId: userStore.userId,
     username: name.value,
-    password: userStore.password,
+    password: pwd,
     email: userStore.email,
     phone: phone.value,
-    salt: userStore.salt,
+    salt: "",
     licensePlate: userStore.licensePlate,
   };
+  console.log(renew);
   const response = await fetch(PUTT_TURL, {
     method: "PUT",
     body: JSON.stringify(renew),
@@ -118,6 +121,7 @@ const updateMemberInfo = async () => {
       "Content-Type": "application/json",
     },
   });
+  console.log(response);
   if (response.ok) {
     userStore.updateUser(renew);
     alert("會員資料已成功更新");
@@ -151,11 +155,15 @@ const submitMemberInfo = async () => {
           >
             <!-- Uncomment the line below if you also wish to use an image logo -->
             <!-- <img src="assets/img/logo.png" alt=""> -->
-            <h1><img src="../images/logo_mygo.png" alt=""><span></span></h1>
+            <h1><img src="../images/logo_mygo.png" alt="" /><span></span></h1>
           </RouterLink>
           <div
             class="nav_search_bar"
-            :class="({ nav_search_bar_animation_forwards: isSearch_barOpen, nav_search_bar_animation_reverse: !isSearch_barOpen })">
+            :class="{
+              nav_search_bar_animation_forwards: isSearch_barOpen,
+              nav_search_bar_animation_reverse: !isSearch_barOpen,
+            }"
+          >
             <a
               id="nav_search_bar_icon"
               href=""
@@ -173,8 +181,10 @@ const submitMemberInfo = async () => {
               type="text"
               ref="searchInput"
               class="nav_search_bar_input"
-              :class="
-                ({ nav_search_bar_input_animation_forwards: isSearch_barOpen, nav_search_bar_animation_reverse: !isSearch_barOpen})"
+              :class="{
+                nav_search_bar_input_animation_forwards: isSearch_barOpen,
+                nav_search_bar_animation_reverse: !isSearch_barOpen,
+              }"
               placeholder="搜尋停車場"
             />
           </div>
@@ -379,7 +389,7 @@ const submitMemberInfo = async () => {
 
 .nav_search_bar_input {
   border-radius: 5px;
-  background-color: rgba(255,255,255,0.8);
+  background-color: rgba(255, 255, 255, 0.8);
   width: 0;
   border: 1px;
   outline: none;
