@@ -1,7 +1,10 @@
 <script setup>
 import { scrollbarProps } from "element-plus";
 import { onMounted, ref } from "vue";
-const userId = 1;
+import { useUserStore } from "@/stores/userStore"; //要取Pinia
+
+const userStore = useUserStore();
+const userId = userStore.userId;
 const API_URL = "https://localhost:7077/api";
 const activePage = ref("current"); //目前在哪個頁面(當前合約還是歷史)
 const monthlyRentals = ref([]);

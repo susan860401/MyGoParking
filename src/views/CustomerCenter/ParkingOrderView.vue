@@ -1,8 +1,11 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/userStore"; //要取Pinia
 
 const API_URL = "https://localhost:7077/api";
+const userStore = useUserStore();
+const userId = userStore.userId;
 const reservations = ref([]); //傳回的預訂資料放此
 const search = ref(""); //搜尋關鍵字
 const period = ref("all"); //選擇篩選區段
@@ -17,7 +20,7 @@ const countOverdue = ref(0); //上方顯示逾時預訂數字(違規)
 const isNoData = ref();
 
 const loadReservations = async () => {
-  const response = await fetch(`${API_URL}/Reservations?userId=1`);
+  const response = await fetch(`${API_URL}/Reservations?userId=${userId}`);
   const datas = await response.json();
   reservations.value = datas;
   //已完成的訂單
@@ -43,7 +46,7 @@ const filterByStatus = async (filter) => {
   } else {
     isAllStatus.value = false;
     const response = await fetch(
-      `${API_URL}/Reservations/filter?userId=1&filter=${filter}`
+      `${API_URL}/Reservations/filter?userId=${userId}&filter=${filter}`
     );
     const datas = await response.json();
     reservations.value = datas;
@@ -57,7 +60,7 @@ const filterByDistrict = async () => {
     loadReservations(); //但其實要考慮可能有進階篩選問題
   } else {
     const response = await fetch(
-      `${API_URL}/Reservations/search/?userId=1&district=${search.value}`
+      `${API_URL}/Reservations/search/?userId=${userId}&district=${search.value}`
     );
     const datas = await response.json();
     reservations.value = datas;

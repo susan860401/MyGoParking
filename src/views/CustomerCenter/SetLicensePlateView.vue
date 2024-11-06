@@ -1,18 +1,19 @@
 <script setup>
 import item from "isotope-layout/js/item";
 import { ref } from "vue";
+import { useUserStore } from "@/stores/userStore"; //要取Pinia
 
 const API_URL = "https://localhost:7077/api";
+const userStore = useUserStore();
+const userId = userStore.userId;
 
 // 一開始要載入的car
 const cars = ref([]);
 let originalCars = []; //存放原始資料
 const remind = ref("");
-//之後要改
-// const user = JSON.parse(localStorage.getItem("user")).userId;
 
 const loadLicensePlates = async () => {
-  const response = await fetch(`${API_URL}/Cars_?userId=1`);
+  const response = await fetch(`${API_URL}/Cars_?userId=${userId}`);
   const datas = await response.json();
   cars.value = datas.map((item) => ({
     ...item,
@@ -65,7 +66,7 @@ const saveCar = async () => {
 
   //處理新增的車牌
   if (newCars.length > 0) {
-    const response = await fetch(`${API_URL}/Cars_?userId=1`, {
+    const response = await fetch(`${API_URL}/Cars_?userId=${userId}`, {
       method: "POST",
       body: JSON.stringify(newCars),
       headers: { "Content-Type": "application/json" },

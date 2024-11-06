@@ -2,7 +2,10 @@
 //表格 暫放 尚未用到
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-const userId = 1;
+import { useUserStore } from "@/stores/userStore"; //要取Pinia
+
+const userStore = useUserStore();
+const userId = userStore.userId;
 const API_URL = "https://localhost:7077/api";
 const parkingRecords = ref([]); //儲存所有停車紀錄
 const filteredRecords = ref([]); // 儲存經過過濾的紀錄
