@@ -48,6 +48,7 @@ const GotoRes = async () => {
 };
 
 const submitRes = async () => {
+  s;
   if (
     !selectedCarPlate.value ||
     !date.value ||
@@ -430,6 +431,7 @@ onMounted(async () => {
 /* 背景設計 */
 main {
   font-family: Arial, sans-serif; /* 更簡約的字體 */
+  height: auto;
 }
 
 /* 停車場資訊區域樣式 */

@@ -60,7 +60,8 @@ h6 {
 # Sections & Section Header
 --------------------------------------------------------------*/
 section {
-  padding: 80px 0;
+  height: 100%;
+  padding: 100px 0;
   overflow: hidden;
 }
 
