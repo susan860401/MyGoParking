@@ -2,7 +2,6 @@
 import { ref, computed, onMounted, reactive, nextTick } from 'vue';
 import BreadcrumbsComponent from '@/components/BreadcrumbsComponent.vue';
 import axios from 'axios';
-import dayjs from 'dayjs';
 
 const MycarId = ref(0);
 const MylotId = ref(0);
@@ -150,6 +149,24 @@ async function validatePlan() {
     }
 }
 
+//-------------------------------------------------------------------------------------------------
+
+// 將金額與方案資訊儲存到 sessionStorage 的函數
+function storePaymentInfo(plan, carId, lotId) {
+    const amount = parseInt(plan.price, 10); // 取得選擇方案的金額
+    const paymentInfo = {
+        amount: amount,         // 金額
+        planLabel: plan.label,  // 方案名稱
+        car: carId,
+        lot: lotId
+    };
+
+    // 儲存金額與方案資訊於 sessionStorage
+    sessionStorage.setItem('paymentInfo', JSON.stringify(paymentInfo));
+}
+
+//-------------------------------------------------------------------------------------------------
+
 
 // 建立交易請求---------------------------------------------------------------------------------------------------
 
@@ -157,22 +174,11 @@ async function requestPayment() {
     const isValid = await validatePlan();
     if (!isValid) return; // 若驗證失敗，中止支付流程
 
-
-    const amount = parseInt(selectedPlan.value.price, 10); // 取得選擇方案的金額
-    const paymentInfo = {
-        amount: amount,  // 金額
-        planLabel: selectedPlan.value.label,  // 方案名稱
-        car: MycarId.value,
-        lot: MylotId.value
-    };
-
-    // 儲存金額與方案資訊於 sessionStorage
-    sessionStorage.setItem('paymentInfo', JSON.stringify(paymentInfo))
-
-
+    // 儲存選擇方案的金額與方案資訊
+    storePaymentInfo(selectedPlan.value, MycarId.value, MylotId.value);
 
     const payment = {
-        amount: amount,  // 總金額
+        amount: parseInt(selectedPlan.value.price, 10),  // 總金額
         currency: "TWD",  // 貨幣類型
         orderId: Date.now().toString(),  // 訂單 ID
         planId: selectedPlan.value.id,  // 方案 ID
@@ -228,16 +234,23 @@ async function fetchPaymentData() {
     const isValid = await validatePlan();
     if (!isValid) return; // 若驗證失敗，中止支付流程
     console.log("MylotId:", MylotId.value);
+
+    // 儲存選擇方案的金額與方案資訊
+    storePaymentInfo(selectedPlan.value, MycarId.value, MylotId.value);
+
     try {
         const paymentData = {
             ItemName: "月租停車場",
             TotalAmount: parseInt(selectedPlan.value.price, 10), // 模擬數據
             PlanName: selectedPlan.value.label,
-            ClientBackURL: window.location.origin + "/MonthlyConfirm", // 動態設置回調 URL
+            ClientBackURL: window.location.origin + "/ECPayConfirmView", // 動態設置回調 URL
+            planId: selectedPlan.value.id,  // 方案 ID
+            carId: MycarId.value,
             lotId: MylotId.value,
+            startTime: startTime.value,
         };
         console.log("paymentData:", paymentData); // 檢查 paymentData 結構
-        const response = await axios.post("https://localhost:7077/ECPayForm", paymentData, {
+        const response = await axios.post('https://19fd-182-235-134-21.ngrok-free.app/api/ECPay/ECPayForm', paymentData, {
             headers: { 'Content-Type': 'application/json' },
         });
 
@@ -352,8 +365,8 @@ const handlePayment = () => {
                         立即付款
                     </button>
                 </div>
+                <!-- 綠界表單開始 -->
                 <div class="text-center mt-4">
-                    <!-- 綠界表單 -->
                     <form ref="ecpayForm" action="https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5"
                         method="post" v-show="false">
                         <div>
@@ -404,7 +417,7 @@ const handlePayment = () => {
                         </div>
                     </form>
                 </div>
-
+                <!-- 綠界表單結束 -->
             </div>
         </main>
     </div>

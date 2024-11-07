@@ -28,6 +28,7 @@ import ChargeView from "./views/ChargeView.vue";
 import ChargConfirmView from "./views/ChargeConfirmView.vue";
 import { useUserStore } from './stores/userStore';
 import TestRentView from "./views/TestRentView.vue";
+import ECPayConfirmView from "./views/ECPayConfirmView.vue";
 
 
 const routes = [
@@ -90,6 +91,11 @@ const routes = [
     path: "/TestRentView",
     component: TestRentView,
     name: "TestRentView",
+  },
+  {
+    path: "/ECPayConfirmView",
+    component: ECPayConfirmView,
+    name: "ECPayConfirmView",
   },
   {
     path: "/CustomerCenter",
