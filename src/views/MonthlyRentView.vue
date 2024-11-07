@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, reactive } from 'vue';
+import { ref, computed, onMounted, reactive, nextTick } from 'vue';
 import BreadcrumbsComponent from '@/components/BreadcrumbsComponent.vue';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -8,7 +8,6 @@ const MycarId = ref(0);
 const MylotId = ref(0);
 const MyAmount = ref(0);
 const startTime = ref('');
-
 // 宣告方案資料，使用 reactive 包裹
 const planData = reactive({
     oneMonth: {
@@ -152,7 +151,8 @@ async function validatePlan() {
 }
 
 
-// 建立交易請求
+// 建立交易請求---------------------------------------------------------------------------------------------------
+
 async function requestPayment() {
     const isValid = await validatePlan();
     if (!isValid) return; // 若驗證失敗，中止支付流程
@@ -217,9 +217,81 @@ async function requestPayment() {
         alert('交易失敗，請稍後再試。');
     }
 }
+
+
+//-----------------------------------------------------------------------------------------------
+
+const ecpayForm = ref(null); // 將表單引用存儲在 ecpayForm 中
+const paymentParameters = ref({}); // 初始化空的支付參數物件
+
+async function fetchPaymentData() {
+    const isValid = await validatePlan();
+    if (!isValid) return; // 若驗證失敗，中止支付流程
+    console.log("MylotId:", MylotId.value);
+    try {
+        const paymentData = {
+            ItemName: "月租停車場",
+            TotalAmount: parseInt(selectedPlan.value.price, 10), // 模擬數據
+            PlanName: selectedPlan.value.label,
+            ClientBackURL: window.location.origin + "/MonthlyConfirm", // 動態設置回調 URL
+            lotId: MylotId.value,
+        };
+        console.log("paymentData:", paymentData); // 檢查 paymentData 結構
+        const response = await axios.post("https://localhost:7077/ECPayForm", paymentData, {
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        paymentParameters.value = response.data; // 將返回的數據分配給 paymentParameters
+
+        await nextTick(); // 確保 DOM 更新完成後操作
+        submitForm();
+    } catch (error) {
+        console.error("獲取支付參數失敗:", error);
+        alert("交易失敗，請稍後再試。");
+    }
+}
+
+function submitForm() {
+    if (ecpayForm.value) {
+        ecpayForm.value.submit(); // 使用 ref 引用直接提交表單
+    } else {
+        console.error("未找到表單");
+    }
+}
+
+//-----------------------------------------------------------------------------------------------
+
+// 金流選擇資料
+const PayData = {
+    linePay: { label: 'LinePay' },
+    ecPay: { label: '綠界金流' }
+};
+
+// 設定選中的金流方式
+const selectedPayKey = ref('linePay'); // 預設為 LinePay
+const selectedPay = ref(PayData[selectedPayKey.value]);
+
+// 選擇金流方法
+const selectPayment = (payKey) => {
+    if (PayData[payKey]) {
+        selectedPay.value = PayData[payKey];
+        selectedPayKey.value = payKey;
+        console.log('已選擇金流方式:', selectedPay.value);
+    } else {
+        console.error('無效的金流 Key:', payKey);
+    }
+}
+//-----------------------------------------------------------------------------------------------
+const handlePayment = () => {
+    if (selectedPayKey.value === 'linePay') {
+        requestPayment()
+    } else if (selectedPayKey.value === 'ecPay') {
+        fetchPaymentData()
+    } else {
+        console.error('請選擇一個支付方式')
+    }
+}
 </script>
-
-
 <template>
     <div>
         <main id="main">
@@ -248,7 +320,6 @@ async function requestPayment() {
                         </div>
                     </li>
                 </ul>
-
                 <div class="tab-content">
                     <div class="tab-pane show active">
                         <div class="text-center p-5 bg-white rounded shadow">
@@ -263,18 +334,79 @@ async function requestPayment() {
                             <p v-if="savingsMessage" class="text-success mt-3">
                                 {{ savingsMessage }}
                             </p>
+                            <h2 class="mt-5">選擇支付方式</h2>
+                            <ul class="nav justify-content-evenly mb-4 mt-5">
+                                <li class="nav-item" style="width: 40%;" v-for="(payment, key) in PayData" :key="key">
+                                    <div class="plan-option" :class="{ active: selectedPayKey === key }"
+                                        @click="selectPayment(key)">
+                                        {{ payment.label }}
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
                 <div class="text-center mt-4">
-                    <button class="btn btn-warning btn-lg" @click="requestPayment()">
+                    <button class="btn btn-warning btn-lg mt-3" @click="handlePayment">
                         立即付款
                     </button>
                 </div>
+                <div class="text-center mt-4">
+                    <!-- 綠界表單 -->
+                    <form ref="ecpayForm" action="https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5"
+                        method="post" v-show="false">
+                        <div>
+                            <label>MerchantID:</label>
+                            <input type="text" name="MerchantID" :value="paymentParameters.MerchantID" readonly />
+                        </div>
+                        <div>
+                            <label>MerchantTradeNo:</label>
+                            <input type="text" name="MerchantTradeNo" :value="paymentParameters.MerchantTradeNo"
+                                readonly />
+                        </div>
+                        <div>
+                            <label>MerchantTradeDate:</label>
+                            <input type="text" name="MerchantTradeDate" :value="paymentParameters.MerchantTradeDate"
+                                readonly />
+                        </div>
+                        <div>
+                            <label>TotalAmount:</label>
+                            <input type="text" name="TotalAmount" :value="paymentParameters.TotalAmount" readonly />
+                        </div>
+                        <div>
+                            <label>TradeDesc:</label>
+                            <input type="text" name="TradeDesc" :value="paymentParameters.TradeDesc" readonly />
+                        </div>
+                        <div>
+                            <label>ItemName:</label>
+                            <input type="text" name="ItemName" :value="paymentParameters.ItemName" readonly />
+                        </div>
+                        <div>
+                            <label>ReturnURL:</label>
+                            <input type="text" name="ReturnURL" :value="paymentParameters.ReturnURL" readonly />
+                        </div>
+                        <div>
+                            <label>ClientBackURL:</label>
+                            <input type="text" name="ClientBackURL" :value="paymentParameters.ClientBackURL" readonly />
+                        </div>
+                        <div>
+                            <label>ChoosePayment:</label>
+                            <input type="text" name="ChoosePayment" :value="paymentParameters.ChoosePayment" readonly />
+                        </div>
+                        <div>
+                            <label>CheckMacValue:</label>
+                            <input type="text" name="CheckMacValue" :value="paymentParameters.CheckMacValue" readonly />
+                        </div>
+                        <div>
+                            <label>PaymentType:</label>
+                            <input type="text" name="PaymentType" :value="paymentParameters.PaymentType" readonly />
+                        </div>
+                    </form>
+                </div>
+
             </div>
         </main>
-        <div id="paymentFormContainer"></div>
     </div>
 </template>
 
@@ -326,9 +458,5 @@ async function requestPayment() {
     color: #28a745;
     margin-right: 8px;
     font-size: 18px;
-}
-
-.btn-lg:hover {
-    background-color: #ffc107;
 }
 </style>
