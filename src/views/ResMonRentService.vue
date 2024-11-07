@@ -48,7 +48,6 @@ const GotoRes = async () => {
 };
 
 const submitRes = async () => {
-  s;
   if (
     !selectedCarPlate.value ||
     !date.value ||
@@ -163,12 +162,13 @@ const GoToMonPay = async () => {
   }
   try {
     const res = await fetch(
-      `${BASE_URL}/MonthlyRentals/CheckMonRentalSpace?lotId=${lotId}`
+      `${BASE_URL}/MonthlyRentals/CheckMonRentalSpace?lotId=${lotId}&userId=${userStore.userId}`
     );
     const data = await res.json();
-    console.log(data);
+    //console.log(data);
     if (!res.ok) {
-      throw new Error(data.message || "檢查月租車位狀態時發生錯誤");
+      console.error(data.message || "檢查月租車位狀態時發生錯誤");
+      return;
     }
     if (data.message === "月租車位可用" && data.success === true) {
       sessionStorage.setItem("carId", selectCar.carId);
@@ -204,6 +204,15 @@ const GoToMonPay = async () => {
             },
           });
         }
+      });
+    } else if (
+      data.message === "黑名單用戶無法申請月租" &&
+      data.success === false
+    ) {
+      Swal.fire({
+        icon: "warning",
+        title: "Oops...",
+        text: data.message,
       });
     } else {
       Swal.fire({
