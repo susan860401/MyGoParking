@@ -326,7 +326,7 @@ const submitMemberInfo = async () => {
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">
-              註冊成功! <P>填寫完整會員資訊即可取得三張優惠券!</P>
+              註冊成功! <p>填寫完整會員資訊即可取得三張優惠券!</p>
             </h5>
             <button
               ref="closeForm"

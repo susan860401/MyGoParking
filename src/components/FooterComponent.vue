@@ -2,26 +2,33 @@
 import router from '@/router';
 import Swal from 'sweetalert2';
 import {useUserStore} from '@/stores/userStore';
-import { onMounted } from "vue";
+import { nextTick, onMounted } from "vue";
+import { RouterLink } from 'vue-router';
 
 // API 基本路徑
 const baseUrl = `${import.meta.env.VITE_API_BASEURL}`;
 const userStore = useUserStore();
 
 const reply = async () => {
+  const userId = userStore.userId;
+  let shouldScrollTop = false;
   try {
-    const userId = userStore.userId;
     // console.log(userStore.userId);
-    if (userId === null || userId === ""){
+    if (userId === null || userId === "" || userId === 0){
       await Swal.fire({
         title:'請先登入系統',
         icon:'error',
         showConfirmButton:true,
         showCancelButton:true,
+        didDestroy: () => {
+          if (shouldScrollTop){
+            window.scrollTo(0,0);
+          }
+        }
       }).then((result)=>{
         if(result.isConfirmed){
+          shouldScrollTop = true;
           router.push('/signIn');
-          window.scrollTo(0,0);
         }
       })
     }else{
@@ -112,7 +119,7 @@ const reply = async () => {
             icon:"error",
             showConfirmButton:true
           })
-          console.log(error)
+          // console.log(error)
         }
         //console.log(JSON.stringify(question));
       }
@@ -130,7 +137,63 @@ const reply = async () => {
         }
       })
   }
-  
+}
+
+const redirected = async (viewName) => {
+  const userId = userStore.userId;
+  let shouldScrollTop = false;
+  try {
+    if (viewName === "/search") {
+      await router.push('/search');
+      window.scrollTo(0, 0);  // 確保頁面跳轉後滾動
+      return;
+    } else if (userId === null || userId === "" || userId === 0) {
+      await Swal.fire({
+        title: '請先登入系統',
+        icon: 'error',
+        showConfirmButton: true,
+        showCancelButton: true,
+        didDestroy: () => {
+          if (shouldScrollTop) {
+            window.scrollTo(0, 0);
+          }
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          shouldScrollTop = true;
+          router.push('/signIn');
+        }
+      })
+      return
+    } else if (viewName === "reservation" || viewName === "monthly") {
+      Swal.fire({
+        title: '使用提醒',
+        icon: 'info',
+        text: '請先選擇您想申請該服務的停車場',
+        didDestroy: () => {
+          router.push('/search')
+          nextTick();
+          window.scrollTo(0,0);
+        }
+      })
+      return
+    } else {
+      router.push(viewName)
+      window.scrollTo(0,0);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const guide = () => {
+  router.push('/guide')
+  .then(()=>{
+    window.scrollTo(0,0);
+  })
+  .catch((err)=>{
+    // console.log(err)
+  })
 }
 
 onMounted(()=>{
@@ -154,7 +217,7 @@ onMounted(()=>{
 </script>
 
 <template>
-  <div>
+
     <!-- 可以互動的選單, 如果不喜歡可以不要 -->
     <nav class="menu" v-if="userStore.isLogin">
       <input type="checkbox" href="#" class="menu-open" name="menu-open" id="menu-open"/>
@@ -203,7 +266,8 @@ onMounted(()=>{
         <div class="container">
           <div class="row">
             <div class="col-lg-1"></div>
-            <div class="col-lg-4 col-md-12">
+            <div class="col-lg-2"><img src="/logo.png" alt="" style="width: 150px;"></div>
+            <div class="col-lg-3 col-md-12">
               <div class="footer-info">
                 <h3>MyGO Parking</h3>
                 <p>
@@ -240,9 +304,9 @@ onMounted(()=>{
             <div class="col-lg-2 col-md-4 footer-links">
               <h4>服務項目</h4>
               <ul>
-                <li><a href="#">停車場搜尋</a></li>
-                <li><a href="#">預定車位</a></li>
-                <li><a href="#">月租車位</a></li>
+                <li><a href="#" @click.prevent="redirected('/search')" title="停車場搜尋">停車場搜尋</a></li>
+                <li><a href="#" @click.prevent="redirected('reservation')" title="預定車位">預定車位</a></li>
+                <li><a href="#" @click.prevent="redirected('monthly')" title="月租車位">月租車位</a></li>
               </ul>
             </div>
             <!-- End footer links column-->
@@ -250,8 +314,8 @@ onMounted(()=>{
             <div class="col-lg-2 col-md-4 footer-links">
               <h4>其他功能</h4>
               <ul>
-                <li><a href="#">用戶中心</a></li>
-                <li><a href="#">使用教學</a></li>
+                <li><a href="#" @click.prevent="redirected('/CustomerCenter')" title="用戶中心">用戶中心</a></li>
+                <li><a href="#" @click.prevent="guide()" title="使用教學">使用教學</a></li>
               </ul>
             </div>
             <!-- End footer links column-->
@@ -260,13 +324,12 @@ onMounted(()=>{
               <h4>聯絡我們</h4>
               <ul>
                 <li><a href="#" @click.prevent="reply">意見回復</a></li>
-                <li><a href="#">即時客服</a></li>
+                <li><a href="#">客服功能</a></li>
               </ul>
             </div>
             <!-- End footer links column-->
           </div>
         </div>
-        <div class="col-lg-1"></div>
       </div>
 
       <div class="footer-legal text-center position-relative">
@@ -298,7 +361,7 @@ onMounted(()=>{
 
     <!-- 意見回復 -->
 
-  </div>
+
 </template>
 
 <style lang="css" scoped>
