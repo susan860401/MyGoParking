@@ -1,12 +1,11 @@
-import { defineStore } from 'pinia';
-import { useUserStore } from './userStore';
+import { defineStore } from "pinia";
+import { useUserStore } from "./userStore";
 
-export const useCouponStore = defineStore('couponStore', {
+export const useCouponStore = defineStore("couponStore", {
   state: () => ({
     coupons: [], // 儲存領取到的優惠券
   }),
   actions: {
-    
     async addCoupon() {
       const userStore = useUserStore();
       try {
@@ -19,26 +18,36 @@ export const useCouponStore = defineStore('couponStore', {
           validFrom: "2024-01-01T00:00:00",
           validUntil: "2024-12-01T00:00:00",
           isUsed: false,
-          userId: userStore.userId
+          userId: userStore.userId,
         };
 
         const response = await fetch(ADD_URL, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(couponData),
         });
         const result = await response.json();
+        console.log(result);
         if (response.ok) {
-          alert(result.message)
-          // userStore.isCouponClaimed = true;
-        } else {
-          alert(result.message)
+          if (result.success === true) {
+            alert(result.message);
+            // userStore.isCouponClaimed = true;
+          } else if (
+            result.success === false &&
+            result.message === "領取失敗,您尚未註冊或登入"
+          ) {
+            alert(result.message);
+          } else if (
+            result.success === false &&
+            result.message === "領取失敗, 請洽客服人員"
+          ) {
+            alert(result.message);
+          }
         }
       } catch (error) {
-        console.error('領取優惠券時發生錯誤', error);
-        this.couponMessage = '領取失敗，請稍後再試。';
+        console.error(error.message);
       }
     },
   },

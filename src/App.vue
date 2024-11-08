@@ -70,11 +70,9 @@ onBeforeUnmount(async () => {
 </script>
 
 <template>
-  <div>
-    <NavbarComponent></NavbarComponent>
-    <RouterView></RouterView>
-    <FooterComponent></FooterComponent>
-  </div>
+  <NavbarComponent></NavbarComponent>
+  <RouterView></RouterView>
+  <FooterComponent></FooterComponent>
 </template>
 
 <style scoped></style>

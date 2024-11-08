@@ -71,7 +71,7 @@ async function confirmPayment() {
       paymentStatus.value = `交易狀態: ${check.data.message}`;
     }
 
-    setTimeout(() => (window.location.href = "/"), 500);
+    setTimeout(() => (window.location.href = "/"), 300);
   } catch (error) {
     console.error("交易確認失敗:", error);
     paymentStatus.value = "交易狀態: 失敗，請稍後再試";

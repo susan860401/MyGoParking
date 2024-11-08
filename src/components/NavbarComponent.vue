@@ -126,7 +126,7 @@ const updateMemberInfo = async () => {
     userStore.updateUser(renew);
     alert("會員資料已成功更新");
     await couponStore.addCoupon();
-    alert(couponStore.couponMessage);
+    //alert(couponStore.couponMessage);
     // console.log('mess');
     autoClose();
   } else {
