@@ -590,4 +590,8 @@ onMounted(() => {
   transition-duration: 490ms;
   transform: translate3d(0, -320px, 0);
 }
+
+svg{
+  position: fixed;
+}
 </style>
