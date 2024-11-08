@@ -56,8 +56,8 @@ const resetPassword = async () => {
     const result = await response.json();
     message.value = result.message || '密碼已成功重設！';
     setTimeout(() => {
-      router.push('/login');  // 重設密碼成功後跳轉到登入頁面
-    }, 3000);  // 等待3秒後自動跳轉
+      router.push('/signIn');  // 重設密碼成功後跳轉到登入頁面
+    }, 2000);  // 等待2秒後自動跳轉
   } catch (err) {
     error.value = err.message || '重設密碼過程中出錯';
   } finally {
