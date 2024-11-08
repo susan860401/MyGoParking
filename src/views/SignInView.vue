@@ -38,13 +38,13 @@ const send = async () => {
 
 //忘記密碼
 
-const message = ref('');
-const error = ref('');
+const message = ref("");
+const error = ref("");
 const isForgot = ref(false);
 
 const forgot = () => {
   isForgot.value = true;
-}
+};
 
 const sendResetLink = async () => {
   message.value = "";
@@ -103,82 +103,89 @@ const sendResetLink = async () => {
             </div>
           </div>
 
-            <div class="col-lg-5" data-aos="fade">
-              <form
-                @submit.prevent="send"
-                action="forms/quote.php"
-                method="post"
-                class="php-email-form"
-              >
-                <h3 v-if="!isForgot">登入</h3>
-                <h3 v-if="isForgot">忘記密碼</h3>
-                <p v-if="!isForgot">請輸入信箱及密碼</p>
-                <p v-if="isForgot">請輸入信箱</p>
-                <div class="row gy-3">
-                  <div class="col-md-12">
-                    <input
-                      type="email"
-                      class="form-control"
-                      name="email"
-                      placeholder="請輸入Email帳號"
-                      required
-                      v-model="user.email"
-                      id="email"
-                    />
-                  </div>
-                  <div class="col-md-12">
-                    <input
-                      v-if="!isForgot"
-                      type="password"
-                      class="form-control"
-                      name="psw"
-                      placeholder="請輸入密碼"
-                      v-model="user.password"
-                      id="password"
-                    />
-                  </div>
+          <div class="col-lg-5" data-aos="fade">
+            <form
+              @submit.prevent="send"
+              action="forms/quote.php"
+              method="post"
+              class="php-email-form"
+            >
+              <h3 v-if="!isForgot">登入</h3>
+              <h3 v-if="isForgot">忘記密碼</h3>
+              <p v-if="!isForgot">請輸入信箱及密碼</p>
+              <p v-if="isForgot">請輸入信箱</p>
+              <div class="row gy-3">
+                <div class="col-md-12">
+                  <input
+                    type="email"
+                    class="form-control"
+                    name="email"
+                    placeholder="請輸入Email帳號"
+                    required
+                    v-model="user.email"
+                    id="email"
+                  />
+                </div>
+                <div class="col-md-12">
+                  <input
+                    v-if="!isForgot"
+                    type="password"
+                    class="form-control"
+                    name="psw"
+                    placeholder="請輸入密碼"
+                    v-model="user.password"
+                    id="password"
+                  />
+                </div>
 
                 <div class="col-md-12 text-center">
                   <div class="loading">Loading</div>
                   <div class="error-message"></div>
                   <div class="sent-message">您已成功登入!</div>
 
-                    <button v-if="!isForgot" type="submit">登入</button>
-                    <button v-if="isForgot" class="button-17" @click="sendResetLink">送出</button>
-                    
-                  </div>
-                  <!-- <hr> -->
-                  <!-- <button class="button-17" id="googleBtn" @click="loginWithGoogle"><img src="" alt="">使用Google登入</button> -->
+                  <button v-if="!isForgot" type="submit">登入</button>
+                  <button
+                    v-if="isForgot"
+                    class="button-17"
+                    @click="sendResetLink"
+                  >
+                    送出
+                  </button>
                 </div>
-                <div class="row">
-                  <div class="col-12">
-                    <hr class="mt-5 mb-4 border-secondary-subtle" />
-                    <div
-                      class="d-flex gap-2 gap-md-4 flex-column flex-md-row justify-content-md-center"
+                <!-- <hr> -->
+                <!-- <button class="button-17" id="googleBtn" @click="loginWithGoogle"><img src="" alt="">使用Google登入</button> -->
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <hr class="mt-5 mb-4 border-secondary-subtle" />
+                  <div
+                    class="d-flex gap-2 gap-md-4 flex-column flex-md-row justify-content-md-center"
+                  >
+                    <RouterLink
+                      :to="{ name: 'signUp' }"
+                      class="link-secondary text-decoration-none"
+                      >註冊新帳號
+                    </RouterLink>
+                    <button
+                      class="btn-none"
+                      :disabled="isLoading"
+                      @click="forgot"
                     >
-                      <RouterLink
-                        :to="{ name: 'signUp' }"
-                        class="link-secondary text-decoration-none">註冊新帳號
-                      </RouterLink>
-                      <button class="btn-none" :disabled="isLoading" @click="forgot">忘記密碼</button>
-                    </div>                 
-                  </div>            
+                      忘記密碼
+                    </button>
+                  </div>
                 </div>
-              </form>
-                  <p v-if="message">{{ message }}</p>
-                  <p v-if="error">{{ error }}</p>
-            </div>
-            <!-- End Quote Form -->
+              </div>
+            </form>
+            <p v-if="message">{{ message }}</p>
+            <p v-if="error">{{ error }}</p>
           </div>
+          <!-- End Quote Form -->
         </div>
-      </section>
-      <!-- End Get Started Section -->
-    </main>
-  </div>
-
-
-
-  
+      </div>
+    </section>
+    <!-- End Get Started Section -->
+  </main>
 </template>
 
 <style lang="css" scoped>
@@ -263,5 +270,4 @@ const sendResetLink = async () => {
   box-shadow: rgba(60, 64, 67, 0.3) 0 1px 3px 0,
     rgba(60, 64, 67, 0.15) 0 4px 8px 3px;
 }
-
 </style>
