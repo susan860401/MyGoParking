@@ -62,57 +62,58 @@ loadCoupons();
 </script>
 
 <template>
-  <section class="p-0">
-    <div class="container mt-0" data-aos="fade-up">
-      <div class="col-md-3">
-        <select
-          v-model="couponFilter"
-          @change="filterCoupon"
-          class="form-select form-select-sm mb-2"
-          aria-label=".form-select-sm example"
-        >
-          <option selected>全部</option>
-          <option value="available">可使用</option>
-          <option value="isUsed">已使用</option>
-          <option value="expired">已失效</option>
-        </select>
-      </div>
-      <div class="row">
-        <!-- 這裡的 col-md-6 確保在 md 屏幕時佔 50%，col-12 確保在小屏幕時佔 100% -->
-        <div
-          v-for="coupon in coupons"
-          :key="coupon.couponId"
-          class="col-md-6 col-12 mb-2"
-        >
-          <!-- 優惠券本體 -->
-          <div id="coupon" class="card d-flex flex-row mb-3">
-            <!-- 照片保持在左邊，文字保持在右邊 -->
-            <div class="col-md-5 col-4 p-1 img-container">
-              <img
-                src="/src/assets/images/coupon.jpeg"
-                class="img-fluid rounded-start"
-                alt="..."
-                style="width: 100%; height: 100%; object-fit: cover"
-              />
-            </div>
-            <div class="col-md-7 col-8">
-              <div class="card-body">
-                <p class="fw-bold mb-1" style="font-size: 14px">
-                  新用戶專屬停車券
-                </p>
-                <div class="mt-0 mb-2">
-                  <span
-                    class="text-muted rounded-pill"
-                    style="
-                      border: 1px solid gray;
-                      padding: 5px;
-                      font-size: 10px;
-                    "
-                    >{{ formatDate(coupon.validFrom) }} ~
-                    {{ formatDate(coupon.validUntil) }}</span
-                  >
-                </div>
-                <p class="mb-1">${{ coupon.discountAmount }} 抵用券</p>
+  <div>
+    <section class="p-0">
+      <div class="container mt-0" data-aos="fade-up">
+        <div class="col-md-3">
+          <select
+            v-model="couponFilter"
+            @change="filterCoupon"
+            class="form-select form-select-sm mb-2"
+            aria-label=".form-select-sm example"
+          >
+            <option selected>全部</option>
+            <option value="available">可使用</option>
+            <option value="isUsed">已使用</option>
+            <option value="expired">已失效</option>
+          </select>
+        </div>
+        <div class="row">
+          <!-- 這裡的 col-md-6 確保在 md 屏幕時佔 50%，col-12 確保在小屏幕時佔 100% -->
+          <div
+            v-for="coupon in coupons"
+            :key="coupon.couponId"
+            class="col-md-6 col-12 mb-2"
+          >
+            <!-- 優惠券本體 -->
+            <div id="coupon" class="card d-flex flex-row mb-3">
+              <!-- 照片保持在左邊，文字保持在右邊 -->
+              <div class="col-md-5 col-4 p-1 img-container">
+                <img
+                  src="/src/assets/images/coupon.jpeg"
+                  class="img-fluid rounded-start"
+                  alt="..."
+                  style="width: 100%; height: 100%; object-fit: cover"
+                />
+              </div>
+              <div class="col-md-7 col-8">
+                <div class="card-body">
+                  <p class="fw-bold mb-1" style="font-size: 14px">
+                    新用戶專屬停車券
+                  </p>
+                  <div class="mt-0 mb-2">
+                    <span
+                      class="text-muted rounded-pill"
+                      style="
+                        border: 1px solid gray;
+                        padding: 5px;
+                        font-size: 10px;
+                      "
+                      >{{ formatDate(coupon.validFrom) }} ~
+                      {{ formatDate(coupon.validUntil) }}</span
+                    >
+                  </div>
+                  <p class="mb-1">${{ coupon.discountAmount }} 抵用券</p>
 
                 <p class="card-text mb-1">
                   <small
@@ -138,7 +139,6 @@ loadCoupons();
           </div>
         </div>
       </div>
-    </div>
   </section>
   <!-- End About Section -->
 </template>
