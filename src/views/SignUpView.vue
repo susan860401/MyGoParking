@@ -63,7 +63,7 @@ const validity = ref({
 
 const emailRule = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const pswRule = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+]{8,}$/;
-const licenseRule = /^[A-Z]{3}\d{4}$/;
+const licenseRule = /^(\d{4}[A-Z]{2}|[A-Z]{3}\d{4})$/;
 
 const validate = async () => {
   const { useremail, license, psw } = userData.value;
@@ -187,7 +187,8 @@ const validate = async () => {
                 <small
                   v-if="!validity.licenseRequired || !validity.licenseFormat"
                   class="text-danger"
-                  >請輸入(英文三碼 數字四碼)例: ABC123</small
+                  >請輸入(英文三碼 數字四碼/數字四碼 英文兩碼)例:
+                  ABC123、1234UK</small
                 >
 
                 <div class="col-md-12 input-group">
@@ -203,7 +204,7 @@ const validate = async () => {
                 <small
                   v-if="!validity.pswRequired || !validity.pswFormat"
                   class="text-danger"
-                  >請輸入正確密碼格式</small
+                  >請輸入正確密碼格式(8位數，要包含大小寫英文及數字)</small
                 >
 
                 <div class="col-md-12 text-center">
