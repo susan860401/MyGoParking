@@ -88,7 +88,7 @@ const routes = [
     name: "ChargeConfirmView",
   },
   {
-    path: "/LineBinding",
+    path: "/bind",
     name: "BindPage",
     component: LineBindingPage,
   },
