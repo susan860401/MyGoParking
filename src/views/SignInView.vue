@@ -1,11 +1,15 @@
 <script setup>
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
 import router from "@/router";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useUserStore } from "@/stores/userStore";
+import { useRoute } from "vue-router";
 
 const API_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/login`;
 const API_FURL = `${import.meta.env.VITE_API_BASEURL}/Customers/forgot`;
+
+const route = useRoute(); //要從uri取得lineid
+
 const userStore = useUserStore();
 
 const user = {
@@ -26,6 +30,17 @@ const send = async () => {
       userStore.updateUser(datas);
       userStore.login(); // 更新登入狀態
       alert("登入成功!!");
+      //-------處理line綁定的部分(如果有讀取到line user ID)
+      // 嘗試從 sessionStorage 取得 line_user_id
+      const lineUserId = sessionStorage.getItem("line_user_id");
+
+      // 若存在 line_user_id，進行綁定處理
+      if (lineUserId) {
+        const userId = userStore.userId;
+        const userIdString = userId.toString();
+        await bindLineUser(lineUserId, userIdString);
+      }
+
       router.push("/search");
     } else if (datas.message === "無此帳號") {
       alert("無此帳號,請重新登入!!");
@@ -69,6 +84,49 @@ const sendResetLink = async () => {
     error.value = err.message || "發送過程中出錯";
   }
 };
+
+// 綁定Line
+const bindLineUser = async (lineUserId, userId) => {
+  try {
+    const response = await fetch(
+      "https://localhost:7077/api/LineBinding/bind",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ line_user_id: lineUserId, user_id: userId }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("錯誤回應: ", errorData);
+      alert(`綁定失敗: ${errorData.message || "未知錯誤"}`);
+      return;
+    }
+
+    const data = await response.json();
+    if (data.success) {
+      alert("綁定成功");
+      window.close(); //關閉此視窗
+    } else {
+      alert("綁定失敗");
+    }
+  } catch (err) {
+    console.error("錯誤", err);
+    alert("發生錯誤，請稍後再試");
+  }
+};
+
+//by 33
+onMounted(() => {
+  const lineUserId = route.query.line_user_id;
+  if (lineUserId) {
+    //若 URL中有line_user_id，將其存入 sessionStorage
+    sessionStorage.setItem("line_user_id", lineUserId);
+  }
+});
 </script>
 
 <template>

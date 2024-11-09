@@ -29,7 +29,6 @@ import ChargConfirmView from "./views/ChargeConfirmView.vue";
 import { useUserStore } from "./stores/userStore";
 import TestRentView from "./views/TestRentView.vue";
 import ECPayConfirmView from "./views/ECPayConfirmView.vue";
-import LineBindingPage from "./views/CustomerCenter/LineBindingPage.vue";
 
 const routes = [
   {
@@ -86,11 +85,6 @@ const routes = [
     path: "/ChargeConfirmView",
     component: ChargConfirmView,
     name: "ChargeConfirmView",
-  },
-  {
-    path: "/bind",
-    name: "BindPage",
-    component: LineBindingPage,
   },
   {
     path: "/TestRentView",
