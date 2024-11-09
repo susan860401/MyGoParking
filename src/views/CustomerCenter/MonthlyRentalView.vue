@@ -2,7 +2,7 @@
 import { scrollbarProps } from "element-plus";
 import { onMounted, ref } from "vue";
 import { useUserStore } from "@/stores/userStore"; //要取Pinia
-const test = ref("");
+
 const userStore = useUserStore();
 const userId = userStore.userId;
 const API_URL = "https://localhost:7077/api";

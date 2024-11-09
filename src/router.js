@@ -26,10 +26,10 @@ import TestView from "./views/ChargeView.vue";
 import TestConfirmView from "./views/ChargeConfirmView.vue";
 import ChargeView from "./views/ChargeView.vue";
 import ChargConfirmView from "./views/ChargeConfirmView.vue";
-import { useUserStore } from './stores/userStore';
+import { useUserStore } from "./stores/userStore";
 import TestRentView from "./views/TestRentView.vue";
 import ECPayConfirmView from "./views/ECPayConfirmView.vue";
-
+import LineBindingPage from "./views/CustomerCenter/LineBindingPage.vue";
 
 const routes = [
   {
@@ -86,6 +86,11 @@ const routes = [
     path: "/ChargeConfirmView",
     component: ChargConfirmView,
     name: "ChargeConfirmView",
+  },
+  {
+    path: "/LineBinding",
+    name: "BindPage",
+    component: LineBindingPage,
   },
   {
     path: "/TestRentView",
@@ -178,7 +183,6 @@ const router = createRouter({
   routes: routes, //名字一樣可以寫routes就好
 });
 
-
 // // 在 router/index.js 或路由文件中
 //   router.beforeEach((to, from, next) => {
 //   const userStore = useUserStore();
@@ -198,6 +202,5 @@ const router = createRouter({
 
 // next(); // 確保導航繼續進行
 // });
-
 
 export default router;
