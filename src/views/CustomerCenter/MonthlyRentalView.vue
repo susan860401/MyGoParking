@@ -14,6 +14,12 @@ const licensePlate = ref([]); //儲存用戶的車牌
 const choseCar = ref("請選擇車牌");
 const choseDate = ref("");
 const search = ref(""); //搜尋行政區
+
+//分頁控制屬性
+const currentPage = ref(1); // 當前頁數
+const pageSize = ref(10); // 每頁顯示的資料數量
+const totalRecords = ref(0); // 總資料數
+
 //用來判斷視窗大小決定顯示欄位
 const isPhoneSize = ref(false);
 const isSmallScreen = ref(false);
@@ -39,6 +45,12 @@ const loadMonthlyRental = async () => {
     currentRental.value = monthlyRentals.value.filter((rental) => {
       return new Date(rental.endDate) > today;
     });
+
+    totalRecords.value = monthlyRentals.value.length; //資料總數
+    // 根據當前頁面和每頁顯示的資料數量來顯示資料
+    const start = (currentPage.value - 1) * pageSize.value;
+    const end = currentPage.value * pageSize.value;
+    filteredRentals.value = filteredRentals.value.slice(start, end);
   } catch (error) {
     console.error("Failed to load monthly rentals", error);
   }
@@ -80,6 +92,12 @@ const applyFilters = () => {
 
     return isMatch; // 滿足所有篩選條件的紀錄才保留
   });
+  totalRecords.value = filteredRentals.value.length; //篩選過後總資料數
+
+  // 根據當前頁面和每頁顯示的資料數量來顯示資料
+  const start = (currentPage.value - 1) * pageSize.value;
+  const end = currentPage.value * pageSize.value;
+  filteredRentals.value = filteredRentals.value.slice(start, end);
 };
 
 //格式化日期
@@ -113,6 +131,12 @@ const getRentalStatus = (endDate) => {
   } else {
     return "Expired";
   }
+};
+
+//當改變選擇頁數
+const handlePageChange = (newPage) => {
+  currentPage.value = newPage;
+  applyFilters(); // 重新篩選資料
 };
 
 //辨識視窗大小(依照視窗大小調整看到的表格欄位)
@@ -483,6 +507,16 @@ onMounted(() => {
         </template>
       </el-table-column>
     </el-table>
+  </div>
+  <!-- 加入分頁 -->
+  <div v-if="activePage == 'history'" class="d-flex justify-content-end mt-4">
+    <el-pagination
+      @current-change="handlePageChange"
+      :current-page="currentPage"
+      :page-size="pageSize"
+      :total="totalRecords"
+      layout="prev, pager, next, jumper,total"
+    />
   </div>
 </template>
 

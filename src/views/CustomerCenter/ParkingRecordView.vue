@@ -13,6 +13,12 @@ const licensePlate = ref([]); //儲存用戶的車牌
 const choseCar = ref("請選擇車牌");
 const choseDate = ref("");
 const search = ref(""); //搜尋行政區
+
+//分頁控制屬性
+const currentPage = ref(1); // 當前頁數
+const pageSize = ref(10); // 每頁顯示的資料數量
+const totalRecords = ref(0); // 總資料數
+
 //用來判斷視窗大小決定顯示欄位
 const isPhoneSize = ref(false);
 const isSmallScreen = ref(false);
@@ -36,6 +42,12 @@ const loadParkingRecords = async () => {
   const datas = await response.json();
   parkingRecords.value = datas;
   filteredRecords.value = datas;
+  totalRecords.value = parkingRecords.value.length;
+
+  // 根據當前頁面和每頁顯示的資料數量來顯示資料
+  const start = (currentPage.value - 1) * pageSize.value;
+  const end = currentPage.value * pageSize.value;
+  filteredRecords.value = filteredRecords.value.slice(start, end);
 };
 //進階篩選
 const applyFilters = () => {
@@ -59,9 +71,20 @@ const applyFilters = () => {
     if (search.value) {
       isMatch = isMatch && record.district.includes(search.value);
     }
-
     return isMatch; // 滿足所有篩選條件的紀錄才保留
   });
+  totalRecords.value = filteredRecords.value.length; //篩選過後總資料數
+
+  // 根據當前頁面和每頁顯示的資料數量來顯示資料
+  const start = (currentPage.value - 1) * pageSize.value;
+  const end = currentPage.value * pageSize.value;
+  filteredRecords.value = filteredRecords.value.slice(start, end);
+};
+
+//當改變選擇頁數
+const handlePageChange = (newPage) => {
+  currentPage.value = newPage;
+  applyFilters(); // 重新篩選資料
 };
 
 //辨識視窗大小(依照視窗大小調整看到的表格欄位)
@@ -143,7 +166,7 @@ onMounted(() => {
 
     <!-- 表格區 -->
     <!-- 屬性說明:show-overflow-tooltip-欄位超出寬度會顯示提示 -->
-    <el-table :data="filteredRecords" height="400">
+    <el-table :data="filteredRecords" height="440">
       <el-table-column
         prop="lotName"
         label="停車場名稱"
@@ -202,6 +225,16 @@ onMounted(() => {
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分頁元件 -->
+    <div class="d-flex justify-content-end mt-4">
+      <el-pagination
+        @current-change="handlePageChange"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        :total="totalRecords"
+        layout="prev, pager, next, jumper,total"
+      />
+    </div>
   </div>
 </template>
 

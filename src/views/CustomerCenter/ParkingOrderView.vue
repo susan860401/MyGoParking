@@ -155,6 +155,7 @@ onMounted(() => {
 <template>
   <!-- ======= Features Section ======= -->
 
+  <!-- 增加與固定 nav bar 相同高度的間距 -->
   <div id="outside" class="container" data-aos="fade-up">
     <ul id="nav" class="d-flex justify-content-around">
       <li
@@ -384,8 +385,7 @@ onMounted(() => {
 }
 
 #nav {
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 設定陰影 */
-  padding: 0px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 #nav li {
