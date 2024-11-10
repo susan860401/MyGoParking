@@ -170,6 +170,8 @@ loadLicensePlates();
 <style lang="css" scoped>
 #outside {
   box-shadow: -5px 0px 10px lightgrey;
+  background: linear-gradient(to bottom right, white 40%, #dfe9f3 100%);
+  border-radius: 10px;
 }
 /* CSS */
 /* 新增按鈕樣式 */

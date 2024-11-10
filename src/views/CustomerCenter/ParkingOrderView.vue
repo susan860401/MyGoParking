@@ -122,6 +122,10 @@ const toRes = (res) => {
   });
 };
 
+const toHome = () => {
+  router.push("/search");
+};
+
 //開啟地圖(導航)
 const openMap = (latitude, longitude) => {
   const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
@@ -246,6 +250,14 @@ onMounted(() => {
             <div class="col-md-6 d-flex flex-column justify-content-center">
               <h2>無進行中預訂</h2>
               <p>立即開始您的預訂，體驗我們的便捷服務！</p>
+              <button
+                class="btn btn-light"
+                style="text-align: left"
+                @click="toHome"
+              >
+                <i class="fa-solid fa-magnifying-glass"></i>
+                立即體驗
+              </button>
             </div>
           </div>
         </div>
@@ -406,7 +418,7 @@ onMounted(() => {
 
 #nav li.active {
   color: #507687 !important; /* 使用 !important 確保樣式生效 */
-  border-bottom: 4px solid #507687 !important; /* 確保底線顯示 */
+  border-bottom: 4px solid #fab12f !important; /* 確保底線顯示 */
 }
 
 strong {

@@ -2,10 +2,12 @@
 import { scrollbarProps } from "element-plus";
 import { onMounted, ref } from "vue";
 import { useUserStore } from "@/stores/userStore"; //要取Pinia
+import { useRouter } from "vue-router";
 
 const userStore = useUserStore();
 const userId = userStore.userId;
 const API_URL = "https://localhost:7077/api";
+const router = useRouter();
 const activePage = ref("current"); //目前在哪個頁面(當前合約還是歷史)
 const monthlyRentals = ref([]);
 const filteredRentals = ref([]); // 儲存經過過濾的紀錄
@@ -14,6 +16,7 @@ const licensePlate = ref([]); //儲存用戶的車牌
 const choseCar = ref("請選擇車牌");
 const choseDate = ref("");
 const search = ref(""); //搜尋行政區
+const isLoaded = ref(false);
 
 //分頁控制屬性
 const currentPage = ref(1); // 當前頁數
@@ -53,7 +56,9 @@ const loadMonthlyRental = async () => {
     filteredRentals.value = filteredRentals.value.slice(start, end);
   } catch (error) {
     console.error("Failed to load monthly rentals", error);
-  }
+  } finally {
+    isLoaded.value = true;
+  } // 資料加載完成，設置為 true
 };
 
 //載入當前合約
@@ -139,6 +144,10 @@ const handlePageChange = (newPage) => {
   applyFilters(); // 重新篩選資料
 };
 
+const toHome = () => {
+  router.push("/search");
+};
+
 //辨識視窗大小(依照視窗大小調整看到的表格欄位)
 const checkScreenSize = () => {
   isPhoneSize.value = window.innerWidth < 450;
@@ -216,6 +225,31 @@ onMounted(() => {
       class="accordion mt-2"
       id="accordionPanelsStayOpenExample"
     >
+      <!-- 無資料顯示 -->
+      <div v-show="isLoaded && !currentRental.length" class="row">
+        <div class="col-md-6">
+          <div class="d-flex mb-2">
+            <img
+              src="/src/assets/images/parkinglot2.webp"
+              alt="無預訂資料"
+              class="img-fluid"
+              style="width: 400px; height: 250px; object-fit: cover"
+            />
+          </div>
+        </div>
+        <div class="col-md-6 d-flex flex-column justify-content-center">
+          <h2>尚無月租車位合約</h2>
+          <p>立即租用月租車位，確保長期停車無憂！</p>
+          <button
+            class="btn btn-light"
+            style="text-align: left"
+            @click="toHome"
+          >
+            <i class="fa-solid fa-magnifying-glass"></i>
+            馬上開始
+          </button>
+        </div>
+      </div>
       <!-- 至少要顯示一個 -->
       <div v-if="currentRental.length" class="accordion-item">
         <h2 class="accordion-header" id="panelsStayOpen-headingOne">
