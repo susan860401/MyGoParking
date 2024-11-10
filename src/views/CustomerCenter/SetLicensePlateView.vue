@@ -155,12 +155,12 @@ loadLicensePlates();
       </div>
     </div>
     <div class="row d-flex justify-content-end mt-4">
-      <div class="col-3">
+      <div class="col-2">
         <button @click="loadLicensePlates" class="button-6" role="button">
           取消
         </button>
       </div>
-      <div class="col-3">
+      <div class="col-2">
         <button @click="saveCar" class="button-6" role="button">儲存</button>
       </div>
     </div>
@@ -248,7 +248,6 @@ loadLicensePlates();
   border-color: #fbc01c;
   box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
   color: #fbc01c;
-
   background-color: white;
 }
 

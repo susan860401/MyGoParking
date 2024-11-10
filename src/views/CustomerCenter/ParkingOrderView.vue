@@ -6,6 +6,7 @@ import { useUserStore } from "@/stores/userStore"; //要取Pinia
 const API_URL = "https://localhost:7077/api";
 const userStore = useUserStore();
 const userId = userStore.userId;
+
 const reservations = ref([]); //傳回的預訂資料放此
 const search = ref(""); //搜尋關鍵字
 const period = ref("all"); //選擇篩選區段
@@ -13,6 +14,7 @@ const router = useRouter();
 const completedRes = ref([]); //已完成的訂單(用isFinish判斷，區分為上下區塊)
 const ongoingRes = ref([]); //還在進行的訂單(用isFinish判斷，區分為上下區塊)
 const isAllStatus = ref(true); //用來判斷如果是顯示全部的情況(才會顯示現正進行中區塊)
+const currentStatus = ref("all"); //目前停留在哪個頁面
 const countAll = ref(0); //上方顯示全部預訂數字
 const countComplete = ref(0); //上方顯示已完成預訂數字
 const countCancel = ref(0); //上方顯示已取消預訂數字
@@ -39,6 +41,7 @@ const loadReservations = async () => {
 
 //切換觀看不同狀態的預訂紀錄
 const filterByStatus = async (filter) => {
+  currentStatus.value = filter;
   if (filter == "all") {
     isAllStatus.value = true;
     loadReservations();
@@ -154,20 +157,36 @@ onMounted(() => {
 
   <div id="outside" class="container" data-aos="fade-up">
     <ul id="nav" class="d-flex justify-content-around">
-      <li @click="filterByStatus('all')" class="text-center">
-        全部 <small style="color: gray">({{ countAll }})</small>
+      <li
+        @click="filterByStatus('all')"
+        class="text-center"
+        :class="{ active: currentStatus == 'all' }"
+      >
+        全部 <small>({{ countAll }})</small>
       </li>
-      <li @click="filterByStatus('isCompleted')" class="text-center">
+      <li
+        @click="filterByStatus('isCompleted')"
+        class="text-center"
+        :class="{ active: currentStatus == 'isCompleted' }"
+      >
         已完成
-        <small style="color: gray">({{ countComplete }})</small>
+        <small>({{ countComplete }})</small>
       </li>
-      <li @click="filterByStatus('isCanceled')" class="text-center">
+      <li
+        @click="filterByStatus('isCanceled')"
+        class="text-center"
+        :class="{ active: currentStatus == 'isCanceled' }"
+      >
         已取消
-        <small style="color: gray">({{ countCancel }})</small>
+        <small>({{ countCancel }})</small>
       </li>
-      <li @click="filterByStatus('isOverDue')" class="text-center">
+      <li
+        @click="filterByStatus('isOverDue')"
+        class="text-center"
+        :class="{ active: currentStatus == 'isOverDue' }"
+      >
         逾時紀錄
-        <small style="color: gray">({{ countOverdue }})</small>
+        <small>({{ countOverdue }})</small>
       </li>
     </ul>
 
@@ -365,18 +384,29 @@ onMounted(() => {
 }
 
 #nav {
-  border-bottom: 2px solid #ccc; /* 設定下方邊框 */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 設定陰影 */
-  padding: 5px 0px;
+  padding: 0px;
 }
 
 #nav li {
   font-size: 18px;
   font-weight: bold;
+  display: block !important; /* 強制 li 成為 block 元素 */
+  text-align: center;
+  cursor: pointer;
+  padding: 10px 20px;
+  width: 100%; /* 讓 li 佔滿父容器寬度 */
+  border-bottom: 2px solid #ccc; /* 設定下方邊框 */
 }
 
 #nav li:hover {
-  color: #fabc3f;
+  color: #507687;
+  /* color: #fabc3f; */
+}
+
+#nav li.active {
+  color: #507687 !important; /* 使用 !important 確保樣式生效 */
+  border-bottom: 4px solid #507687 !important; /* 確保底線顯示 */
 }
 
 strong {
