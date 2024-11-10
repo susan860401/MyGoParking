@@ -312,12 +312,6 @@ const handlePayment = () => {
 
       <div class="text-center mt-4">
         <button class="btn btn-warning btn-lg mt-3" @click="handlePayment">
-          付款
-        </button>
-      </div>
-
-      <div class="text-center mt-4">
-        <button class="btn btn-warning btn-lg" @click="requestPayment">
           立即付款
         </button>
       </div>

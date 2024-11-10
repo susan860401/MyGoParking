@@ -92,6 +92,7 @@ import BreadcrumbsComponent from '@/components/BreadcrumbsComponent.vue';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import { useRouter } from 'vue-router';
 dayjs.extend(utc);
 
 // 初始化資料
@@ -103,7 +104,7 @@ const buttonClass = ref('btn-secondary');
 const startTime = ref('');
 const merchantTradeNo = ref(null);
 const payType = ref(null); // 定義 payType 為 ref
-
+const router = useRouter();  // 初始化 Vue Router
 // API 路徑
 const baseApiUrl = `${import.meta.env.VITE_API_BASEURL}/ECPay`;
 
@@ -144,11 +145,9 @@ function handleMonthlyPayment() {
     // 自動確認付款狀態
     confirmPayment();
 
-    // 設置按鈕延遲啟用
-    setTimeout(() => {
-        isDisabled.value = false;
-        buttonClass.value = 'btn-warning';
-    }, 5000);
+    // 等待 5 秒後自動調用 goToHomePage 函數
+    setTimeout(goToHomePage, 5000);
+
 }
 
 // 處理 Res 支付的邏輯
@@ -167,10 +166,8 @@ function handleResPayment() {
 
     confirmPayment();
 
-    setTimeout(() => {
-        isDisabled.value = false;
-        buttonClass.value = 'btn-warning';
-    }, 5000);
+    // 等待 5 秒後自動調用 goToHomePage 函數
+    setTimeout(goToHomePage, 5000);
 }
 
 // 查詢支付狀態
@@ -200,6 +197,12 @@ async function confirmPayment() {
         buttonClass.value = 'btn-warning';
         isDisabled.value = false;
     }
+}
+
+// 返回首頁
+function goToHomePage() {
+    paymentStatus.value = '支付成功，正在返回首頁...';
+    router.push("/"); // 使用 router.push 返回首頁
 }
 </script>
 
@@ -232,8 +235,7 @@ async function confirmPayment() {
                     readonly />
             </div>
             <div class="text-center">
-                <button class="btn btn-lg mt-3" :class="[buttonClass]" @click.prevent="confirmPayment"
-                    :disabled="isDisabled">
+                <button class="btn btn-lg mt-3 btn-success" @click.prevent="goToHomePage">
                     確認支付
                 </button>
             </div>
