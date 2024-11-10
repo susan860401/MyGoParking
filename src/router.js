@@ -20,10 +20,7 @@ import ResMonRentService from "./views/ResMonRentService.vue";
 import ResConfirmView from "./views/ResConfirmView.vue";
 import ResPaymentView from "./views/ResPaymentView.vue";
 import MonthlyRentalView from "./views/CustomerCenter/MonthlyRentalView.vue";
-import Test from "./views/CustomerCenter/test.vue";
 import MonApplyView from "./views/MonApplyView.vue";
-import TestView from "./views/ChargeView.vue";
-import TestConfirmView from "./views/ChargeConfirmView.vue";
 import ChargeView from "./views/ChargeView.vue";
 import ChargConfirmView from "./views/ChargeConfirmView.vue";
 import { useUserStore } from "./stores/userStore";
@@ -135,11 +132,6 @@ const routes = [
         path: "coupon",
         component: CouponView,
         name: "coupon",
-      },
-      {
-        path: "test",
-        component: Test,
-        name: "test",
       },
 
       // 其他子路由...
