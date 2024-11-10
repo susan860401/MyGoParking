@@ -33,7 +33,7 @@ import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
                 >車牌設定</RouterLink
               >
               <RouterLink activeClass="active" :to="{ name: 'parking-order' }"
-                >預定紀錄</RouterLink
+                >預訂紀錄</RouterLink
               >
               <RouterLink activeClass="active" :to="{ name: 'parking-record' }"
                 >停車紀錄</RouterLink
