@@ -36,7 +36,9 @@ const getLicensePlate = async () => {
 };
 
 const loadParkingRecords = async () => {
-  const response = await fetch(`${API_URL}/EntryExitManagements/${userId}`);
+  const response = await fetch(
+    `${API_URL}/EntryExitManagements?userId=${userId}`
+  );
   const datas = await response.json();
   parkingRecords.value = datas;
   filteredRecords.value = datas;
