@@ -54,7 +54,7 @@ const handleBlur = (event) => {
   const relatedTarget = event.relatedTarget;
   // console.log(relatedTarget)
   if (!relatedTarget) {
-    console.log("blur", isSearch_barOpen.value);
+    // console.log("blur", isSearch_barOpen.value);
     isSearch_barOpen.value = false;
   }
 };
@@ -66,7 +66,7 @@ const enable_Search_bar = () => {
     // 在猶豫按下去跳轉後這邊要關起來還是保持開著
     isSearch_barOpen.value = false;
   } else {
-    console.log("Focus", isSearch_barOpen.value);
+    // console.log("Focus", isSearch_barOpen.value);
     searchInput.value.focus();
     isSearch_barOpen.value = true;
   }
