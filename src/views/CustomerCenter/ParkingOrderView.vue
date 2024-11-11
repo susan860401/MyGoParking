@@ -233,7 +233,11 @@ onMounted(() => {
         data-aos-delay="100"
       >
         <!-- 現正進行中區塊:還未取消、還未overdue -->
-        <i><h3 class="title" v-if="isAllStatus && !isNoData">現正進行中</h3></i>
+        <i
+          ><h3 class="title" v-if="isAllStatus && !isNoData">
+            當前預訂 Active
+          </h3></i
+        >
         <!-- place holder -->
         <div class="container mb-3 noDataArea" v-if="isNoData && isAllStatus">
           <div class="row">
@@ -326,7 +330,7 @@ onMounted(() => {
         </div>
         <!-- 已完成區塊 -->
 
-        <i><h3 class="title" v-if="isAllStatus">歷史預訂</h3></i>
+        <i><h3 class="title" v-if="isAllStatus">歷史預訂 Past</h3></i>
         <div
           v-for="complete in completedRes"
           :key="complete.resId"
@@ -429,10 +433,14 @@ strong {
 }
 
 .title {
-  padding: 2px 5px;
-  color: lightslategrey;
+  padding: 5px 10px;
+  color: white;
   font-weight: normal;
-  background: linear-gradient(to right, #dfe9f3 0%, white 100%);
+  background: linear-gradient(to left, #ffe259, #fab12f);
+  opacity: 0.6;
+  /* background: linear-gradient(to right, #dfe9f3 0%, white 100%); */
   background-color: transparent;
+  font-size: 20px;
+  border-radius: 50px 20px 20px 50px;
 }
 </style>
