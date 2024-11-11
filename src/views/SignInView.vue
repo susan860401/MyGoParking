@@ -1,12 +1,87 @@
 <script setup>
 import BreadcrumbsComponent from "@/components/BreadcrumbsComponent.vue";
 import router from "@/router";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useUserStore } from "@/stores/userStore";
+
 
 const API_URL = `${import.meta.env.VITE_API_BASEURL}/Customers/login`;
 const API_FURL = `${import.meta.env.VITE_API_BASEURL}/Customers/forgot`;
 const userStore = useUserStore();
+
+// const StyledFirebaseAuth = () => {   
+//   useEffect(() => {
+
+//   const unregisterAuthObserver = onAuthStateChanged(
+//    getAuth(),
+//    async (user) => {
+//      console.log('user', user);
+//    },
+//  );
+// }
+// )};
+
+
+// onMounted(async () => {
+//   window.google.accounts.id.initialize({
+//     // 初始化 Google 登入
+//   client_id: '1082013721099-pvgt90o9snnqur6kir30q4ccjqr1889e.apps.googleusercontent.com',
+//   callback: handleCredentialResponse
+//   });
+//   window.google.accounts.id.renderButton(
+//           document.getElementById('g_id_signin'),
+//           { theme: 'outline', size: 'large' }
+//         );
+// });
+
+// const handleCredentialResponse = (response) => {
+//       console.log('Google ID Token:', response.credential);
+//       // 在這裡處理 Google 登入邏輯，例如將 token 傳送至後端
+//        // 從 Google 登入回應中獲取用戶資料
+//       const userInfo = parseJwt(response.credential);  // 假設 parseJwt 函數可以解析 Google JWT 令牌
+//        // 檢查該電子郵件是否已經註冊
+//     checkIfEmailExists(userInfo.email).then((emailExists) => {
+//         if (emailExists) {
+//             // 如果該電子郵件已經註冊，顯示合併帳號選項或直接登入選項
+//             showAccountConflictModal(userInfo);
+//         } else {
+//             // 如果電子郵件尚未註冊，執行註冊邏輯
+//             registerUserWithGoogle(userInfo);
+//         }
+//     });
+//     };
+
+//     // JWT 解析函數（簡單範例）
+// const parseJwt = (token) => {
+//   try {
+//     const base64Url = token.split('.')[1];
+//     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+//     const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+//       return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+//     }).join(''));
+    
+//     return JSON.parse(jsonPayload);
+//   } catch (error) {
+//     console.error('Failed to parse JWT:', error);
+//     return null;
+//   }
+// };
+
+    // 檢查電子郵件是否已經存在
+  // const checkIfEmailExists = async (email) => {
+  //     const response = await fetch('/api/user/checkEmail', {
+  //         method: 'POST',
+  //         body: JSON.stringify({ email }),
+  //         headers: { 'Content-Type': 'application/json' },
+  //     });
+  //     const data = await response.json();
+  //     return data.exists;  // 假設返回 { exists: true/false }
+  // };
+  // 顯示帳號衝突模態框
+  // const showAccountConflictModal = (userInfo) => {
+  //     // 顯示模態框，提示用戶該電子郵件已經註冊並提供合併帳號或登入選項
+  // };
+
 
 const user = {
   email: "",
@@ -69,7 +144,11 @@ const sendResetLink = async () => {
     error.value = err.message || "發送過程中出錯";
   }
 };
+
 </script>
+
+
+<!-- 載入程式庫 -->
 
 <template>
   <main id="main">
@@ -152,8 +231,8 @@ const sendResetLink = async () => {
                     送出
                   </button>
                 </div>
-                <!-- <hr> -->
-                <!-- <button class="button-17" id="googleBtn" @click="loginWithGoogle"><img src="" alt="">使用Google登入</button> -->
+                <!-- <hr>
+                <div id="g_id_signin"></div> -->
               </div>
               <div class="row">
                 <div class="col-12">
@@ -189,6 +268,11 @@ const sendResetLink = async () => {
 </template>
 
 <style lang="css" scoped>
+/* #g_id_signin{
+  text-align: center; 
+  margin-left: 50px; 
+  display: inline-block;
+} */
 .btn-none {
   border: 0;
   background-color: #fff;
