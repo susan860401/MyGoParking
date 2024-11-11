@@ -437,7 +437,7 @@ strong {
   color: white;
   font-weight: normal;
   background: linear-gradient(to left, #ffe259, #fab12f);
-  opacity: 0.6;
+  opacity: 0.7;
   /* background: linear-gradient(to right, #dfe9f3 0%, white 100%); */
   background-color: transparent;
   font-size: 20px;
