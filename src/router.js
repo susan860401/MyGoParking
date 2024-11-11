@@ -24,8 +24,8 @@ import MonApplyView from "./views/MonApplyView.vue";
 import ChargeView from "./views/ChargeView.vue";
 import ChargConfirmView from "./views/ChargeConfirmView.vue";
 import { useUserStore } from "./stores/userStore";
-import TestRentView from "./views/TestRentView.vue";
 import ECPayConfirmView from "./views/ECPayConfirmView.vue";
+import ECPayChargeConfirmView from "./views/ECPayChargeConfirmView.vue";
 
 const routes = [
   {
@@ -84,14 +84,14 @@ const routes = [
     name: "ChargeConfirmView",
   },
   {
-    path: "/TestRentView",
-    component: TestRentView,
-    name: "TestRentView",
-  },
-  {
     path: "/ECPayConfirmView",
     component: ECPayConfirmView,
     name: "ECPayConfirmView",
+  },
+  {
+    path: "/ECPayCharge",
+    component: ECPayChargeConfirmView,
+    name: "ECPayCharge",
   },
   {
     path: "/CustomerCenter",

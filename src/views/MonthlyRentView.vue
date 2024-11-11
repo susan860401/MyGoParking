@@ -254,7 +254,7 @@ async function fetchPaymentData() {
     };
     console.log("paymentData:", paymentData); // 檢查 paymentData 結構
     const response = await axios.post(
-      "https://goparkapi-c7cuejg9etfybcgs.japanwest-01.azurewebsites.net/api/ECPay/ECPayForm",
+      `${import.meta.env.VITE_API_BASEURL}/ECPay/ECPayForm`,
       paymentData,
       {
         headers: { "Content-Type": "application/json" },
