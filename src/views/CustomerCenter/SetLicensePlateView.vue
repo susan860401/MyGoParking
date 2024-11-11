@@ -2,6 +2,7 @@
 import item from "isotope-layout/js/item";
 import { ref } from "vue";
 import { useUserStore } from "@/stores/userStore"; //要取Pinia
+import Swal from "sweetalert2";
 
 const API_URL = "https://localhost:7077/api";
 const userStore = useUserStore();
@@ -55,6 +56,8 @@ const sanitizeData = (car) => {
 };
 
 const saveCar = async () => {
+  let addResult = true;
+  let modifyResult;
   const newCars = cars.value.filter((car) => car.isNew).map(sanitizeData); // 新增的車牌，不含多餘屬性; //抓出新增的車牌
   const updatedCars = cars.value
     .filter((car, index) => {
@@ -74,9 +77,14 @@ const saveCar = async () => {
     const result = await response.json(); // 解析 JSON 響應
 
     if (result.success) {
-      alert(result.message);
+      addResult = true;
     } else {
-      alert(result.message); //顯示錯誤訊息
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: result.message,
+      });
+      addResult = false;
     }
   }
   if (updatedCars.length > 0) {
@@ -86,12 +94,23 @@ const saveCar = async () => {
       headers: { "Content-Type": "application/json" },
     });
     if (response.ok) {
-      alert("修改成功");
+      modifyResult = true;
     } else {
-      alert("修改失敗");
+      modifyResult = false;
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: 修改失敗,
+      });
     }
   }
-
+  if (addResult && modifyResult) {
+    Swal.fire({
+      title: "Good job!",
+      text: "車牌登記修改成功",
+      icon: "success",
+    });
+  }
   loadLicensePlates();
 };
 
@@ -155,12 +174,12 @@ loadLicensePlates();
       </div>
     </div>
     <div class="row d-flex justify-content-end mt-4">
-      <div class="col-3">
+      <div class="col-2">
         <button @click="loadLicensePlates" class="button-6" role="button">
           取消
         </button>
       </div>
-      <div class="col-3">
+      <div class="col-2">
         <button @click="saveCar" class="button-6" role="button">儲存</button>
       </div>
     </div>
@@ -170,6 +189,8 @@ loadLicensePlates();
 <style lang="css" scoped>
 #outside {
   box-shadow: -5px 0px 10px lightgrey;
+  background: linear-gradient(to bottom right, white 40%, #dfe9f3 100%);
+  border-radius: 10px;
 }
 /* CSS */
 /* 新增按鈕樣式 */
@@ -248,7 +269,6 @@ loadLicensePlates();
   border-color: #fbc01c;
   box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
   color: #fbc01c;
-
   background-color: white;
 }
 

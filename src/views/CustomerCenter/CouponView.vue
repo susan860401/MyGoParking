@@ -89,7 +89,7 @@ loadCoupons();
             <!-- 照片保持在左邊，文字保持在右邊 -->
             <div class="col-md-5 col-4 p-1 img-container">
               <img
-                src="/src/assets/images/coupon_2.png"
+                src="/src/assets/images/coupon_2.webp"
                 class="img-fluid rounded-start"
                 alt="..."
                 style="width: 100%; height: 100%; object-fit: cover"
@@ -146,6 +146,6 @@ loadCoupons();
 <style lang="css" scoped>
 #coupon:hover {
   cursor: pointer;
-  border: 3px solid #d8d2c2;
+  border: 3px solid lightgray;
 }
 </style>

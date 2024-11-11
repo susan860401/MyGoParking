@@ -2,10 +2,12 @@
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/stores/userStore"; //要取Pinia
+import Swal from "sweetalert2";
 
 const API_URL = "https://localhost:7077/api";
 const userStore = useUserStore();
 const userId = userStore.userId;
+
 const reservations = ref([]); //傳回的預訂資料放此
 const search = ref(""); //搜尋關鍵字
 const period = ref("all"); //選擇篩選區段
@@ -13,6 +15,7 @@ const router = useRouter();
 const completedRes = ref([]); //已完成的訂單(用isFinish判斷，區分為上下區塊)
 const ongoingRes = ref([]); //還在進行的訂單(用isFinish判斷，區分為上下區塊)
 const isAllStatus = ref(true); //用來判斷如果是顯示全部的情況(才會顯示現正進行中區塊)
+const currentStatus = ref("all"); //目前停留在哪個頁面
 const countAll = ref(0); //上方顯示全部預訂數字
 const countComplete = ref(0); //上方顯示已完成預訂數字
 const countCancel = ref(0); //上方顯示已取消預訂數字
@@ -39,6 +42,7 @@ const loadReservations = async () => {
 
 //切換觀看不同狀態的預訂紀錄
 const filterByStatus = async (filter) => {
+  currentStatus.value = filter;
   if (filter == "all") {
     isAllStatus.value = true;
     loadReservations();
@@ -119,6 +123,10 @@ const toRes = (res) => {
   });
 };
 
+const toHome = () => {
+  router.push("/search");
+};
+
 //開啟地圖(導航)
 const openMap = (latitude, longitude) => {
   const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
@@ -127,20 +135,32 @@ const openMap = (latitude, longitude) => {
 
 //取消預訂
 const cancelRes = async (id) => {
-  try {
-    const response = await fetch(`${API_URL}/Reservations/${id}`, {
-      method: "PUT",
-    });
-    if (response.ok) {
-      const result = await response.text(); // 獲取返回的字串
-      alert(result);
-      loadReservations();
-    } else {
-      const errorResult = await response.text();
-      alert(errorResult);
+  const confirmResult = await Swal.fire({
+    title: "是否確認取消此筆預訂?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "確定",
+  });
+
+  // 如果確認取消預訂
+  if (confirmResult.isConfirmed) {
+    try {
+      const response = await fetch(`${API_URL}/Reservations/${id}`, {
+        method: "PUT",
+      });
+
+      if (response.ok) {
+        const result = await response.text(); // 獲取返回的字串
+        await Swal.fire("成功", "預訂取消成功", "success");
+        loadReservations(); // 重新載入預訂列表
+      } else {
+        const errorResult = await response.text();
+        await Swal.fire("錯誤", errorResult, "error");
+      }
+    } catch (error) {
+      console.error("API 呼叫錯誤:", error);
+      await Swal.fire("錯誤", "API 呼叫失敗，請稍後再試。", "error");
     }
-  } catch (error) {
-    console.error("API 呼叫錯誤:", error);
   }
 };
 
@@ -152,22 +172,39 @@ onMounted(() => {
 <template>
   <!-- ======= Features Section ======= -->
 
+  <!-- 增加與固定 nav bar 相同高度的間距 -->
   <div id="outside" class="container" data-aos="fade-up">
     <ul id="nav" class="d-flex justify-content-around">
-      <li @click="filterByStatus('all')" class="text-center">
-        全部 <small style="color: gray">({{ countAll }})</small>
+      <li
+        @click="filterByStatus('all')"
+        class="text-center"
+        :class="{ active: currentStatus == 'all' }"
+      >
+        全部 <small>({{ countAll }})</small>
       </li>
-      <li @click="filterByStatus('isCompleted')" class="text-center">
+      <li
+        @click="filterByStatus('isCompleted')"
+        class="text-center"
+        :class="{ active: currentStatus == 'isCompleted' }"
+      >
         已完成
-        <small style="color: gray">({{ countComplete }})</small>
+        <small>({{ countComplete }})</small>
       </li>
-      <li @click="filterByStatus('isCanceled')" class="text-center">
+      <li
+        @click="filterByStatus('isCanceled')"
+        class="text-center"
+        :class="{ active: currentStatus == 'isCanceled' }"
+      >
         已取消
-        <small style="color: gray">({{ countCancel }})</small>
+        <small>({{ countCancel }})</small>
       </li>
-      <li @click="filterByStatus('isOverDue')" class="text-center">
+      <li
+        @click="filterByStatus('isOverDue')"
+        class="text-center"
+        :class="{ active: currentStatus == 'isOverDue' }"
+      >
         逾時紀錄
-        <small style="color: gray">({{ countOverdue }})</small>
+        <small>({{ countOverdue }})</small>
       </li>
     </ul>
 
@@ -209,7 +246,11 @@ onMounted(() => {
         data-aos-delay="100"
       >
         <!-- 現正進行中區塊:還未取消、還未overdue -->
-        <i><h3 class="title" v-if="isAllStatus && !isNoData">現正進行中</h3></i>
+        <i
+          ><h3 class="title" v-if="isAllStatus && !isNoData">
+            當前預訂 Active
+          </h3></i
+        >
         <!-- place holder -->
         <div class="container mb-3 noDataArea" v-if="isNoData && isAllStatus">
           <div class="row">
@@ -226,6 +267,14 @@ onMounted(() => {
             <div class="col-md-6 d-flex flex-column justify-content-center">
               <h2>無進行中預訂</h2>
               <p>立即開始您的預訂，體驗我們的便捷服務！</p>
+              <button
+                class="btn btn-light"
+                style="text-align: left"
+                @click="toHome"
+              >
+                <i class="fa-solid fa-magnifying-glass"></i>
+                立即體驗
+              </button>
             </div>
           </div>
         </div>
@@ -294,7 +343,7 @@ onMounted(() => {
         </div>
         <!-- 已完成區塊 -->
 
-        <i><h3 class="title" v-if="isAllStatus">歷史預訂</h3></i>
+        <i><h3 class="title" v-if="isAllStatus">歷史預訂 Past</h3></i>
         <div
           v-for="complete in completedRes"
           :key="complete.resId"
@@ -365,18 +414,28 @@ onMounted(() => {
 }
 
 #nav {
-  border-bottom: 2px solid #ccc; /* 設定下方邊框 */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 設定陰影 */
-  padding: 5px 0px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 #nav li {
   font-size: 18px;
   font-weight: bold;
+  display: block !important; /* 強制 li 成為 block 元素 */
+  text-align: center;
+  cursor: pointer;
+  padding: 10px 20px;
+  width: 100%; /* 讓 li 佔滿父容器寬度 */
+  border-bottom: 2px solid #ccc; /* 設定下方邊框 */
 }
 
 #nav li:hover {
-  color: #fabc3f;
+  color: #507687;
+  /* color: #fabc3f; */
+}
+
+#nav li.active {
+  color: #507687 !important; /* 使用 !important 確保樣式生效 */
+  border-bottom: 4px solid #fab12f !important; /* 確保底線顯示 */
 }
 
 strong {
@@ -387,10 +446,14 @@ strong {
 }
 
 .title {
-  padding: 2px 5px;
-  color: lightslategrey;
+  padding: 5px 10px;
+  color: white;
   font-weight: normal;
-  background: linear-gradient(to right, #dfe9f3 0%, white 100%);
+  background: linear-gradient(to left, #ffe259, #fab12f);
+  opacity: 0.7;
+  /* background: linear-gradient(to right, #dfe9f3 0%, white 100%); */
   background-color: transparent;
+  font-size: 20px;
+  border-radius: 50px 20px 20px 50px;
 }
 </style>

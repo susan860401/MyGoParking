@@ -20,16 +20,12 @@ import ResMonRentService from "./views/ResMonRentService.vue";
 import ResConfirmView from "./views/ResConfirmView.vue";
 import ResPaymentView from "./views/ResPaymentView.vue";
 import MonthlyRentalView from "./views/CustomerCenter/MonthlyRentalView.vue";
-import Test from "./views/CustomerCenter/test.vue";
 import MonApplyView from "./views/MonApplyView.vue";
-import TestView from "./views/ChargeView.vue";
-import TestConfirmView from "./views/ChargeConfirmView.vue";
 import ChargeView from "./views/ChargeView.vue";
 import ChargConfirmView from "./views/ChargeConfirmView.vue";
-import { useUserStore } from './stores/userStore';
+import { useUserStore } from "./stores/userStore";
 import TestRentView from "./views/TestRentView.vue";
 import ECPayConfirmView from "./views/ECPayConfirmView.vue";
-
 
 const routes = [
   {
@@ -137,11 +133,6 @@ const routes = [
         component: CouponView,
         name: "coupon",
       },
-      {
-        path: "test",
-        component: Test,
-        name: "test",
-      },
 
       // 其他子路由...
     ],
@@ -178,7 +169,6 @@ const router = createRouter({
   routes: routes, //名字一樣可以寫routes就好
 });
 
-
 // // 在 router/index.js 或路由文件中
 //   router.beforeEach((to, from, next) => {
 //   const userStore = useUserStore();
@@ -198,6 +188,5 @@ const router = createRouter({
 
 // next(); // 確保導航繼續進行
 // });
-
 
 export default router;
