@@ -2,6 +2,7 @@
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/stores/userStore"; //要取Pinia
+import Swal from "sweetalert2";
 
 const API_URL = "https://localhost:7077/api";
 const userStore = useUserStore();
@@ -134,20 +135,32 @@ const openMap = (latitude, longitude) => {
 
 //取消預訂
 const cancelRes = async (id) => {
-  try {
-    const response = await fetch(`${API_URL}/Reservations/${id}`, {
-      method: "PUT",
-    });
-    if (response.ok) {
-      const result = await response.text(); // 獲取返回的字串
-      alert(result);
-      loadReservations();
-    } else {
-      const errorResult = await response.text();
-      alert(errorResult);
+  const confirmResult = await Swal.fire({
+    title: "是否確認取消此筆預訂?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "確定",
+  });
+
+  // 如果確認取消預訂
+  if (confirmResult.isConfirmed) {
+    try {
+      const response = await fetch(`${API_URL}/Reservations/${id}`, {
+        method: "PUT",
+      });
+
+      if (response.ok) {
+        const result = await response.text(); // 獲取返回的字串
+        await Swal.fire("成功", "預訂取消成功", "success");
+        loadReservations(); // 重新載入預訂列表
+      } else {
+        const errorResult = await response.text();
+        await Swal.fire("錯誤", errorResult, "error");
+      }
+    } catch (error) {
+      console.error("API 呼叫錯誤:", error);
+      await Swal.fire("錯誤", "API 呼叫失敗，請稍後再試。", "error");
     }
-  } catch (error) {
-    console.error("API 呼叫錯誤:", error);
   }
 };
 
