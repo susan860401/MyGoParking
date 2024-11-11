@@ -2,7 +2,7 @@
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
-const API_URL = "https://localhost:7077/api";
+const API_URL = "https://goparkapi.azurewebsites.net/api";
 const route = useRoute();
 const id = route.params.id; //獲取路由的id
 const parkingInfo = ref({});

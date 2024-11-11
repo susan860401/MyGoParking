@@ -4,7 +4,7 @@ import { ref } from "vue";
 import { useUserStore } from "@/stores/userStore"; //要取Pinia
 import Swal from "sweetalert2";
 
-const API_URL = "https://localhost:7077/api";
+const API_URL = "https://goparkapi.azurewebsites.net/api";
 const userStore = useUserStore();
 const userId = userStore.userId;
 

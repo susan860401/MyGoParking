@@ -6,7 +6,7 @@ import { useUserStore } from "@/stores/userStore"; //要取Pinia
 
 const userStore = useUserStore();
 const userId = userStore.userId;
-const API_URL = "https://localhost:7077/api";
+const API_URL = "https://goparkapi.azurewebsites.net/api";
 const parkingRecords = ref([]); //儲存所有停車紀錄
 const filteredRecords = ref([]); // 儲存經過過濾的紀錄
 const licensePlate = ref([]); //儲存用戶的車牌

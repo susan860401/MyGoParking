@@ -6,7 +6,7 @@ import { useRouter } from "vue-router";
 
 const userStore = useUserStore();
 const userId = userStore.userId;
-const API_URL = "https://localhost:7077/api";
+const API_URL = "https://goparkapi.azurewebsites.net/api";
 const router = useRouter();
 const activePage = ref("current"); //目前在哪個頁面(當前合約還是歷史)
 const monthlyRentals = ref([]);
